@@ -1,0 +1,326 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-1
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: client_expediteur
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prenom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telephone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: adresse
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-2
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: destinataire
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prenom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: telephone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: adresse
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-3
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: zone
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code_postal
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-4
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: livreur
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prenom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telephone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: vehicule
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: zone_id
+                  type: BIGINT
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-5
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: produit
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: categorie
+                  type: VARCHAR(100)
+              - column:
+                  name: poids
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prix
+                  type: DECIMAL(10,2)
+                  defaultValue: 0.00
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-6
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: colis
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: poids
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: statut
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                  defaultValue: "CRÉÉ"
+              - column:
+                  name: priorite
+                  type: VARCHAR(20)
+                  defaultValue: "NORMALE"
+              - column:
+                  name: ville_destination
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_expediteur_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: destinataire_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: livreur_id
+                  type: BIGINT
+              - column:
+                  name: zone_id
+                  type: BIGINT
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: date_modification
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 001-7
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: historique_livraison
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: colis_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: statut
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_changement
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: commentaire
+                  type: TEXT
+
+  - changeSet:
+      id: 001-8
+      author: smartlogi_team
+      changes:
+        - createTable:
+            tableName: colis_produit
+            columns:
+              - column:
+                  name: colis_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: produit_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: quantite
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+                  defaultValue: 1
+              - column:
+                  name: prix
+                  type: DECIMAL(10,2)
+              - column:
+                  name: date_ajout
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+  - changeSet:
+      id: 001-9
+      author: smartlogi_team
+      changes:
+        - addColumn:
+            tableName: historique_livraison
+            columns:
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
