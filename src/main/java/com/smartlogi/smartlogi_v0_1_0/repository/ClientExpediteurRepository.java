@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ClientExpediteurRepository extends JpaRepository<ClientExpediteur, Long> {
+public interface ClientExpediteurRepository extends JpaRepository<ClientExpediteur, String> {
 
     Optional<ClientExpediteur> findByEmail(String email);
 
