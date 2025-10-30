@@ -27,8 +27,6 @@ public class Colis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 255)
     private String description;
 
     @DecimalMin("0.1")
@@ -42,8 +40,6 @@ public class Colis {
     private Priorite priorite = Priorite.NORMALE;
 
 
-    @NotBlank
-    @Size(max = 100)
     private String villeDestination;
 
     @ManyToOne
