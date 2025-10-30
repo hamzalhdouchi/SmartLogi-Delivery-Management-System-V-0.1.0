@@ -6,6 +6,6 @@ import java.io.Serializable;
 
 @Embeddable
 class ColisProduitId implements Serializable {
-    private Long colisId;
-    private Long produitId;
+    private String colisId;
+    private String produitId;
 }
