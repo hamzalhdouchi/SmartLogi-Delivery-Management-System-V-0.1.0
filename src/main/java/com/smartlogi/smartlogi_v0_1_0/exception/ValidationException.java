@@ -24,8 +24,7 @@ public class ValidationException extends RuntimeException {
         return violations;
     }
 
-    // Exceptions de validation spécifiques
-    public static ValidationException (String email) {
+    public static ValidationException EmailInvalide(String email) {
         return new ValidationException(String.format("L'email %s est déjà utilisé", email));
     }
 
