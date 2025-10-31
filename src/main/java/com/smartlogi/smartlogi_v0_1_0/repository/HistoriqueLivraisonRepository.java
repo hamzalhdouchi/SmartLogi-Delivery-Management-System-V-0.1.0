@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface HistoriqueLivraisonRepository extends JpaRepository<HistoriqueLivraison, Long> {
+public interface HistoriqueLivraisonRepository extends JpaRepository<HistoriqueLivraison, String> {
 
     List<HistoriqueLivraison> findByColis(Colis colis);
 
