@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ColisRepository extends JpaRepository<Colis, Long> {
+public interface ColisRepository extends JpaRepository<Colis, String> {
 
     // Filtrage par statut
     List<Colis> findByStatut(StatutColis statut);
