@@ -8,7 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -51,7 +51,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -92,7 +92,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -120,7 +120,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -146,7 +146,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: zone_id
-                  type: BIGINT
+                  type: varchar(255)
               - column:
                   name: date_creation
                   type: TIMESTAMP
@@ -161,7 +161,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -196,7 +196,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -227,20 +227,20 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: client_expediteur_id
-                  type: BIGINT
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
                   name: destinataire_id
-                  type: BIGINT
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
                   name: livreur_id
-                  type: BIGINT
+                  type: varchar(255)
               - column:
                   name: zone_id
-                  type: BIGINT
+                  type: varchar(255)
               - column:
                   name: date_creation
                   type: TIMESTAMP
@@ -259,13 +259,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: BIGSERIAL
+                  type: varchar(255)
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: colis_id
-                  type: BIGINT
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
@@ -280,6 +280,10 @@ databaseChangeLog:
               - column:
                   name: commentaire
                   type: TEXT
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   - changeSet:
       id: 001-8
@@ -290,15 +294,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: colis_id
-                  type: BIGINT
+                  type: varchar(255)
                   constraints:
-                    primaryKey: true
                     nullable: false
               - column:
                   name: produit_id
-                  type: BIGINT
+                  type: varchar(255)
                   constraints:
-                    primaryKey: true
                     nullable: false
               - column:
                   name: quantite
@@ -313,14 +315,60 @@ databaseChangeLog:
                   name: date_ajout
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP
+        - addPrimaryKey:
+            tableName: colis_produit
+            columnNames: colis_id, produit_id
+            constraintName: pk_colis_produit
+
   - changeSet:
       id: 001-9
       author: smartlogi_team
       changes:
-        - addColumn:
-            tableName: historique_livraison
-            columns:
-              - column:
-                  name: date_creation
-                  type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            baseTableName: livreur
+            baseColumnNames: zone_id
+            referencedTableName: zone
+            referencedColumnNames: id
+            constraintName: fk_livreur_zone
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: client_expediteur_id
+            referencedTableName: client_expediteur
+            referencedColumnNames: id
+            constraintName: fk_colis_client_expediteur
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: destinataire_id
+            referencedTableName: destinataire
+            referencedColumnNames: id
+            constraintName: fk_colis_destinataire
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: livreur_id
+            referencedTableName: livreur
+            referencedColumnNames: id
+            constraintName: fk_colis_livreur
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: zone_id
+            referencedTableName: zone
+            referencedColumnNames: id
+            constraintName: fk_colis_zone
+        - addForeignKeyConstraint:
+            baseTableName: historique_livraison
+            baseColumnNames: colis_id
+            referencedTableName: colis
+            referencedColumnNames: id
+            constraintName: fk_historique_colis
+        - addForeignKeyConstraint:
+            baseTableName: colis_produit
+            baseColumnNames: colis_id
+            referencedTableName: colis
+            referencedColumnNames: id
+            constraintName: fk_colis_produit_colis
+        - addForeignKeyConstraint:
+            baseTableName: colis_produit
+            baseColumnNames: produit_id
+            referencedTableName: produit
+            referencedColumnNames: id
+            constraintName: fk_colis_produit_produit
