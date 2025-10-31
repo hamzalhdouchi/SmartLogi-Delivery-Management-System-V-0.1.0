@@ -2,7 +2,9 @@ package com.smartlogi.smartlogi_v0_1_0.entity;
 
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,23 +21,27 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HistoriqueLivraison {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "colis_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "colis_id", nullable = false)
     private Colis colis;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatutColis statut;
 
-    private LocalDateTime dateChangement;
+    @Column(name = "date_changement", nullable = false)
+    private LocalDateTime dateChangement = LocalDateTime.now();
 
     @CreationTimestamp
     @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;
 
-    @Size(max = 500)
+
+    @Column(columnDefinition = "TEXT")
     private String commentaire;
 }
