@@ -3,6 +3,7 @@ package com.smartlogi.smartlogi_v0_1_0.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,32 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "destinataire")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Destinataire {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    @NotBlank
-    @Size(max = 100)
+
     private String nom;
 
-    @NotBlank
-    @Size(max = 100)
     private String prenom;
 
-    @Email
+    @Column(unique = true)
     private String email;
 
-    @NotBlank
-    @Size(max = 20)
     private String telephone;
 
-    @NotBlank
-    @Size(max = 255)
     private String adresse;
 
     @CreationTimestamp
