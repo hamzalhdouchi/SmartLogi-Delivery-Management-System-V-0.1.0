@@ -21,31 +21,19 @@ import java.util.List;
 @NoArgsConstructor
 public class ClientExpediteur {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    @NotBlank
-    @Size(max = 100)
     private String nom;
 
-    @NotBlank
-    @Size(max = 100)
     private String prenom;
 
-    @Email
-    @NotBlank
     private String email;
 
-    @NotBlank
-    @Size(max = 20)
     private String telephone;
 
-    @NotBlank
-    @Size(max = 255)
     private String adresse;
 
-    @CreationTimestamp
-    @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;
 
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL)
