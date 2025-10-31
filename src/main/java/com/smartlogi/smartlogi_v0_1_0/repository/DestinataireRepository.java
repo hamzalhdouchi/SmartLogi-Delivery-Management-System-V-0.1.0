@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DestinataireRepository extends JpaRepository<Destinataire, Long> {
+public interface DestinataireRepository extends JpaRepository<Destinataire, String> {
 
     Optional<Destinataire> findByEmail(String email);
 
@@ -19,4 +19,6 @@ public interface DestinataireRepository extends JpaRepository<Destinataire, Long
 
     @Query("SELECT d FROM Destinataire d WHERE d.nom LIKE %:keyword% OR d.prenom LIKE %:keyword% OR d.email LIKE %:keyword%")
     List<Destinataire> searchByKeyword(@Param("keyword") String keyword);
+
+    boolean existsDestinataireByEmail(String email);
 }
