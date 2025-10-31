@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface LivreurRepository extends JpaRepository<Livreur, Long> {
+public interface LivreurRepository extends JpaRepository<Livreur, String> {
 
     List<Livreur> findByZone(Zone zone);
 
@@ -24,7 +24,7 @@ public interface LivreurRepository extends JpaRepository<Livreur, Long> {
     List<Livreur> searchByKeyword(@Param("keyword") String keyword);
 
     @Query("SELECT l FROM Livreur l WHERE l.zone.id = :zoneId")
-    List<Livreur> findByZoneId(@Param("zoneId") Long zoneId);
+    List<Livreur> findByZoneId(@Param("zoneId") String zoneId);
 
     long countByZone(Zone zone);
 }
