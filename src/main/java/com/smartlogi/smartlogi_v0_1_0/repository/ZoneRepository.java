@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ZoneRepository extends JpaRepository<Zone, Long> {
+public interface ZoneRepository extends JpaRepository<Zone, String> {
 
     Optional<Zone> findByCodePostal(String codePostal);
 
