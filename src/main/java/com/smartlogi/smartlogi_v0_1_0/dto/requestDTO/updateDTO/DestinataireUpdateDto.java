@@ -2,7 +2,14 @@ package com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DestinataireUpdateDto {
 
     @Size(min = 1, max = 100)
