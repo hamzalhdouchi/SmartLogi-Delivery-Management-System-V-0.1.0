@@ -143,15 +143,9 @@ public class ZoneServiceImpl implements ZoneService {
         return zoneRepository.existsById(id);
     }
 
-    // === MÉTHODES UTILITAIRES ===
-
+    @Override
     public boolean existsByNom(String nom) {
-        return zoneRepository.findByNom(nom).isPresent();
+        return zoneRepository.existsByNom(nom);
     }
 
-    public ZoneSimpleResponseDto getOrCreateByCodePostal(ZoneCreateRequestDto requestDto) {
-        return zoneRepository.findByCodePostal(requestDto.getCodePostal())
-                .map(smartLogiMapper::toSimpleResponseDto)
-                .orElseGet(() -> create(requestDto));
-    }
 }
