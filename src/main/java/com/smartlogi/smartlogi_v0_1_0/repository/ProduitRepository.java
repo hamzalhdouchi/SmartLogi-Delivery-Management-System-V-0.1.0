@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
-public interface ProduitRepository extends JpaRepository<Produit, Long> {
+public interface ProduitRepository extends JpaRepository<Produit, String> {
 
     List<Produit> findByNomContainingIgnoreCase(String nom);
 
@@ -24,4 +24,6 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
     List<String> findAllCategories();
 
     List<Produit> findByPrixBetween(BigDecimal prixMin, BigDecimal prixMax);
+
+    boolean existsByNomContainingIgnoreCase(String nom);
 }
