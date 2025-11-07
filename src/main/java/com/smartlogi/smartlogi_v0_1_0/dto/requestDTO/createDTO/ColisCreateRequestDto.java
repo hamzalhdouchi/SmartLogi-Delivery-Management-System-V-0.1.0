@@ -1,21 +1,22 @@
-package com.smartlogi.smartlogi_v0_1_0.dto;
+package com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO;
 
+import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ProduitCreateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ColisCreateRequestDto {
+public class ColisCreateRequestDto implements Serializable{
 
     @NotBlank(message = "La description est obligatoire")
     private String description;
@@ -39,4 +40,20 @@ public class ColisCreateRequestDto {
 
     private String livreurId;
     private String zoneId;
+
+    @Valid
+    private List<ProduitColisDto> produits;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProduitColisDto {
+        private String produitId;
+        @Valid
+        private ProduitCreateRequestDto nouveauProduit;
+        @NotNull(message = "La quantité est obligatoire")
+        @Min(value = 1, message = "La quantité doit être au moins 1")
+        private Integer quantite;
+        private BigDecimal prix;
+    }
 }
