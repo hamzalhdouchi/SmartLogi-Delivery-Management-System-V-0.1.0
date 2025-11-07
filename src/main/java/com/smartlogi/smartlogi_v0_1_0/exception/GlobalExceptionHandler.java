@@ -4,7 +4,9 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,13 +25,120 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // ===== OVERRIDE DES METHODES DE ResponseEntityExceptionHandler =====
+
+    // 400 - Bad Request (MethodArgumentNotValidException)
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        logger.warn("Erreurs de validation des arguments: {}", errors);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Validation Error",
+                "Erreurs de validation des données",
+                request.getDescription(false)
+        );
+        errorResponse.setDetails(errors);
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    // 405 - Method Not Allowed
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+            org.springframework.web.HttpRequestMethodNotSupportedException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        String supportedMethods = ex.getSupportedHttpMethods() != null ?
+                ex.getSupportedHttpMethods().toString() : "[]";
+
+        logger.warn("Méthode HTTP non supportée: {}, méthodes supportées: {}", ex.getMethod(), supportedMethods);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Method Not Allowed",
+                String.format("La méthode %s n'est pas supportée pour cet endpoint. Méthodes supportées: %s",
+                        ex.getMethod(), supportedMethods),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    // 415 - Unsupported Media Type
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+            org.springframework.web.HttpMediaTypeNotSupportedException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        logger.warn("Type de média non supporté: {}", ex.getContentType());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Unsupported Media Type",
+                String.format("Le type de média %s n'est pas supporté", ex.getContentType()),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    // 406 - Not Acceptable
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
+            org.springframework.web.HttpMediaTypeNotAcceptableException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        logger.warn("Type de média non acceptable: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Not Acceptable",
+                "Le type de média demandé n'est pas acceptable",
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    // 400 - Bad Request (HttpMessageNotReadable)
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        logger.warn("Requête HTTP mal formée: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Malformed Request",
+                "La requête JSON est mal formée ou incomplète",
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    // ===== EXCEPTIONS METIERS =====
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex, WebRequest request) {
 
         logger.warn("Ressource non trouvee: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(),
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 ex.getMessage(),
                 request.getDescription(false)
@@ -38,7 +147,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    // Gestion des BusinessException
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException ex, WebRequest request) {
@@ -55,7 +163,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Gestion des ValidationException
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             ValidationException ex, WebRequest request) {
@@ -72,7 +179,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Gestion des DatabaseException
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<ErrorResponse> handleDatabaseException(
             DatabaseException ex, WebRequest request) {
@@ -89,32 +195,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Gestion des contraintes de validation (@Valid)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
+    // ===== EXCEPTIONS DE VALIDATION =====
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-
-        logger.warn("Erreurs de validation des arguments: {}", errors);
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                "Erreurs de validation des données",
-                request.getDescription(false)
-        );
-        errorResponse.setDetails(errors);
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    // Gestion des ConstraintViolationException
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
@@ -138,7 +220,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Gestion des erreurs de type de paramètre
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
@@ -157,6 +238,43 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // ===== EXCEPTIONS HTTP =====
+
+     @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
+            EmailAlreadyExistsException ex, WebRequest request) {
+
+        logger.warn("Email déjà existant: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(), // 409 Conflict
+                "Email Already Exists",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    // ===== EXCEPTIONS GENERIQUES =====
+
+    // Gestion des RuntimeException (inclut les NullPointerException, IllegalArgumentException, etc.)
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(
+            RuntimeException ex, WebRequest request) {
+
+        logger.error("Runtime exception: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                "Une erreur inattendue est survenue",
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // Gestion générale de toutes les autres exceptions
