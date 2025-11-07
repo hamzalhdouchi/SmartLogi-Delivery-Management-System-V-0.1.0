@@ -23,4 +23,6 @@ public interface ZoneRepository extends JpaRepository<Zone, String> {
     List<Zone> searchByKeyword(@Param("keyword") String keyword);
 
     boolean existsByCodePostal(String codePostal);
+
+    boolean existsByNom(String nom);
 }
