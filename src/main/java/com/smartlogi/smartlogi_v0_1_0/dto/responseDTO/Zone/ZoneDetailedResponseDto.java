@@ -1,6 +1,7 @@
 package com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Zone;
 
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Livreur.LivreurSimpleResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
