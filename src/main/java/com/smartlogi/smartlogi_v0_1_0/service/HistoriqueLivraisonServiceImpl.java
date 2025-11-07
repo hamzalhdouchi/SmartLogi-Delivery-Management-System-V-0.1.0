@@ -29,18 +29,6 @@ public class HistoriqueLivraisonServiceImpl implements HistoriqueLivraisonServic
     private final ColisRepository colisRepository;
     private final SmartLogiMapper smartLogiMapper;
 
-    @Override
-    @Transactional
-    public HistoriqueLivraisonResponseDto create(HistoriqueLivraisonCreateRequestDto requestDto) {
-        HistoriqueLivraison historique = smartLogiMapper.toEntity(requestDto);
-
-        Colis colis = colisRepository.findById(requestDto.getColisId())
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
-        historique.setColis(colis);
-
-        HistoriqueLivraison savedHistorique = historiqueLivraisonRepository.save(historique);
-        return smartLogiMapper.toResponseDto(savedHistorique);
-    }
 
     @Override
     public HistoriqueLivraisonResponseDto getById(String id) {
@@ -105,7 +93,7 @@ public class HistoriqueLivraisonServiceImpl implements HistoriqueLivraisonServic
 
     @Override
     public List<HistoriqueLivraisonResponseDto> getByColisIdAndStatut(String colisId, StatutColis statut) {
-        return historiqueLivraisonRepository.findByColisIdAndStatut(Long.parseLong(colisId), statut)
+        return historiqueLivraisonRepository.findByColisIdAndStatut(colisId, statut)
                 .stream()
                 .map(smartLogiMapper::toResponseDto)
                 .collect(Collectors.toList());
@@ -126,7 +114,5 @@ public class HistoriqueLivraisonServiceImpl implements HistoriqueLivraisonServic
         return historique.isEmpty() ? null : historique.get(0);
     }
 
-    public boolean colisAvecStatut(String colisId, StatutColis statut) {
-        return !getByColisIdAndStatut(colisId, statut).isEmpty();
-    }
+
 }
