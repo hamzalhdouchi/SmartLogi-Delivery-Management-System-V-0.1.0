@@ -19,19 +19,15 @@ import java.util.List;
 @Repository
 public interface ColisRepository extends JpaRepository<Colis, String> {
 
-    // Filtrage par statut
     List<Colis> findByStatut(StatutColis statut);
     Page<Colis> findByStatut(StatutColis statut, Pageable pageable);
 
-    // Filtrage par priorité
     List<Colis> findByPriorite(Priorite priorite);
     List<Colis> findByPrioriteAndStatut(Priorite priorite, StatutColis statut);
 
-    // Filtrage par livreur
     List<Colis> findByLivreur(Livreur livreur);
     List<Colis> findByLivreurAndStatut(Livreur livreur, StatutColis statut);
 
-    // Filtrage par zone
     List<Colis> findByZone(Zone zone);
     List<Colis> findByZoneAndStatut(Zone zone, StatutColis statut);
 
@@ -52,10 +48,10 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
     long countByStatut(@Param("statut") StatutColis statut);
 
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.zone.id = :zoneId AND c.statut = :statut")
-    long countByZoneAndStatut(@Param("zoneId") Long zoneId, @Param("statut") StatutColis statut);
+    long countByZoneAndStatut(@Param("zoneId") String zoneId, @Param("statut") StatutColis statut);
 
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.livreur.id = :livreurId AND c.statut = :statut")
-    long countByLivreurAndStatut(@Param("livreurId") Long livreurId, @Param("statut") StatutColis statut);
+    long countByLivreurAndStatut(@Param("livreurId") String livreurId, @Param("statut") StatutColis statut);
 
     // Colis en retard (créés il y a plus de 2 jours et non livrés)
     @Query("SELECT c FROM Colis c WHERE c.dateCreation < :dateLimite AND c.statut NOT IN ('LIVRÉ')")
@@ -72,5 +68,5 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
 
     // Pour la pagination
     Page<Colis> findAll(Pageable pageable);
-    Page<Colis> findByZoneId(Long zoneId, Pageable pageable);
+    Page<Colis> findByZoneId(String zoneId, Pageable pageable);
 }
