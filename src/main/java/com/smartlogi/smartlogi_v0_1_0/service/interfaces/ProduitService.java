@@ -16,14 +16,14 @@ public interface ProduitService {
 
     // === CRUD Operations ===
     ProduitSimpleResponseDto create(ProduitCreateRequestDto requestDto);
-    ProduitSimpleResponseDto update(Long id, ProduitUpdateRequestDto requestDto);
-    ProduitSimpleResponseDto getById(Long id);
-    void delete(Long id);
-    boolean existsById(Long id);
+    ProduitSimpleResponseDto update(String id, ProduitUpdateRequestDto requestDto);
+    ProduitSimpleResponseDto getById(String id);
+    void delete(String id);
+    boolean existsById(String id);
 
     // === Advanced Queries ===
-    ProduitAdvancedResponseDto getByIdWithStats(Long id);
-    ProduitDetailedResponseDto getByIdWithColis(Long id);
+    ProduitAdvancedResponseDto getByIdWithStats(String id);
+    ProduitDetailedResponseDto getByIdWithColis(String id);
 
     // === Listing & Pagination ===
     Page<ProduitSimpleResponseDto> getAll(Pageable pageable);
