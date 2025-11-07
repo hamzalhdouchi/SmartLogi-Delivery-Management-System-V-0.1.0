@@ -23,12 +23,12 @@ public interface HistoriqueLivraisonRepository extends JpaRepository<HistoriqueL
     List<HistoriqueLivraison> findByStatut(StatutColis statut);
 
     @Query("SELECT h FROM HistoriqueLivraison h WHERE h.colis.id = :colisId ORDER BY h.dateChangement DESC")
-    List<HistoriqueLivraison> findByColisIdOrderByDateChangementDesc(@Param("colisId") Long colisId);
+    List<HistoriqueLivraison> findByColisIdOrderByDateChangementDesc(@Param("colisId") String colisId);
 
     @Query("SELECT h FROM HistoriqueLivraison h WHERE h.dateChangement BETWEEN :startDate AND :endDate")
     List<HistoriqueLivraison> findByDateChangementBetween(@Param("startDate") LocalDateTime startDate,
                                                           @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT h FROM HistoriqueLivraison h WHERE h.colis.id = :colisId AND h.statut = :statut")
-    List<HistoriqueLivraison> findByColisIdAndStatut(@Param("colisId") Long colisId, @Param("statut") StatutColis statut);
+    List<HistoriqueLivraison> findByColisIdAndStatut(@Param("colisId") String colisId, @Param("statut") StatutColis statut);
 }
