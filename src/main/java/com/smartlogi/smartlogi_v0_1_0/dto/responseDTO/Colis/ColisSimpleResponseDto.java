@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ColisSimpleResponseDto {
-    private Long id;
+    private String id;
     private String description;
     private BigDecimal poids;
     private StatutColis statut;
@@ -28,5 +28,4 @@ public class ColisSimpleResponseDto {
     private String zoneId;
     private String zoneNom;
     private LocalDateTime dateCreation;
-    private LocalDateTime dateModification;
 }
