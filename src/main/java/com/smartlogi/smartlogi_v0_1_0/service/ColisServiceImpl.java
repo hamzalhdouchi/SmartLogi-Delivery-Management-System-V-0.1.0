@@ -13,6 +13,7 @@ import com.smartlogi.smartlogi_v0_1_0.exception.ArgementNotFoundExption;
 import com.smartlogi.smartlogi_v0_1_0.mapper.SmartLogiMapper;
 import com.smartlogi.smartlogi_v0_1_0.repository.*;
 import com.smartlogi.smartlogi_v0_1_0.service.interfaces.ColisService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +40,7 @@ public class ColisServiceImpl implements ColisService {
     private final ZoneRepository zoneRepository;
     private final HistoriqueLivraisonRepository historiqueLivraisonRepository;
     private final SmartLogiMapper smartLogiMapper;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -71,7 +75,32 @@ public class ColisServiceImpl implements ColisService {
         }
 
         creerHistoriqueLivraison(savedColis, StatutColis.CREE, "Colis créé avec produits");
+
+        try {
+            sendColisCreationEmail(client, destinataire, savedColis);
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'envoi de l'email: " + e.getMessage());
+        }
         return smartLogiMapper.toSimpleResponseDto(savedColis);
+    }
+
+    private void sendColisCreationEmail(ClientExpediteur client,
+                                        Destinataire destinataire, Colis colis) throws MessagingException {
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("clientName", client.getNom());
+        variables.put("colisId", colis.getId());
+        variables.put("destinataireName", destinataire.getNom());
+        variables.put("poids", colis.getPoids());
+        variables.put("priorite", colis.getPriorite());
+        variables.put("dateCreation", colis.getDateCreation());
+
+        emailService.sendTemplateEmail(
+                client.getEmail(),
+                "Colis Créé avec Succès - SmartLogi",
+                "email-colis-created",
+                variables
+        );
     }
 
     private void ajouterProduitAuColis(Colis colis, ColisCreateRequestDto.ProduitColisDto produitDto) {
