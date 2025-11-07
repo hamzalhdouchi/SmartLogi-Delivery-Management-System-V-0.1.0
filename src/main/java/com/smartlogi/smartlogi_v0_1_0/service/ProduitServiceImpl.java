@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProduitServiceImpl implements ProduitService {
+public class    ProduitServiceImpl implements ProduitService {
 
     private final ProduitRepository produitRepository;
     private final SmartLogiMapper smartLogiMapper;
@@ -39,7 +39,7 @@ public class ProduitServiceImpl implements ProduitService {
     }
 
     @Override
-    public ProduitSimpleResponseDto update(Long id, ProduitUpdateRequestDto requestDto) {
+    public ProduitSimpleResponseDto update(String id, ProduitUpdateRequestDto requestDto) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
 
@@ -57,21 +57,21 @@ public class ProduitServiceImpl implements ProduitService {
     }
 
     @Override
-    public ProduitSimpleResponseDto getById(Long id) {
+    public ProduitSimpleResponseDto getById(String id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
         return smartLogiMapper.toSimpleResponseDto(produit);
     }
 
     @Override
-    public ProduitAdvancedResponseDto getByIdWithStats(Long id) {
+    public ProduitAdvancedResponseDto getByIdWithStats(String id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
         return smartLogiMapper.toAdvancedResponseDto(produit);
     }
 
     @Override
-    public ProduitDetailedResponseDto getByIdWithColis(Long id) {
+    public ProduitDetailedResponseDto getByIdWithColis(String id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
         return smartLogiMapper.toDetailedResponseDto(produit);
@@ -142,7 +142,7 @@ public class ProduitServiceImpl implements ProduitService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
 
@@ -155,25 +155,8 @@ public class ProduitServiceImpl implements ProduitService {
     }
 
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(String id) {
         return produitRepository.existsById(id);
     }
 
-    // === MÉTHODES UTILITAIRES ===
-
-    public List<ProduitSimpleResponseDto> getByPrixLessThan(BigDecimal prixMax) {
-        return getByPrixBetween(BigDecimal.ZERO, prixMax);
-    }
-
-    public List<ProduitSimpleResponseDto> getByPrixGreaterThan(BigDecimal prixMin) {
-        return getByPrixBetween(prixMin, new BigDecimal("999999.99"));
-    }
-
-    public boolean existsByNom(String nom) {
-        return !produitRepository.findByNomContainingIgnoreCase(nom).isEmpty();
-    }
-
-    public long countByCategorie(String categorie) {
-        return produitRepository.findByCategorie(categorie).size();
-    }
 }
