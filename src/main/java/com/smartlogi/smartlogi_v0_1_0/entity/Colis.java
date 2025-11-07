@@ -24,8 +24,8 @@ import java.util.List;
 @NoArgsConstructor
 public class Colis {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private String description;
 
@@ -60,7 +60,7 @@ public class Colis {
 
     @CreationTimestamp
     @Column(name = "date_creation", updatable = false)
-    private LocalDateTime dateCreation;
+    private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToMany(mappedBy = "colis", cascade = CascadeType.ALL)
     private List<HistoriqueLivraison> historique = new ArrayList<>();
