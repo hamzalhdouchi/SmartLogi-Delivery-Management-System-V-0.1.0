@@ -18,7 +18,7 @@ public interface ClientExpediteurRepository extends JpaRepository<ClientExpedite
     List<ClientExpediteur> findByNomContainingIgnoreCase(String nom);
 
     @Query("SELECT c FROM ClientExpediteur c WHERE c.nom LIKE %:keyword% OR c.prenom LIKE %:keyword% OR c.email LIKE %:keyword%")
-    List<ClientExpediteur> searchByKeyword(@Param("keyword") String keyword);
+    ClientExpediteur searchByKeyword(@Param("keyword") String keyword);
 
     boolean existsByEmail(String email);
 }
