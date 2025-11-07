@@ -33,7 +33,7 @@ public class LivreurServiceImpl implements LivreurService {
         Livreur livreur = smartLogiMapper.toEntity(requestDto);
 
         Zone zone = zoneRepository.findById(requestDto.getZoneId())
-                .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
+                .orElse(null);
         livreur.setZone(zone);
 
         Livreur savedLivreur = livreurRepository.save(livreur);
@@ -48,7 +48,6 @@ public class LivreurServiceImpl implements LivreurService {
 
         smartLogiMapper.updateEntityFromDto(requestDto, livreur);
 
-        // Update zone if provided
         if (requestDto.getZoneId() != null) {
             Zone zone = zoneRepository.findById(requestDto.getZoneId())
                     .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
@@ -146,16 +145,9 @@ public class LivreurServiceImpl implements LivreurService {
         return livreurRepository.existsById(id);
     }
 
-    // === MÉTHODES ADDITIONNELLES POUR UTILISER TOUTES LES FONCTIONNALITÉS DU REPOSITORY ===
 
-    public List<LivreurSimpleResponseDto> getByZoneId(String zoneId) {
-        return livreurRepository.findByZoneId(zoneId)
-                .stream()
-                .map(smartLogiMapper::toSimpleResponseDto)
-                .collect(Collectors.toList());
-    }
-
+    @Override
     public boolean existsByTelephone(String telephone) {
-        return livreurRepository.findByTelephone(telephone).isPresent();
+        return livreurRepository.existsByTelephone(telephone);
     }
 }
