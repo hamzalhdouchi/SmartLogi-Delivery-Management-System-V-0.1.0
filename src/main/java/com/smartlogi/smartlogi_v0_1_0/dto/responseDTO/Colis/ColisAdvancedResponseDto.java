@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ColisAdvancedResponseDto {
-    private Long id;
+    private String id;
     private String description;
     private BigDecimal poids;
     private StatutColis statut;
