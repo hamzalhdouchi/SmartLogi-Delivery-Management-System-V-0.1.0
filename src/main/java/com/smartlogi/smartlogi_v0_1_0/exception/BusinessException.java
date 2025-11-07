@@ -15,7 +15,7 @@ public class BusinessException extends RuntimeException {
     }
 
     // Exceptions métier spécifiques
-    public static BusinessException colisDejaLivre(Long colisId) {
+    public static BusinessException colisDejaLivre(String colisId) {
         return new BusinessException(String.format("Le colis avec ID %d est déjà livré", colisId));
     }
 
@@ -24,7 +24,7 @@ public class BusinessException extends RuntimeException {
                 "Changement de statut invalide : %s → %s", statutActuel, statutDemande));
     }
 
-    public static BusinessException livreurNonDisponible(Long livreurId) {
+    public static BusinessException livreurNonDisponible(String livreurId) {
         return new BusinessException(String.format(
                 "Le livreur avec ID %d n'est pas disponible", livreurId));
     }
