@@ -34,4 +34,5 @@ public interface ZoneService {
 
     // === Validation ===
     boolean existsByCodePostal(String codePostal);
+    boolean existsByNom(String nom);
 }
