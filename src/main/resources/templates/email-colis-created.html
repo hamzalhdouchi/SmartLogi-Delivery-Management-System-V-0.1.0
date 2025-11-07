@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { background-color: #4CAF50; color: white; padding: 15px; border-radius: 5px; text-align: center; }
+        .content { margin: 20px 0; line-height: 1.6; }
+        .details { background-color: #f9f9f9; padding: 15px; border-left: 4px solid #4CAF50; margin: 15px 0; }
+        .detail-row { margin: 8px 0; }
+        .label { font-weight: bold; color: #333; }
+        .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Colis Créé avec Succès</h1>
+    </div>
+
+    <div class="content">
+        <p>Bonjour <span th:text="${clientName}"></span>,</p>
+
+        <p>Nous vous confirmons que votre colis a été créé avec succès dans notre système SmartLogi.</p>
+
+        <div class="details">
+            <div class="detail-row">
+                <span class="label">ID Colis:</span> <span th:text="${colisId}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Destinataire:</span> <span th:text="${destinataireName}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Ville de Destination:</span> <span th:text="${destinataireVille}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Poids:</span> <span th:text="${poids + ' kg'}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Priorité:</span> <span th:text="${priorite}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Date de Création:</span> <span th:text="${#temporals.format(dateCreation, 'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+        </div>
+
+        <p>Vous pouvez suivre l'état de votre colis à tout moment via notre plateforme.</p>
+
+        <p>Merci de nous faire confiance!</p>
+    </div>
+
+    <div class="footer">
+        <p>SmartLogi - Système de Gestion de Livraison</p>
+        <p>© 2025 Tous droits réservés</p>
+    </div>
+</div>
+</body>
+</html>
