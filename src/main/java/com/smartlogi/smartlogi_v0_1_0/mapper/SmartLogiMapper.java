@@ -1,6 +1,5 @@
 package com.smartlogi.smartlogi_v0_1_0.mapper;
 
-import com.smartlogi.smartlogi_v0_1_0.dto.ColisCreateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.*;
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.*;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.ClientExpediteur.*;
@@ -24,7 +23,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface SmartLogiMapper {
 
     SmartLogiMapper INSTANCE = Mappers.getMapper(SmartLogiMapper.class);
@@ -162,7 +163,6 @@ public interface SmartLogiMapper {
     @Mapping(target = "clientExpediteur", ignore = true)
     @Mapping(target = "destinataire", ignore = true)
     @Mapping(target = "dateCreation", ignore = true)
-    @Mapping(target = "dateModification", ignore = true)
     @Mapping(target = "historique", ignore = true)
     @Mapping(target = "produits", ignore = true)
     void updateEntityFromDto(ColisUpdateRequestDto requestDto, @MappingTarget Colis colis);
@@ -189,6 +189,7 @@ public interface SmartLogiMapper {
     @Mapping(source = "historique", target = "historique")
     @Mapping(source = "produits", target = "produits")
     ColisAdvancedResponseDto toAdvancedResponseDto(Colis colis);
+
 
     List<ColisSimpleResponseDto> toColisSimpleResponseDtos(List<Colis> colis);
 
@@ -228,13 +229,10 @@ public interface SmartLogiMapper {
     @Mapping(source = "produit.categorie", target = "produitCategorie")
     @Mapping(source = "prix", target = "prixUnitaire")
     @Mapping(expression = "java(colisProduit.getPrix().multiply(java.math.BigDecimal.valueOf(colisProduit.getQuantite())))", target = "prixTotal")
-    @Mapping(source = "colis.description", target = "colisDescription")
-    @Mapping(source = "colis.statut", target = "colisStatut")
     ColisProduitResponseDto toResponseDto(ColisProduit colisProduit);
 
     List<ColisProduitResponseDto> toColisProduitResponseDtos(List<ColisProduit> colisProduits);
 
-    // ============ MÉTHODES UTILITAIRES ============
 
     @Named("countColis")
     default Integer countColis(List<Colis> colis) {
