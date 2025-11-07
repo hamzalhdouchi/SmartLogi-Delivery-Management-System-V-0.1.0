@@ -27,4 +27,6 @@ public interface LivreurRepository extends JpaRepository<Livreur, String> {
     List<Livreur> findByZoneId(@Param("zoneId") String zoneId);
 
     long countByZone(Zone zone);
+
+    boolean existsByTelephone(String telephone);
 }
