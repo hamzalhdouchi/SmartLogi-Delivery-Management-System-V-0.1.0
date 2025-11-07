@@ -1,15 +1,17 @@
 package com.smartlogi.smartlogi_v0_1_0.service.interfaces;
 
-import com.smartlogi.smartlogi_v0_1_0.dto.ColisCreateRequestDto;
+    import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ColisCreateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisAdvancedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduit;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
+    import java.math.BigDecimal;
+    import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ColisService {
@@ -19,6 +21,8 @@ public interface ColisService {
     ColisSimpleResponseDto getById(String id);
     ColisAdvancedResponseDto getByIdWithDetails(String id);
     Page<ColisSimpleResponseDto> getAll(Pageable pageable);
+    public BigDecimal getPrixTotalColis(String colisId);
+    boolean produitExisteDansColis(String colisId, String produitId);
     void delete(String id);
 
     void assignerLivreur(String colisId, String livreurId);
@@ -36,6 +40,10 @@ public interface ColisService {
     List<ColisSimpleResponseDto> getByLivreurAndStatut(String livreurId, StatutColis statut);
     List<ColisSimpleResponseDto> getByZoneAndStatut(String zoneId, StatutColis statut);
     List<ColisSimpleResponseDto> getByVilleDestinationAndStatut(String ville, StatutColis statut);
+    List<ColisProduit> getProduitsByColis(String colisId);
+    void ajouterProduit(String colisId, ColisCreateRequestDto.ProduitColisDto produitDto);
+    void mettreAJourQuantiteProduit(String colisId, String produitId, Integer nouvelleQuantite);
+    void supprimerProduit(String colisId, String produitId);
 
     List<ColisSimpleResponseDto> searchByKeyword(String keyword);
 
@@ -48,4 +56,5 @@ public interface ColisService {
     long countByStatut(StatutColis statut);
     long countByZoneAndStatut(String zoneId, StatutColis statut);
     long countByLivreurAndStatut(String livreurId, StatutColis statut);
+
 }
