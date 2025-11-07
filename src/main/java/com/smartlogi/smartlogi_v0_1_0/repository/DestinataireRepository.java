@@ -18,7 +18,7 @@ public interface DestinataireRepository extends JpaRepository<Destinataire, Stri
     List<Destinataire> findByNomContainingIgnoreCase(String nom);
 
     @Query("SELECT d FROM Destinataire d WHERE d.nom LIKE %:keyword% OR d.prenom LIKE %:keyword% OR d.email LIKE %:keyword%")
-    List<Destinataire> searchByKeyword(@Param("keyword") String keyword);
+    Destinataire searchByKeyword(@Param("keyword") String keyword);
 
     boolean existsDestinataireByEmail(String email);
 }
