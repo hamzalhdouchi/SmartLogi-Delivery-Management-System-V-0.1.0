@@ -15,8 +15,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ColisProduitUpdateRequestDto {
 
-    @NotBlank(message = "L'ID est obligatoire")
-    private String id;
 
     @NotNull(message = "La quantité est obligatoire")
     @Min(value = 1, message = "La quantité doit être au moins 1")
