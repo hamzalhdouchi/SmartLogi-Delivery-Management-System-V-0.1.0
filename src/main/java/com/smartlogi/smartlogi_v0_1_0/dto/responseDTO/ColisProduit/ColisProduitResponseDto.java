@@ -16,6 +16,7 @@ public class ColisProduitResponseDto {
     private String produitNom;
     private String produitCategorie;
     private Integer quantite;
-    private BigDecimal prix;
+    private BigDecimal prixUnitaire;
+    private BigDecimal prixTotal;
     private LocalDateTime dateAjout;
 }
