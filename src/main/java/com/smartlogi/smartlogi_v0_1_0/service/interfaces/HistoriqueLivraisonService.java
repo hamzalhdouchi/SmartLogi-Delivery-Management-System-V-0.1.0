@@ -13,8 +13,6 @@ import java.util.List;
 
 public interface HistoriqueLivraisonService {
 
-    // === CRUD Operations ===
-    HistoriqueLivraisonResponseDto create(HistoriqueLivraisonCreateRequestDto requestDto);
     HistoriqueLivraisonResponseDto getById(String id);
 
     // === Listing ===
