@@ -20,5 +20,5 @@ public class ClientExpediteurAdvancedResponseDto {
     private String telephone;
     private String adresse;
     private LocalDateTime dateCreation;
-    private List<ColisSimpleResponseDto> colis = new ArrayList<>();
+    private List<ColisSimpleResponseDto> colis;
 }
