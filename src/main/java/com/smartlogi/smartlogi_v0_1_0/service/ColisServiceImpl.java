@@ -1,12 +1,15 @@
 package com.smartlogi.smartlogi_v0_1_0.service;
 
-import com.smartlogi.smartlogi_v0_1_0.dto.ColisCreateRequestDto;
+import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ColisCreateRequestDto;
+import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ProduitCreateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisAdvancedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduitId;
 import com.smartlogi.smartlogi_v0_1_0.entity.*;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
+import com.smartlogi.smartlogi_v0_1_0.exception.ArgementNotFoundExption;
 import com.smartlogi.smartlogi_v0_1_0.mapper.SmartLogiMapper;
 import com.smartlogi.smartlogi_v0_1_0.repository.*;
 import com.smartlogi.smartlogi_v0_1_0.service.interfaces.ColisService;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
 public class ColisServiceImpl implements ColisService {
 
     private final ColisRepository colisRepository;
+    private final ProduitRepository  produitRepository;
+    private final ColisProduitRepository colisProduitRepository;
     private final ClientExpediteurRepository clientExpediteurRepository;
     private final DestinataireRepository destinataireRepository;
     private final LivreurRepository livreurRepository;
@@ -35,14 +41,12 @@ public class ColisServiceImpl implements ColisService {
     @Override
     @Transactional
     public ColisSimpleResponseDto create(ColisCreateRequestDto requestDto) {
-        Colis colis = smartLogiMapper.toEntity(requestDto);
-
-        // Set relations
         ClientExpediteur client = clientExpediteurRepository.findById(requestDto.getClientExpediteurId())
                 .orElseThrow(() -> new RuntimeException("Client expéditeur non trouvé"));
         Destinataire destinataire = destinataireRepository.findById(requestDto.getDestinataireId())
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
 
+        Colis colis = smartLogiMapper.toEntity(requestDto);
         colis.setClientExpediteur(client);
         colis.setDestinataire(destinataire);
 
@@ -60,35 +64,171 @@ public class ColisServiceImpl implements ColisService {
 
         Colis savedColis = colisRepository.save(colis);
 
-        // Create initial historique
-        HistoriqueLivraison historique = new HistoriqueLivraison();
-        historique.setColis(savedColis);
-        historique.setStatut(StatutColis.CREE);
-        historique.setDateChangement(LocalDateTime.now());
-        historique.setCommentaire("Colis créé");
-        historiqueLivraisonRepository.save(historique);
+        if (requestDto.getProduits() != null && !requestDto.getProduits().isEmpty()) {
+            for (ColisCreateRequestDto.ProduitColisDto produitDto : requestDto.getProduits()) {
+                ajouterProduitAuColis(savedColis, produitDto);
+            }
+        }
 
+        creerHistoriqueLivraison(savedColis, StatutColis.CREE, "Colis créé avec produits");
         return smartLogiMapper.toSimpleResponseDto(savedColis);
+    }
+
+    private void ajouterProduitAuColis(Colis colis, ColisCreateRequestDto.ProduitColisDto produitDto) {
+        // Validation de la requête produit
+        validerProduitRequest(produitDto);
+
+        Produit produit;
+
+        if (produitDto.getProduitId() != null && !produitDto.getProduitId().isBlank()) {
+            // Cas 1: Produit existant
+            produit = produitRepository.findById(produitDto.getProduitId())
+                    .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + produitDto.getProduitId()));
+        } else {
+            // Cas 2: Nouveau produit à créer
+            produit = creerNouveauProduit(produitDto.getNouveauProduit());
+        }
+
+        if (produitDto.getQuantite() == null || produitDto.getQuantite() <= 0) {
+            throw new RuntimeException("La quantité doit être supérieure à 0 pour le produit: " + produit.getNom());
+        }
+
+        // Calculer le prix total automatiquement (prix unitaire × quantité)
+        BigDecimal prixTotal = produit.getPrix().multiply(BigDecimal.valueOf(produitDto.getQuantite()));
+
+        ColisProduitId colisProduitId = new ColisProduitId(colis.getId(), produit.getId());
+        ColisProduit colisProduit = new ColisProduit();
+        colisProduit.setId(colisProduitId);
+        colisProduit.setColis(colis);
+        colisProduit.setProduit(produit);
+        colisProduit.setQuantite(produitDto.getQuantite());
+        colisProduit.setPrix(prixTotal);
+
+        colisProduitRepository.save(colisProduit);
+    }
+
+    private void validerProduitRequest(ColisCreateRequestDto.ProduitColisDto produitDto) {
+        boolean aProduitId = produitDto.getProduitId() != null && !produitDto.getProduitId().isBlank();
+        boolean aNouveauProduit = produitDto.getNouveauProduit() != null;
+
+        if (aProduitId && aNouveauProduit) {
+            throw new RuntimeException("Vous ne pouvez pas fournir à la fois un produitId et un nouveauProduit");
+        }
+
+        if (!aProduitId && !aNouveauProduit) {
+            throw new RuntimeException("Vous devez fournir soit un produitId soit un nouveauProduit");
+        }
+
+        if (aNouveauProduit) {
+            // Validation supplémentaire pour le nouveau produit
+            ProduitCreateRequestDto nouveauProduit = produitDto.getNouveauProduit();
+            if (nouveauProduit.getNom() == null || nouveauProduit.getNom().isBlank()) {
+                throw new RuntimeException("Le nom du nouveau produit est obligatoire");
+            }
+            if (nouveauProduit.getPrix() == null || nouveauProduit.getPrix().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("Le prix du nouveau produit doit être supérieur à 0");
+            }
+        }
+    }
+
+    private Produit creerNouveauProduit(ProduitCreateRequestDto nouveauProduitDto) {
+        // Vérifier si un produit avec le même nom existe déjà
+        if (produitRepository.existsByNomContainingIgnoreCase(nouveauProduitDto.getNom())) {
+            throw new RuntimeException("Un produit avec le nom '" + nouveauProduitDto.getNom() + "' existe déjà");
+        }
+
+        // Créer et sauvegarder le nouveau produit
+        Produit produit = new Produit();
+        produit.setNom(nouveauProduitDto.getNom());
+        produit.setCategorie(nouveauProduitDto.getCategorie());
+        produit.setPoids(nouveauProduitDto.getPoids());
+        produit.setPrix(nouveauProduitDto.getPrix());
+
+        return produitRepository.save(produit);
+    }
+
+    private void creerHistoriqueLivraison(Colis colis, StatutColis statut, String commentaire) {
+        HistoriqueLivraison historique = new HistoriqueLivraison();
+        historique.setColis(colis);
+        historique.setStatut(statut);
+        historique.setDateChangement(LocalDateTime.now());
+        historique.setCommentaire(commentaire);
+        historiqueLivraisonRepository.save(historique);
+    }
+
+    @Transactional
+    public void ajouterProduit(String colisId, ColisCreateRequestDto.ProduitColisDto produitDto) {
+        Colis colis = colisRepository.findById(colisId)
+                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+        ajouterProduitAuColis(colis, produitDto);
+
+        String produitInfo = produitDto.getProduitId() != null ?
+                "Produit existant ajouté: " + produitDto.getProduitId() :
+                "Nouveau produit créé et ajouté: " + produitDto.getNouveauProduit().getNom();
+
+        creerHistoriqueLivraison(colis, colis.getStatut(), produitInfo);
+    }
+
+    @Transactional
+    public void supprimerProduit(String colisId, String produitId) {
+        ColisProduitId colisProduitId = new ColisProduitId(colisId, produitId);
+        if (colisProduitRepository.existsById(colisProduitId)) {
+            colisProduitRepository.deleteById(colisProduitId);
+
+            Colis colis = colisRepository.findById(colisId)
+                    .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+            creerHistoriqueLivraison(colis, colis.getStatut(),
+                    "Produit retiré du colis: " + produitId);
+        } else {
+            throw new RuntimeException("Produit non trouvé dans ce colis");
+        }
+    }
+
+    // Méthode pour mettre à jour la quantité d'un produit dans un colis
+    @Transactional
+    public void mettreAJourQuantiteProduit(String colisId, String produitId, Integer nouvelleQuantite) {
+        ColisProduitId colisProduitId = new ColisProduitId(colisId, produitId);
+        ColisProduit colisProduit = colisProduitRepository.findById(colisProduitId)
+                .orElseThrow(() -> new RuntimeException("Produit non trouvé dans ce colis"));
+
+        if (nouvelleQuantite == null || nouvelleQuantite <= 0) {
+            throw new RuntimeException("La quantité doit être supérieure à 0");
+        }
+
+        // Recalculer le prix avec la nouvelle quantité
+        BigDecimal nouveauPrix = colisProduit.getProduit().getPrix().multiply(BigDecimal.valueOf(nouvelleQuantite));
+
+        colisProduit.setQuantite(nouvelleQuantite);
+        colisProduit.setPrix(nouveauPrix);
+        colisProduitRepository.save(colisProduit);
+
+        Colis colis = colisRepository.findById(colisId)
+                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+        creerHistoriqueLivraison(colis, colis.getStatut(),
+                "Quantité mise à jour pour le produit: " + produitId + " (nouvelle quantité: " + nouvelleQuantite + ")");
+    }
+
+    public List<ColisProduit> getProduitsByColis(String colisId) {
+        return colisProduitRepository.findByColisId(colisId);
     }
 
     @Override
     @Transactional
     public ColisSimpleResponseDto update(String id, ColisUpdateRequestDto requestDto) {
         Colis colis = colisRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ArgementNotFoundExption(id,"Colis with this id"));
 
         smartLogiMapper.updateEntityFromDto(requestDto, colis);
 
-        // Update relations if provided
         if (requestDto.getLivreurId() != null) {
             Livreur livreur = livreurRepository.findById(requestDto.getLivreurId())
-                    .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
+                    .orElseThrow(() -> new ArgementNotFoundExption(requestDto.getLivreurId(),"livreur with this id"));
             colis.setLivreur(livreur);
         }
 
         if (requestDto.getZoneId() != null) {
             Zone zone = zoneRepository.findById(requestDto.getZoneId())
-                    .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
+                    .orElseThrow(() -> new ArgementNotFoundExption(requestDto.getZoneId(),"zone with this id"));
             colis.setZone(zone);
         }
 
@@ -105,7 +245,6 @@ public class ColisServiceImpl implements ColisService {
 
     @Override
     public ColisAdvancedResponseDto getByIdWithDetails(String id) {
-        // Utiliser la méthode searchByKeyword ou une autre méthode pour récupérer les détails
         Colis colis = colisRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
         return smartLogiMapper.toAdvancedResponseDto(colis);
@@ -127,7 +266,6 @@ public class ColisServiceImpl implements ColisService {
 
     @Override
     public List<ColisSimpleResponseDto> getByClientExpediteur(String clientExpediteurId) {
-        // Utiliser searchByKeyword avec le nom du client ou implémenter une méthode spécifique
         return colisRepository.searchByKeyword(clientExpediteurId)
                 .stream()
                 .filter(colis -> colis.getClientExpediteur().getId().equals(clientExpediteurId))
@@ -137,7 +275,6 @@ public class ColisServiceImpl implements ColisService {
 
     @Override
     public List<ColisSimpleResponseDto> getByDestinataire(String destinataireId) {
-        // Utiliser searchByKeyword avec le nom du destinataire ou implémenter une méthode spécifique
         return colisRepository.searchByKeyword(destinataireId)
                 .stream()
                 .filter(colis -> colis.getDestinataire().getId().equals(destinataireId))
@@ -184,7 +321,6 @@ public class ColisServiceImpl implements ColisService {
         colis.setLivreur(livreur);
         colisRepository.save(colis);
 
-        // Add to historique
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setColis(colis);
         historique.setStatut(colis.getStatut());
@@ -203,7 +339,6 @@ public class ColisServiceImpl implements ColisService {
         colis.setStatut(nouveauStatut);
         colisRepository.save(colis);
 
-        // Add to historique
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setColis(colis);
         historique.setStatut(nouveauStatut);
@@ -220,8 +355,6 @@ public class ColisServiceImpl implements ColisService {
                 .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
         colisRepository.delete(colis);
     }
-
-    // === NOUVELLES MÉTHODES POUR UTILISER LES FONCTIONNALITÉS DU REPOSITORY ===
 
     public List<ColisSimpleResponseDto> getByPriorite(Priorite priorite) {
         return colisRepository.findByPriorite(priorite)
@@ -285,7 +418,7 @@ public class ColisServiceImpl implements ColisService {
     }
 
     public Page<ColisSimpleResponseDto> getByZoneId(String zoneId, Pageable pageable) {
-        return colisRepository.findByZoneId(Long.parseLong(zoneId), pageable)
+        return colisRepository.findByZoneId(zoneId, pageable)
                 .map(smartLogiMapper::toSimpleResponseDto);
     }
 
@@ -294,16 +427,27 @@ public class ColisServiceImpl implements ColisService {
                 .map(smartLogiMapper::toSimpleResponseDto);
     }
 
-    // Méthodes de statistiques
     public long countByStatut(StatutColis statut) {
         return colisRepository.countByStatut(statut);
     }
 
     public long countByZoneAndStatut(String zoneId, StatutColis statut) {
-        return colisRepository.countByZoneAndStatut(Long.parseLong(zoneId), statut);
+        return colisRepository.countByZoneAndStatut(zoneId, statut);
     }
 
     public long countByLivreurAndStatut(String livreurId, StatutColis statut) {
-        return colisRepository.countByLivreurAndStatut(Long.parseLong(livreurId), statut);
+        return colisRepository.countByLivreurAndStatut(livreurId, statut);
+    }
+
+    public boolean produitExisteDansColis(String colisId, String produitId) {
+        ColisProduitId colisProduitId = new ColisProduitId(colisId, produitId);
+        return colisProduitRepository.existsById(colisProduitId);
+    }
+
+    public BigDecimal getPrixTotalColis(String colisId) {
+        List<ColisProduit> produits = colisProduitRepository.findByColisId(colisId);
+        return produits.stream()
+                .map(ColisProduit::getPrix)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
