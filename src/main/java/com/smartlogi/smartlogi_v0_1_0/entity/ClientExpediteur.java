@@ -34,7 +34,7 @@ public class ClientExpediteur {
 
     private String adresse;
 
-    private LocalDateTime dateCreation;
+    private LocalDateTime dateCreation =  LocalDateTime.now();
 
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL)
     private List<Colis> colis = new ArrayList<>();
