@@ -13,8 +13,6 @@ import java.util.Optional;
 @Repository
 public interface DestinataireRepository extends JpaRepository<Destinataire, String> {
 
-    Optional<Destinataire> findByEmail(String email);
-
     List<Destinataire> findByNomContainingIgnoreCase(String nom);
 
     @Query("SELECT d FROM Destinataire d WHERE d.nom LIKE %:keyword% OR d.prenom LIKE %:keyword% OR d.email LIKE %:keyword%")
