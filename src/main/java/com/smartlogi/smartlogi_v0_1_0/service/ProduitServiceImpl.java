@@ -27,7 +27,6 @@ public class    ProduitServiceImpl implements ProduitService {
 
     @Override
     public ProduitSimpleResponseDto create(ProduitCreateRequestDto requestDto) {
-        // Vérifier l'unicité du nom si nécessaire
         if (produitRepository.findByNomContainingIgnoreCase(requestDto.getNom()).stream()
                 .anyMatch(p -> p.getNom().equalsIgnoreCase(requestDto.getNom()))) {
             throw new RuntimeException("Un produit avec ce nom existe déjà");
@@ -146,7 +145,6 @@ public class    ProduitServiceImpl implements ProduitService {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
 
-        // Vérifier s'il y a des colis associés
         if (!produit.getColisProduits().isEmpty()) {
             throw new RuntimeException("Impossible de supprimer le produit : il est associé à des colis");
         }
