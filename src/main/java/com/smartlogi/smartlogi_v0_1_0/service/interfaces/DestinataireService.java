@@ -14,7 +14,6 @@ public interface DestinataireService {
     DestinataireSimpleResponseDto create(DestinataireCreateDto requestDto) throws EmailAlreadyExistsException;
     DestinataireSimpleResponseDto update(String id, DestinataireUpdateDto requestDto);
     DestinataireSimpleResponseDto getById(String id);
-//    DestinataireAdvancedResponseDto getByIdWithColis(String id);
     DestinataireSimpleResponseDto findByKeyWord(String keyword);
     Page<DestinataireSimpleResponseDto> getAll(Pageable pageable);
     List<DestinataireSimpleResponseDto> searchByNom(String nom);
