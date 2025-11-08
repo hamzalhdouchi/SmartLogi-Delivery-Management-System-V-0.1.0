@@ -107,12 +107,5 @@ public class HistoriqueLivraisonServiceImpl implements HistoriqueLivraisonServic
                 .collect(Collectors.toList());
     }
 
-    // === MÉTHODES UTILITAIRES ===
-
-    public HistoriqueLivraisonResponseDto getDernierStatut(String colisId) {
-        List<HistoriqueLivraisonResponseDto> historique = getByColisOrderByDateDesc(colisId);
-        return historique.isEmpty() ? null : historique.get(0);
-    }
-
 
 }
