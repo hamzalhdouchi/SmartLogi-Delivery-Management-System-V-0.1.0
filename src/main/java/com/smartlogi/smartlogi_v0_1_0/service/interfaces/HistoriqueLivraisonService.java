@@ -14,12 +14,8 @@ import java.util.List;
 public interface HistoriqueLivraisonService {
 
     HistoriqueLivraisonResponseDto getById(String id);
-
-    // === Listing ===
     Page<HistoriqueLivraisonResponseDto> getAll(Pageable pageable);
     List<HistoriqueLivraisonResponseDto> getAll();
-
-    // === Filtering ===
     List<HistoriqueLivraisonResponseDto> getByColis(String colisId);
     List<HistoriqueLivraisonResponseDto> getByColisOrderByDateAsc(String colisId);
     List<HistoriqueLivraisonResponseDto> getByColisOrderByDateDesc(String colisId);
