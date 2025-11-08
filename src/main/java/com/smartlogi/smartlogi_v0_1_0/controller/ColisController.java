@@ -5,6 +5,8 @@ import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ColisCreateReques
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisAdvancedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDTO;
+import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDetailDTO;
 import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduit;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
@@ -352,12 +354,12 @@ public class ColisController {
             description = "Récupérer tous les colis assignés à un livreur spécifique"
     )
     @GetMapping("/livreur/{livreurId}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByLivreur(
+    public ResponseEntity<ApiResponseDTO<List<ColisAdvancedResponseDto>>> getByLivreur(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
-        List<ColisSimpleResponseDto> colis = colisService.getByLivreur(livreurId);
+        List<ColisAdvancedResponseDto> colis = colisService.getByLivreur(livreurId);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponseDTO<List<ColisAdvancedResponseDto>> response = ApiResponseDTO.<List<ColisAdvancedResponseDto>>builder()
                 .success(true)
                 .message("Colis par livreur récupérés avec succès")
                 .data(colis)
@@ -729,5 +731,54 @@ public class ColisController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/poidstotal/colis/{colisId}")
+    public ResponseEntity<ApiResponseDTO<Double>> poidsTotal(@PathVariable String colisId) {
+        Double poids = colisService.calculateTotal(colisId);
+        ApiResponseDTO<Double> response = ApiResponseDTO.<Double>builder()
+                .success(true)
+                .message("le Poids recupere successfully")
+                .data(poids)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/prixtotal/colis/{colisId}")
+    public ResponseEntity<ApiResponseDTO<Double>> PrixTotal(@PathVariable String colisId) {
+        Double poids = colisService.calculateTotalPrix(colisId);
+
+        ApiResponseDTO<Double> response = ApiResponseDTO.<Double>builder()
+                .success(true)
+                .message("le prix recupere successfully")
+                .data(poids)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/poids-par-livreur")
+    public ResponseEntity<ApiResponseDTO<List<PoidsParLivreurDTO>>> getPoidsTotalParLivreur() {
+           List<PoidsParLivreurDTO> result = colisService.getPoidsTotalParLivreur();
+
+            ApiResponseDTO<List<PoidsParLivreurDTO>> response = ApiResponseDTO.<List<PoidsParLivreurDTO>>builder()
+                    .success(true)
+                    .message("Poids total par livreur récupéré avec succès")
+                    .data(result)
+                    .build();
+            return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/poids-par-livreur/detail")
+    public ResponseEntity<ApiResponseDTO<List<PoidsParLivreurDetailDTO>>> getPoidsDetailParLivreur() {
+            List<PoidsParLivreurDetailDTO> result = colisService.getPoidsDetailParLivreur();
+
+            ApiResponseDTO<List<PoidsParLivreurDetailDTO>> response = ApiResponseDTO.<List<PoidsParLivreurDetailDTO>>builder()
+                    .success(true)
+                    .message("Détail poids par livreur récupéré avec succès")
+                    .data(result)
+                    .build();
+            return ResponseEntity.ok(response);
+
+
     }
 }
