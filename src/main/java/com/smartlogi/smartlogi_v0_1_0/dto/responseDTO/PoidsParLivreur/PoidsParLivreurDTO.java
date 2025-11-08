@@ -43,7 +43,6 @@ public class PoidsParLivreurDTO {
         return poidsTotal != null ? poidsTotal : BigDecimal.ZERO;
     }
 
-    // Méthode utilitaire pour vérifier si le poids dépasse un seuil
     public boolean depasseSeuil(BigDecimal seuil) {
         return getPoidsTotal().compareTo(seuil != null ? seuil : BigDecimal.ZERO) > 0;
     }
