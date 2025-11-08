@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Colis Collecté</title>
+</head>
+<body>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #2E86AB;">Votre colis a été collecté !</h2>
+
+    <p>Bonjour <span th:text="${client.prenom + ' ' + client.nom}"></span>,</p>
+
+    <p>Nous vous informons que votre colis a été collecté avec succès.</p>
+
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>📦 Détails du colis</h3>
+        <p><strong>Référence:</strong> <span th:text="${colis.id}"></span></p>
+        <p><strong>Description:</strong> <span th:text="${colis.description}"></span></p>
+        <p><strong>Date de collecte:</strong> <span th:text="${#temporals.format(dateCollecte, 'dd/MM/yyyy HH:mm')}"></span></p>
+    </div>
+
+    <p>Vous pouvez suivre l'évolution de votre colis sur notre plateforme.</p>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+        <p><strong>L'équipe SmartLogi</strong><br>
+            +212 5 20 123 456<br>
+            www.smartlogi.ma</p>
+    </div>
+</div>
+</body>
+</html>
