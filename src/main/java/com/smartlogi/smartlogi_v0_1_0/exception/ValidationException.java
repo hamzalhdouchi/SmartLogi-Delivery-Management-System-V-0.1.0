@@ -20,19 +20,4 @@ public class ValidationException extends RuntimeException {
         this.violations = violations;
     }
 
-    public Set<? extends ConstraintViolation<?>> getViolations() {
-        return violations;
-    }
-
-    public static ValidationException EmailInvalide(String email) {
-        return new ValidationException(String.format("L'email %s est déjà utilisé", email));
-    }
-
-    public static ValidationException telephoneInvalide(String telephone) {
-        return new ValidationException(String.format("Le numéro de téléphone %s est invalide", telephone));
-    }
-
-    public static ValidationException codePostalInvalide(String codePostal) {
-        return new ValidationException(String.format("Le code postal %s est invalide", codePostal));
-    }
 }
