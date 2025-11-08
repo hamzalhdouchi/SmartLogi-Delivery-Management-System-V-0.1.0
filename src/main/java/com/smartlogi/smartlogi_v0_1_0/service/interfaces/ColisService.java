@@ -4,7 +4,9 @@ package com.smartlogi.smartlogi_v0_1_0.service.interfaces;
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisAdvancedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
-import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduit;
+    import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDTO;
+    import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDetailDTO;
+    import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduit;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
 import com.smartlogi.smartlogi_v0_1_0.enums.StatutColis;
 import org.springframework.data.domain.Page;
@@ -24,17 +26,14 @@ public interface ColisService {
     public BigDecimal getPrixTotalColis(String colisId);
     boolean produitExisteDansColis(String colisId, String produitId);
     void delete(String id);
-
     void assignerLivreur(String colisId, String livreurId);
     void changerStatut(String colisId, StatutColis nouveauStatut, String commentaire);
-
     List<ColisSimpleResponseDto> getByStatut(StatutColis statut);
     List<ColisSimpleResponseDto> getByClientExpediteur(String clientExpediteurId);
     List<ColisSimpleResponseDto> getByDestinataire(String destinataireId);
-    List<ColisSimpleResponseDto> getByLivreur(String livreurId);
+    List<ColisAdvancedResponseDto> getByLivreur(String livreurId);
     List<ColisSimpleResponseDto> getByZone(String zoneId);
     List<ColisSimpleResponseDto> searchByVilleDestination(String ville);
-
     List<ColisSimpleResponseDto> getByPriorite(Priorite priorite);
     List<ColisSimpleResponseDto> getByPrioriteAndStatut(Priorite priorite, StatutColis statut);
     List<ColisSimpleResponseDto> getByLivreurAndStatut(String livreurId, StatutColis statut);
@@ -44,17 +43,18 @@ public interface ColisService {
     void ajouterProduit(String colisId, ColisCreateRequestDto.ProduitColisDto produitDto);
     void mettreAJourQuantiteProduit(String colisId, String produitId, Integer nouvelleQuantite);
     void supprimerProduit(String colisId, String produitId);
-
     List<ColisSimpleResponseDto> searchByKeyword(String keyword);
-
     List<ColisSimpleResponseDto> getByDateCreationBetween(LocalDateTime startDate, LocalDateTime endDate);
     List<ColisSimpleResponseDto> getColisEnRetard();
-
     Page<ColisSimpleResponseDto> getByZoneId(String zoneId, Pageable pageable);
     Page<ColisSimpleResponseDto> getByStatut(StatutColis statut, Pageable pageable);
-
+    List<PoidsParLivreurDTO> getPoidsTotalParLivreur();
+    List<PoidsParLivreurDetailDTO> getPoidsDetailParLivreur();
     long countByStatut(StatutColis statut);
     long countByZoneAndStatut(String zoneId, StatutColis statut);
     long countByLivreurAndStatut(String livreurId, StatutColis statut);
+
+    Double calculateTotal(String colisId);
+    Double calculateTotalPrix(String colisId);
 
 }
