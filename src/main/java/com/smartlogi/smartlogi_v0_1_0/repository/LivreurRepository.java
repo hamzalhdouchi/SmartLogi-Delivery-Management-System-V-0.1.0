@@ -23,9 +23,6 @@ public interface LivreurRepository extends JpaRepository<Livreur, String> {
     @Query("SELECT l FROM Livreur l WHERE l.nom LIKE %:keyword% OR l.prenom LIKE %:keyword% OR l.telephone LIKE %:keyword%")
     List<Livreur> searchByKeyword(@Param("keyword") String keyword);
 
-    @Query("SELECT l FROM Livreur l WHERE l.zone.id = :zoneId")
-    List<Livreur> findByZoneId(@Param("zoneId") String zoneId);
-
     long countByZone(Zone zone);
 
     boolean existsByTelephone(String telephone);
