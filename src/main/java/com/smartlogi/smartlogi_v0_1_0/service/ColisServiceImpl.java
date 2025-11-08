@@ -5,6 +5,8 @@ import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ProduitCreateRequ
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisAdvancedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Colis.ColisSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDTO;
+import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.PoidsParLivreur.PoidsParLivreurDetailDTO;
 import com.smartlogi.smartlogi_v0_1_0.entity.ColisProduitId;
 import com.smartlogi.smartlogi_v0_1_0.entity.*;
 import com.smartlogi.smartlogi_v0_1_0.enums.Priorite;
@@ -40,7 +42,7 @@ public class ColisServiceImpl implements ColisService {
     private final ZoneRepository zoneRepository;
     private final HistoriqueLivraisonRepository historiqueLivraisonRepository;
     private final SmartLogiMapper smartLogiMapper;
-    private final EmailService emailService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -68,6 +70,8 @@ public class ColisServiceImpl implements ColisService {
 
         Colis savedColis = colisRepository.save(colis);
 
+        notificationService.envoyerNotificationCollecte(client , savedColis);
+
         if (requestDto.getProduits() != null && !requestDto.getProduits().isEmpty()) {
             for (ColisCreateRequestDto.ProduitColisDto produitDto : requestDto.getProduits()) {
                 ajouterProduitAuColis(savedColis, produitDto);
@@ -76,45 +80,19 @@ public class ColisServiceImpl implements ColisService {
 
         creerHistoriqueLivraison(savedColis, StatutColis.CREE, "Colis créé avec produits");
 
-        try {
-            sendColisCreationEmail(client, destinataire, savedColis);
-        } catch (Exception e) {
-            System.err.println("Erreur lors de l'envoi de l'email: " + e.getMessage());
-        }
+
         return smartLogiMapper.toSimpleResponseDto(savedColis);
     }
 
-    private void sendColisCreationEmail(ClientExpediteur client,
-                                        Destinataire destinataire, Colis colis) throws MessagingException {
-
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("clientName", client.getNom());
-        variables.put("colisId", colis.getId());
-        variables.put("destinataireName", destinataire.getNom());
-        variables.put("poids", colis.getPoids());
-        variables.put("priorite", colis.getPriorite());
-        variables.put("dateCreation", colis.getDateCreation());
-
-        emailService.sendTemplateEmail(
-                client.getEmail(),
-                "Colis Créé avec Succès - SmartLogi",
-                "email-colis-created",
-                variables
-        );
-    }
-
     private void ajouterProduitAuColis(Colis colis, ColisCreateRequestDto.ProduitColisDto produitDto) {
-        // Validation de la requête produit
         validerProduitRequest(produitDto);
 
         Produit produit;
 
         if (produitDto.getProduitId() != null && !produitDto.getProduitId().isBlank()) {
-            // Cas 1: Produit existant
             produit = produitRepository.findById(produitDto.getProduitId())
                     .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + produitDto.getProduitId()));
         } else {
-            // Cas 2: Nouveau produit à créer
             produit = creerNouveauProduit(produitDto.getNouveauProduit());
         }
 
@@ -122,7 +100,6 @@ public class ColisServiceImpl implements ColisService {
             throw new RuntimeException("La quantité doit être supérieure à 0 pour le produit: " + produit.getNom());
         }
 
-        // Calculer le prix total automatiquement (prix unitaire × quantité)
         BigDecimal prixTotal = produit.getPrix().multiply(BigDecimal.valueOf(produitDto.getQuantite()));
 
         ColisProduitId colisProduitId = new ColisProduitId(colis.getId(), produit.getId());
@@ -149,7 +126,6 @@ public class ColisServiceImpl implements ColisService {
         }
 
         if (aNouveauProduit) {
-            // Validation supplémentaire pour le nouveau produit
             ProduitCreateRequestDto nouveauProduit = produitDto.getNouveauProduit();
             if (nouveauProduit.getNom() == null || nouveauProduit.getNom().isBlank()) {
                 throw new RuntimeException("Le nom du nouveau produit est obligatoire");
@@ -161,7 +137,6 @@ public class ColisServiceImpl implements ColisService {
     }
 
     private Produit creerNouveauProduit(ProduitCreateRequestDto nouveauProduitDto) {
-        // Vérifier si un produit avec le même nom existe déjà
         if (produitRepository.existsByNomContainingIgnoreCase(nouveauProduitDto.getNom())) {
             throw new RuntimeException("Un produit avec le nom '" + nouveauProduitDto.getNom() + "' existe déjà");
         }
@@ -213,7 +188,6 @@ public class ColisServiceImpl implements ColisService {
         }
     }
 
-    // Méthode pour mettre à jour la quantité d'un produit dans un colis
     @Transactional
     public void mettreAJourQuantiteProduit(String colisId, String produitId, Integer nouvelleQuantite) {
         ColisProduitId colisProduitId = new ColisProduitId(colisId, produitId);
@@ -224,7 +198,6 @@ public class ColisServiceImpl implements ColisService {
             throw new RuntimeException("La quantité doit être supérieure à 0");
         }
 
-        // Recalculer le prix avec la nouvelle quantité
         BigDecimal nouveauPrix = colisProduit.getProduit().getPrix().multiply(BigDecimal.valueOf(nouvelleQuantite));
 
         colisProduit.setQuantite(nouvelleQuantite);
@@ -312,12 +285,12 @@ public class ColisServiceImpl implements ColisService {
     }
 
     @Override
-    public List<ColisSimpleResponseDto> getByLivreur(String livreurId) {
+    public List<ColisAdvancedResponseDto> getByLivreur(String livreurId) {
         Livreur livreur = livreurRepository.findById(livreurId)
                 .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
         return colisRepository.findByLivreur(livreur)
                 .stream()
-                .map(smartLogiMapper::toSimpleResponseDto)
+                .map(smartLogiMapper::toAdvancedResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -364,6 +337,11 @@ public class ColisServiceImpl implements ColisService {
         Colis colis = colisRepository.findById(colisId)
                 .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
 
+        Destinataire destinataire = colis.getDestinataire();
+
+        if (nouveauStatut == StatutColis.LIVRE){
+            notificationService.envoyerNotificationLivraison(destinataire,colis);
+        }
         StatutColis ancienStatut = colis.getStatut();
         colis.setStatut(nouveauStatut);
         colisRepository.save(colis);
@@ -478,5 +456,50 @@ public class ColisServiceImpl implements ColisService {
         return produits.stream()
                 .map(ColisProduit::getPrix)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Double calculateTotal(String colisId){
+        if(colisRepository.existsById(colisId)){
+            return colisProduitRepository.calculateTotalPoidsByColis(colisId);
+        }else {
+          throw new ArgementNotFoundExption(colisId,"this colis is not found");
+        }
+    }
+
+    public Double calculateTotalPrix(String colisId){
+        if(colisRepository.existsById(colisId)){
+            return colisProduitRepository.calculateTotalPrixByColis(colisId);
+        }else {
+            throw new ArgementNotFoundExption(colisId,"this colis is not found");
+        }
+    }
+
+
+    public List<PoidsParLivreurDTO> getPoidsTotalParLivreur() {
+        try {
+            List<Object[]> results = colisRepository.findPoidsTotalParLivreur();
+
+            return results.stream()
+                    .map(PoidsParLivreurDTO::new)
+                    .sorted((d1, d2) -> d2.getPoidsTotal().compareTo(d1.getPoidsTotal()))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Impossible de calculer le poids par livreur", e);
+        }
+    }
+
+    public List<PoidsParLivreurDetailDTO> getPoidsDetailParLivreur() {
+        try {
+            List<Object[]> results = colisRepository.findPoidsDetailParLivreur();
+
+            return results.stream()
+                    .map(PoidsParLivreurDetailDTO::new)
+                    .sorted((d1, d2) -> d2.getPoidsTotal().compareTo(d1.getPoidsTotal()))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Impossible de calculer le détail poids par livreur", e);
+        }
     }
 }
