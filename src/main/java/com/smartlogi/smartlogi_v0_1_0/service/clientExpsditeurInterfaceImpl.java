@@ -46,13 +46,6 @@
                     .orElseThrow(() -> new RuntimeException("Client expéditeur non trouvé"));
             return smartLogiMapper.toSimpleResponseDto(client);
         }
-    //
-    //    @Override
-    //    public ClientExpediteurAdvancedResponseDto getByIdWithColis(String id) {
-    //        ClientExpediteur client = clientExpediteurRepository.findByIdWithColis(id)
-    //                .orElseThrow(() -> new RuntimeException("Client expéditeur non trouvé"));
-    //        return smartLogiMapper.toAdvancedResponseDto(client);
-    //    }
 
         @Override
         public Page<ClientExpediteurSimpleResponseDto> getAll(Pageable pageable) {
