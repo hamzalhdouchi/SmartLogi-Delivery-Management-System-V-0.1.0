@@ -1,0 +1,23 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hamzaalhadouchi@gmail.com
+    password: your_app_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+
+smartlogi:
+  email:
+    from: "hamzaalhadouchi@gmail.com"
+    support: "hamzaalhadouchi@gmail.com"
+    noreply: "hamzaalhadouchi@gmail.com"
+  company:
+    name: "SmartLogi"
+    phone: "+212 5 20 123 456"
+    website: "www.smartlogi.ma"
