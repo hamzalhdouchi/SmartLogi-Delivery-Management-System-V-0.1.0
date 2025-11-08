@@ -13,11 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ColisProduitRepository extends JpaRepository<ColisProduit, ColisProduitId> { // ✅ Changer String par ColisProduitId
+public interface ColisProduitRepository extends JpaRepository<ColisProduit, ColisProduitId> {
 
     List<ColisProduit> findByColis(Colis colis);
-
-    List<ColisProduit> findByProduit(Produit produit);
 
     @Query("SELECT cp FROM ColisProduit cp WHERE cp.colis.id = :colisId")
     List<ColisProduit> findByColisId(@Param("colisId") String colisId);
@@ -31,16 +29,6 @@ public interface ColisProduitRepository extends JpaRepository<ColisProduit, Coli
     @Query("SELECT SUM(cp.quantite * p.poids) FROM ColisProduit cp JOIN cp.produit p WHERE cp.colis.id = :colisId")
     Double calculateTotalPoidsByColis(@Param("colisId") String colisId);
 
-    // ✅ CORRIGER cette méthode - utiliser existsById au lieu de existsByColisProduitId
     boolean existsById(ColisProduitId id);
 
-    void deleteByColis(Colis colis);
-
-    // ✅ AJOUTER cette méthode utilitaire
-    @Query("SELECT CASE WHEN COUNT(cp) > 0 THEN true ELSE false END FROM ColisProduit cp WHERE cp.colis.id = :colisId AND cp.produit.id = :produitId")
-    boolean existsByColisIdAndProduitId(@Param("colisId") String colisId, @Param("produitId") String produitId);
-
-    // ✅ AJOUTER cette méthode pour trouver par colis et produit
-    @Query("SELECT cp FROM ColisProduit cp WHERE cp.colis.id = :colisId AND cp.produit.id = :produitId")
-    Optional<ColisProduit> findByColisIdAndProduitId(@Param("colisId") String colisId, @Param("produitId") String produitId);
 }
