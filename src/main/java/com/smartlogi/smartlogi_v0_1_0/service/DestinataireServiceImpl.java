@@ -52,13 +52,6 @@ public class DestinataireServiceImpl implements DestinataireService {
         return smartLogiMapper.toSimpleResponseDto(destinataire);
     }
 
-////    @Override
-//    public DestinataireAdvancedResponseDto getByIdWithColis(String id) {
-//        Destinataire destinataire = destinataireRepository.findByIdWithColis(id)
-//                .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
-//        return smartLogiMapper.toAdvancedResponseDto(destinataire);
-//    }
-
     @Override
     public Page<DestinataireSimpleResponseDto> getAll(Pageable pageable) {
         return destinataireRepository.findAll(pageable)
