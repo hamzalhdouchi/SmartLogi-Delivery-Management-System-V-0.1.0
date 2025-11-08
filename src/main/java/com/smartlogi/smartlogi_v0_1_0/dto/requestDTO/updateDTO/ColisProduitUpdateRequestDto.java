@@ -16,11 +16,9 @@ import java.math.BigDecimal;
 public class ColisProduitUpdateRequestDto {
 
 
-    @NotNull(message = "La quantité est obligatoire")
     @Min(value = 1, message = "La quantité doit être au moins 1")
     private Integer quantite;
 
-    @NotNull(message = "Le prix est obligatoire")
     @Min(value = 0, message = "Le prix ne peut pas être négatif")
     private BigDecimal prix;
 }
