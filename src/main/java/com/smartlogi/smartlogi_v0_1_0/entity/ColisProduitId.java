@@ -16,7 +16,6 @@ public class ColisProduitId implements Serializable {
     private String colisId;
     private String produitId;
 
-    // ✅ Important: Override equals() and hashCode()
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
