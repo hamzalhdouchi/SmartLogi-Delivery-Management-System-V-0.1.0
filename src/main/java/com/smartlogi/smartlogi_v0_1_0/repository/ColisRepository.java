@@ -21,52 +21,50 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
 
     List<Colis> findByStatut(StatutColis statut);
     Page<Colis> findByStatut(StatutColis statut, Pageable pageable);
-
     List<Colis> findByPriorite(Priorite priorite);
     List<Colis> findByPrioriteAndStatut(Priorite priorite, StatutColis statut);
-
     List<Colis> findByLivreur(Livreur livreur);
     List<Colis> findByLivreurAndStatut(Livreur livreur, StatutColis statut);
-
     List<Colis> findByZone(Zone zone);
     List<Colis> findByZoneAndStatut(Zone zone, StatutColis statut);
-
-    // Filtrage par ville
     List<Colis> findByVilleDestination(String villeDestination);
     List<Colis> findByVilleDestinationAndStatut(String villeDestination, StatutColis statut);
-
-    // Recherche avancée
     @Query("SELECT c FROM Colis c WHERE " +
             "c.description LIKE %:keyword% OR " +
             "c.villeDestination LIKE %:keyword% OR " +
             "c.clientExpediteur.nom LIKE %:keyword% OR " +
             "c.destinataire.nom LIKE %:keyword%")
     List<Colis> searchByKeyword(@Param("keyword") String keyword);
-
-    // Statistiques
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.statut = :statut")
     long countByStatut(@Param("statut") StatutColis statut);
-
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.zone.id = :zoneId AND c.statut = :statut")
     long countByZoneAndStatut(@Param("zoneId") String zoneId, @Param("statut") StatutColis statut);
-
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.livreur.id = :livreurId AND c.statut = :statut")
     long countByLivreurAndStatut(@Param("livreurId") String livreurId, @Param("statut") StatutColis statut);
-
-    // Colis en retard (créés il y a plus de 2 jours et non livrés)
     @Query("SELECT c FROM Colis c WHERE c.dateCreation < :dateLimite AND c.statut NOT IN ('LIVRÉ')")
     List<Colis> findColisEnRetard(@Param("dateLimite") LocalDateTime dateLimite);
 
-    // Poids total par livreur
+
+    // Requête basique
     @Query("SELECT c.livreur, SUM(c.poids) FROM Colis c WHERE c.livreur IS NOT NULL GROUP BY c.livreur")
     List<Object[]> findPoidsTotalParLivreur();
 
-    // Colis par période
-    @Query("SELECT c FROM Colis c WHERE c.dateCreation BETWEEN :startDate AND :endDate")
-    List<Colis> findByDateCreationBetween(@Param("startDate") LocalDateTime startDate,
-                                          @Param("endDate") LocalDateTime endDate);
+    // Requête détaillée avec plus d'informations
+    @Query("SELECT l.id, CONCAT(l.prenom, ' ', l.nom), l.telephone, l.zone, " +
+            "SUM(c.poids), COUNT(c), AVG(c.poids) " +
+            "FROM Colis c JOIN c.livreur l " +
+            "WHERE c.livreur IS NOT NULL " +
+            "GROUP BY l.id, l.prenom, l.nom, l.telephone, l.zone")
+    List<Object[]> findPoidsDetailParLivreur();
 
-    // Pour la pagination
+    // Avec filtre par statut
+    @Query("SELECT c.livreur, SUM(c.poids) FROM Colis c " +
+            "WHERE c.livreur IS NOT NULL AND c.statut IN :statuts " +
+            "GROUP BY c.livreur")
+    List<Object[]> findPoidsTotalParLivreurAvecStatut(@Param("statuts") List<StatutColis> statuts);
+
+    @Query("SELECT c FROM Colis c WHERE c.dateCreation BETWEEN :startDate AND :endDate")
+    List<Colis> findByDateCreationBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     Page<Colis> findAll(Pageable pageable);
     Page<Colis> findByZoneId(String zoneId, Pageable pageable);
 }
