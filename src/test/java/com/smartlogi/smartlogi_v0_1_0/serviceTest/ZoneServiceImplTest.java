@@ -176,4 +176,17 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findById("zone-999");
         verify(zoneRepository, never()).save(any(Zone.class));
     }
+
+    @Test
+    @DisplayName("Update - Should throw exception when code postal already exists")
+    void testUpdate_CodePostalAlreadyExists() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(true);
+
+        assertThatThrownBy(() -> zoneService.update("zone-123", updateRequestDto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Une zone avec ce code postal existe déjà");
+
+        verify(zoneRepository, never()).save(any(Zone.class));
+    }
 }
