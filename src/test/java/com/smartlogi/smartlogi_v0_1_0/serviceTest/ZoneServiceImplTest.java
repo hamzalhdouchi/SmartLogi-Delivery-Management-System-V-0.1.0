@@ -374,4 +374,27 @@ class ZoneServiceImplTest {
         assertThat(result).isEmpty();
         verify(zoneRepository, times(1)).findAll();
     }
+
+
+    @Test
+    @DisplayName("GetAll - Should handle multiple zones")
+    void testGetAllList_MultipleZones() {
+        Zone zone2 = new Zone();
+        zone2.setId("zone-456");
+        zone2.setNom("Zone 2");
+
+        ZoneSimpleResponseDto dto2 = new ZoneSimpleResponseDto();
+        dto2.setId("zone-456");
+        dto2.setNom("Zone 2");
+
+        List<Zone> zones = Arrays.asList(zone, zone2);
+        when(zoneRepository.findAll()).thenReturn(zones);
+        when(smartLogiMapper.toSimpleResponseDto(zone)).thenReturn(simpleResponseDto);
+        when(smartLogiMapper.toSimpleResponseDto(zone2)).thenReturn(dto2);
+
+        List<ZoneSimpleResponseDto> result = zoneService.getAll();
+
+        assertThat(result).hasSize(2);
+        verify(smartLogiMapper, times(2)).toSimpleResponseDto(any(Zone.class));
+    }
 }
