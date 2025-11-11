@@ -130,4 +130,19 @@ class ZoneServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName("Create - Should handle special characters in code postal")
+    void testCreate_SpecialCharactersCodePostal() {
+        createRequestDto.setCodePostal("75001-@#");
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(false);
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.empty());
+        when(smartLogiMapper.toEntity(any(ZoneCreateRequestDto.class))).thenReturn(zone);
+        when(zoneRepository.save(any(Zone.class))).thenReturn(zone);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        ZoneSimpleResponseDto result = zoneService.create(createRequestDto);
+
+        assertThat(result).isNotNull();
+        verify(zoneRepository, times(1)).existsByCodePostal("75001-@#");
+    }
 }
