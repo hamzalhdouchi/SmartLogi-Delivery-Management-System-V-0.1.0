@@ -207,4 +207,21 @@ class ZoneServiceImplTest {
 
         verify(zoneRepository, never()).save(any(Zone.class));
     }
+
+    @Test
+    @DisplayName("Update - Should allow update with same code postal")
+    void testUpdate_SameCodePostal() {
+        updateRequestDto.setCodePostal("75001");
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.empty());
+        when(zoneRepository.save(any(Zone.class))).thenReturn(zone);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+        doNothing().when(smartLogiMapper).updateEntityFromDto((ZoneUpdateRequestDto) any(), any());
+
+        ZoneSimpleResponseDto result = zoneService.update("zone-123", updateRequestDto);
+
+        assertThat(result).isNotNull();
+        verify(zoneRepository, never()).existsByCodePostal(anyString());
+        verify(zoneRepository, times(1)).save(zone);
+    }
 }
