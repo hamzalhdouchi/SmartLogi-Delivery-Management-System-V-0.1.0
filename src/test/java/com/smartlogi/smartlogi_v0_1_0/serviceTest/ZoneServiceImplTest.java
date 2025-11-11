@@ -164,5 +164,16 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).save(zone);
     }
 
+    @Test
+    @DisplayName("Update - Should throw exception when zone not found")
+    void testUpdate_ZoneNotFound() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.empty());
 
+        assertThatThrownBy(() -> zoneService.update("zone-999", updateRequestDto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Zone non trouvée");
+
+        verify(zoneRepository, times(1)).findById("zone-999");
+        verify(zoneRepository, never()).save(any(Zone.class));
+    }
 }
