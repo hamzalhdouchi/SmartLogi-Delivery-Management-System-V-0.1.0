@@ -255,4 +255,17 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findById("zone-123");
         verify(smartLogiMapper, times(1)).toSimpleResponseDto(zone);
     }
+
+    @Test
+    @DisplayName("GetById - Should throw exception when zone not found")
+    void testGetById_NotFound() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> zoneService.getById("zone-999"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Zone non trouvée");
+
+        verify(zoneRepository, times(1)).findById("zone-999");
+    }
+
 }
