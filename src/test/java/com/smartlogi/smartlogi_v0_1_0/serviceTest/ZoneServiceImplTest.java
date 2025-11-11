@@ -189,4 +189,22 @@ class ZoneServiceImplTest {
 
         verify(zoneRepository, never()).save(any(Zone.class));
     }
+
+    @Test
+    @DisplayName("Update - Should throw exception when nom already exists")
+    void testUpdate_NomAlreadyExists() {
+        Zone anotherZone = new Zone();
+        anotherZone.setId("zone-456");
+        anotherZone.setNom("Another Zone");
+
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(false);
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.of(anotherZone));
+
+        assertThatThrownBy(() -> zoneService.update("zone-123", updateRequestDto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Une zone avec ce nom existe déjà");
+
+        verify(zoneRepository, never()).save(any(Zone.class));
+    }
 }
