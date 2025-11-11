@@ -268,4 +268,19 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findById("zone-999");
     }
 
+
+    @Test
+    @DisplayName("GetByIdWithDetails - Should get zone with details successfully")
+    void testGetByIdWithDetails_Success() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(smartLogiMapper.toDetailedResponseDto(any(Zone.class))).thenReturn(detailedResponseDto);
+
+        ZoneDetailedResponseDto result = zoneService.getByIdWithDetails("zone-123");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo("zone-123");
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(smartLogiMapper, times(1)).toDetailedResponseDto(zone);
+    }
+
 }
