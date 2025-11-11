@@ -362,4 +362,16 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findAll();
         verify(smartLogiMapper, times(1)).toSimpleResponseDto(zone);
     }
+
+    @Test
+    @DisplayName("GetAll - Should return empty list when no zones exist")
+    void testGetAllList_EmptyList() {
+        when(zoneRepository.findAll()).thenReturn(new ArrayList<>());
+
+        List<ZoneSimpleResponseDto> result = zoneService.getAll();
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+        verify(zoneRepository, times(1)).findAll();
+    }
 }
