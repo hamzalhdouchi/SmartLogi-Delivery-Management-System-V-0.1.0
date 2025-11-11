@@ -315,4 +315,20 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findAll(pageable);
     }
 
+    @Test
+    @DisplayName("GetAll - Should return empty page when no zones exist")
+    void testGetAllWithPagination_EmptyPage() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Zone> emptyPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+
+        when(zoneRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+        Page<ZoneSimpleResponseDto> result = zoneService.getAll(pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        verify(zoneRepository, times(1)).findAll(pageable);
+    }
+
 }
