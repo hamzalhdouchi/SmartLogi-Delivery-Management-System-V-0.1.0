@@ -295,4 +295,24 @@ class ZoneServiceImplTest {
 
         verify(zoneRepository, times(1)).findById("zone-999");
     }
+
+
+    @Test
+    @DisplayName("GetAll - Should get all zones with pagination")
+    void testGetAllWithPagination_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Zone> zones = Arrays.asList(zone);
+        Page<Zone> zonePage = new PageImpl<>(zones, pageable, zones.size());
+
+        when(zoneRepository.findAll(any(Pageable.class))).thenReturn(zonePage);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        Page<ZoneSimpleResponseDto> result = zoneService.getAll(pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(zoneRepository, times(1)).findAll(pageable);
+    }
+
 }
