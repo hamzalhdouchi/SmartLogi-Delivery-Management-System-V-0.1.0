@@ -411,4 +411,202 @@ class ZoneServiceImplTest {
         assertThat(result.get().getCodePostal()).isEqualTo("75001");
         verify(zoneRepository, times(1)).findByCodePostal("75001");
     }
+
+    @Test
+    @DisplayName("GetByCodePostal - Should return empty when zone not found")
+    void testGetByCodePostal_NotFound() {
+        when(zoneRepository.findByCodePostal(anyString())).thenReturn(Optional.empty());
+
+        Optional<ZoneSimpleResponseDto> result = zoneService.getByCodePostal("99999");
+
+        assertThat(result).isEmpty();
+        verify(zoneRepository, times(1)).findByCodePostal("99999");
+    }
+
+    @Test
+    @DisplayName("GetByNom - Should find zone by nom")
+    void testGetByNom_Found() {
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.of(zone));
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        Optional<ZoneSimpleResponseDto> result = zoneService.getByNom("Zone Test");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getNom()).isEqualTo("Zone Test");
+        verify(zoneRepository, times(1)).findByNom("Zone Test");
+    }
+
+    @Test
+    @DisplayName("GetByNom - Should return empty when zone not found")
+    void testGetByNom_NotFound() {
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.empty());
+
+        Optional<ZoneSimpleResponseDto> result = zoneService.getByNom("Non Existent");
+
+        assertThat(result).isEmpty();
+        verify(zoneRepository, times(1)).findByNom("Non Existent");
+    }
+
+
+    @Test
+    @DisplayName("SearchByNom - Should find zones containing nom")
+    void testSearchByNom_Found() {
+        List<Zone> zones = Arrays.asList(zone);
+        when(zoneRepository.findByNomContainingIgnoreCase(anyString())).thenReturn(zones);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        List<ZoneSimpleResponseDto> result = zoneService.searchByNom("Test");
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(zoneRepository, times(1)).findByNomContainingIgnoreCase("Test");
+    }
+
+    @Test
+    @DisplayName("SearchByNom - Should return empty list when no zones match")
+    void testSearchByNom_NotFound() {
+        when(zoneRepository.findByNomContainingIgnoreCase(anyString())).thenReturn(new ArrayList<>());
+
+        List<ZoneSimpleResponseDto> result = zoneService.searchByNom("NonExistent");
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+        verify(zoneRepository, times(1)).findByNomContainingIgnoreCase("NonExistent");
+    }
+
+    @Test
+    @DisplayName("SearchByNom - Should be case insensitive")
+    void testSearchByNom_CaseInsensitive() {
+        List<Zone> zones = Arrays.asList(zone);
+        when(zoneRepository.findByNomContainingIgnoreCase(anyString())).thenReturn(zones);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        List<ZoneSimpleResponseDto> result = zoneService.searchByNom("test");
+
+        assertThat(result).hasSize(1);
+        verify(zoneRepository, times(1)).findByNomContainingIgnoreCase("test");
+    }
+
+
+    @Test
+    @DisplayName("SearchByKeyword - Should find zones by keyword")
+    void testSearchByKeyword_Found() {
+        List<Zone> zones = Arrays.asList(zone);
+        when(zoneRepository.searchByKeyword(anyString())).thenReturn(zones);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        List<ZoneSimpleResponseDto> result = zoneService.searchByKeyword("Test");
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(zoneRepository, times(1)).searchByKeyword("Test");
+    }
+
+    @Test
+    @DisplayName("SearchByKeyword - Should return empty list when no zones match")
+    void testSearchByKeyword_NotFound() {
+        when(zoneRepository.searchByKeyword(anyString())).thenReturn(new ArrayList<>());
+
+        List<ZoneSimpleResponseDto> result = zoneService.searchByKeyword("NonExistent");
+
+        assertThat(result).isEmpty();
+        verify(zoneRepository, times(1)).searchByKeyword("NonExistent");
+    }
+
+
+    @Test
+    @DisplayName("ExistsByCodePostal - Should return true when zone exists")
+    void testExistsByCodePostal_True() {
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(true);
+
+        boolean result = zoneService.existsByCodePostal("75001");
+
+        assertThat(result).isTrue();
+        verify(zoneRepository, times(1)).existsByCodePostal("75001");
+    }
+
+    @Test
+    @DisplayName("ExistsByCodePostal - Should return false when zone does not exist")
+    void testExistsByCodePostal_False() {
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(false);
+
+        boolean result = zoneService.existsByCodePostal("99999");
+
+        assertThat(result).isFalse();
+        verify(zoneRepository, times(1)).existsByCodePostal("99999");
+    }
+
+
+    @Test
+    @DisplayName("ExistsById - Should return true when zone exists")
+    void testExistsById_True() {
+        when(zoneRepository.existsById(anyString())).thenReturn(true);
+
+        boolean result = zoneService.existsById("zone-123");
+
+        assertThat(result).isTrue();
+        verify(zoneRepository, times(1)).existsById("zone-123");
+    }
+
+    @Test
+    @DisplayName("ExistsById - Should return false when zone does not exist")
+    void testExistsById_False() {
+        when(zoneRepository.existsById(anyString())).thenReturn(false);
+
+        boolean result = zoneService.existsById("zone-999");
+
+        assertThat(result).isFalse();
+        verify(zoneRepository, times(1)).existsById("zone-999");
+    }
+
+
+    @Test
+    @DisplayName("ExistsByNom - Should return true when zone exists")
+    void testExistsByNom_True() {
+        when(zoneRepository.existsByNom(anyString())).thenReturn(true);
+
+        boolean result = zoneService.existsByNom("Zone Test");
+
+        assertThat(result).isTrue();
+        verify(zoneRepository, times(1)).existsByNom("Zone Test");
+    }
+
+    @Test
+    @DisplayName("ExistsByNom - Should return false when zone does not exist")
+    void testExistsByNom_False() {
+        when(zoneRepository.existsByNom(anyString())).thenReturn(false);
+
+        boolean result = zoneService.existsByNom("Non Existent");
+
+        assertThat(result).isFalse();
+        verify(zoneRepository, times(1)).existsByNom("Non Existent");
+    }
+
+
+    @Test
+    @DisplayName("Delete - Should delete zone successfully")
+    void testDelete_Success() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        doNothing().when(zoneRepository).delete(any(Zone.class));
+
+        zoneService.delete("zone-123");
+
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(zoneRepository, times(1)).delete(zone);
+    }
+
+    @Test
+    @DisplayName("Delete - Should throw exception when zone not found")
+    void testDelete_ZoneNotFound() {
+        // Given
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> zoneService.delete("zone-999"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Zone non trouvée");
+
+        verify(zoneRepository, times(1)).findById("zone-999");
+        verify(zoneRepository, never()).delete(any(Zone.class));
+    }
 }
