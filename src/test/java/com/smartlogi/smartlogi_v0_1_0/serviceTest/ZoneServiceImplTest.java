@@ -101,4 +101,17 @@ class ZoneServiceImplTest {
         verify(smartLogiMapper, times(1)).toSimpleResponseDto(zone);
     }
 
+    @Test
+    @DisplayName("Create - Should throw exception when code postal already exists")
+    void testCreate_CodePostalAlreadyExists() {
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(true);
+
+        assertThatThrownBy(() -> zoneService.create(createRequestDto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Une zone avec ce code postal existe déjà");
+
+        verify(zoneRepository, times(1)).existsByCodePostal(createRequestDto.getCodePostal());
+        verify(zoneRepository, never()).save(any(Zone.class));
+    }
+
 }
