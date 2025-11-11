@@ -241,4 +241,18 @@ class ZoneServiceImplTest {
         verify(zoneRepository, never()).existsByCodePostal(anyString());
         verify(zoneRepository, never()).findByNom(anyString());
     }
+
+    @Test
+    @DisplayName("GetById - Should get zone by id successfully")
+    void testGetById_Success() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        ZoneSimpleResponseDto result = zoneService.getById("zone-123");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo("zone-123");
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(smartLogiMapper, times(1)).toSimpleResponseDto(zone);
+    }
 }
