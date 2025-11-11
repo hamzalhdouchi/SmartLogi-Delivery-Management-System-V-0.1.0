@@ -331,4 +331,20 @@ class ZoneServiceImplTest {
         verify(zoneRepository, times(1)).findAll(pageable);
     }
 
+    @Test
+    @DisplayName("GetAll - Should handle multiple pages")
+    void testGetAllWithPagination_MultiplePages() {
+        Pageable pageable = PageRequest.of(1, 5);
+        List<Zone> zones = Arrays.asList(zone);
+        Page<Zone> zonePage = new PageImpl<>(zones, pageable, 10);
+
+        when(zoneRepository.findAll(any(Pageable.class))).thenReturn(zonePage);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        Page<ZoneSimpleResponseDto> result = zoneService.getAll(pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalPages()).isEqualTo(2);
+        assertThat(result.getNumber()).isEqualTo(1);
+    }
 }
