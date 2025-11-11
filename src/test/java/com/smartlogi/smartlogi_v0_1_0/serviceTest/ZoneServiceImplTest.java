@@ -224,4 +224,21 @@ class ZoneServiceImplTest {
         verify(zoneRepository, never()).existsByCodePostal(anyString());
         verify(zoneRepository, times(1)).save(zone);
     }
+
+    @Test
+    @DisplayName("Update - Should handle null values in update DTO")
+    void testUpdate_NullValues() {
+        updateRequestDto.setCodePostal(null);
+        updateRequestDto.setNom(null);
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(zoneRepository.save(any(Zone.class))).thenReturn(zone);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+        doNothing().when(smartLogiMapper).updateEntityFromDto((ZoneUpdateRequestDto) any(), any());
+
+        ZoneSimpleResponseDto result = zoneService.update("zone-123", updateRequestDto);
+
+        assertThat(result).isNotNull();
+        verify(zoneRepository, never()).existsByCodePostal(anyString());
+        verify(zoneRepository, never()).findByNom(anyString());
+    }
 }
