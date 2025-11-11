@@ -397,4 +397,18 @@ class ZoneServiceImplTest {
         assertThat(result).hasSize(2);
         verify(smartLogiMapper, times(2)).toSimpleResponseDto(any(Zone.class));
     }
+
+
+    @Test
+    @DisplayName("GetByCodePostal - Should find zone by code postal")
+    void testGetByCodePostal_Found() {
+        when(zoneRepository.findByCodePostal(anyString())).thenReturn(Optional.of(zone));
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        Optional<ZoneSimpleResponseDto> result = zoneService.getByCodePostal("75001");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getCodePostal()).isEqualTo("75001");
+        verify(zoneRepository, times(1)).findByCodePostal("75001");
+    }
 }
