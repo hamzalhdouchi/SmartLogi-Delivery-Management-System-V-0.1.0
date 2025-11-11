@@ -145,4 +145,24 @@ class ZoneServiceImplTest {
         assertThat(result).isNotNull();
         verify(zoneRepository, times(1)).existsByCodePostal("75001-@#");
     }
+
+    @Test
+    @DisplayName("Update - Should update zone successfully")
+    void testUpdate_Success() {
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+        when(zoneRepository.existsByCodePostal(anyString())).thenReturn(false);
+        when(zoneRepository.findByNom(anyString())).thenReturn(Optional.empty());
+        when(zoneRepository.save(any(Zone.class))).thenReturn(zone);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+        doNothing().when(smartLogiMapper).updateEntityFromDto((ZoneUpdateRequestDto) any(), any());
+
+        ZoneSimpleResponseDto result = zoneService.update("zone-123", updateRequestDto);
+
+        assertThat(result).isNotNull();
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(smartLogiMapper, times(1)).updateEntityFromDto(updateRequestDto, zone);
+        verify(zoneRepository, times(1)).save(zone);
+    }
+
+
 }
