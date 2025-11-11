@@ -347,4 +347,19 @@ class ZoneServiceImplTest {
         assertThat(result.getTotalPages()).isEqualTo(2);
         assertThat(result.getNumber()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("GetAll - Should get all zones without pagination")
+    void testGetAllList_Success() {
+        List<Zone> zones = Arrays.asList(zone);
+        when(zoneRepository.findAll()).thenReturn(zones);
+        when(smartLogiMapper.toSimpleResponseDto(any(Zone.class))).thenReturn(simpleResponseDto);
+
+        List<ZoneSimpleResponseDto> result = zoneService.getAll();
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(zoneRepository, times(1)).findAll();
+        verify(smartLogiMapper, times(1)).toSimpleResponseDto(zone);
+    }
 }
