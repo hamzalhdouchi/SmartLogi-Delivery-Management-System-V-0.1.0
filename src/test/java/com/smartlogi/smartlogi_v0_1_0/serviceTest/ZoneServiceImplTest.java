@@ -4,6 +4,8 @@ import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.createDTO.ZoneCreateRequest
 import com.smartlogi.smartlogi_v0_1_0.dto.requestDTO.updateDTO.ZoneUpdateRequestDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Zone.ZoneDetailedResponseDto;
 import com.smartlogi.smartlogi_v0_1_0.dto.responseDTO.Zone.ZoneSimpleResponseDto;
+import com.smartlogi.smartlogi_v0_1_0.entity.Colis;
+import com.smartlogi.smartlogi_v0_1_0.entity.Livreur;
 import com.smartlogi.smartlogi_v0_1_0.entity.Zone;
 import com.smartlogi.smartlogi_v0_1_0.mapper.SmartLogiMapper;
 import com.smartlogi.smartlogi_v0_1_0.repository.ZoneRepository;
@@ -607,6 +609,53 @@ class ZoneServiceImplTest {
                 .hasMessage("Zone non trouvée");
 
         verify(zoneRepository, times(1)).findById("zone-999");
+        verify(zoneRepository, never()).delete(any(Zone.class));
+    }
+
+
+    @Test
+    @DisplayName("Delete - Should throw exception when zone has livreurs")
+    void testDelete_HasLivreurs() {
+        Livreur mockLivreur = mock(Livreur.class);
+        zone.getLivreurs().add(mockLivreur);
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+
+        assertThatThrownBy(() -> zoneService.delete("zone-123"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Impossible de supprimer la zone : des livreurs y sont associés");
+
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(zoneRepository, never()).delete(any(Zone.class));
+    }
+
+    @Test
+    @DisplayName("Delete - Should throw exception when zone has colis")
+    void testDelete_HasColis() {
+        Colis mockColis = mock(Colis.class);
+        zone.getColis().add(mockColis);
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+
+        assertThatThrownBy(() -> zoneService.delete("zone-123"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Impossible de supprimer la zone : des colis y sont associés");
+
+        verify(zoneRepository, times(1)).findById("zone-123");
+        verify(zoneRepository, never()).delete(any(Zone.class));
+    }
+
+    @Test
+    @DisplayName("Delete - Should throw exception when zone has both livreurs and colis")
+    void testDelete_HasBothLivreursAndColis() {
+        Livreur mockLivreur = mock(Livreur.class);
+        Colis mockColis = mock(Colis.class);
+        zone.getLivreurs().add(mockLivreur);
+        zone.getColis().add(mockColis);
+        when(zoneRepository.findById(anyString())).thenReturn(Optional.of(zone));
+
+        assertThatThrownBy(() -> zoneService.delete("zone-123"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Impossible de supprimer la zone : des livreurs y sont associés");
+
         verify(zoneRepository, never()).delete(any(Zone.class));
     }
 }
