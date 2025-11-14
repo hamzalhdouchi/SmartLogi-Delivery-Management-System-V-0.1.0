@@ -57,7 +57,6 @@ class ColisControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Initialisation des données de test
         colisSimpleDto = new ColisSimpleResponseDto();
         colisSimpleDto.setId("colis-123");
         colisSimpleDto.setDescription("Test Colis");
@@ -96,7 +95,6 @@ class ColisControllerTest {
         colisProduit.setProduit(produit);
     }
 
-    // === TESTS CRÉATION ===
 
     @Test
     void testCreate_Success() throws Exception {
@@ -141,7 +139,6 @@ class ColisControllerTest {
         verify(colisService, times(1)).ajouterProduit(eq(colisId), any(ColisCreateRequestDto.ProduitColisDto.class));
     }
 
-    // === TESTS LECTURE ===
 
     @Test
     void testGetById_Success() throws Exception {
@@ -210,7 +207,6 @@ class ColisControllerTest {
         verify(colisService, times(1)).getAll(any(Pageable.class));
     }
 
-    // === TESTS RECHERCHE PAR STATUT ===
 
     @Test
     void testGetByStatut_Success() throws Exception {
@@ -250,7 +246,6 @@ class ColisControllerTest {
         verify(colisService, times(1)).getByStatut(eq(statut), any(Pageable.class));
     }
 
-    // === TESTS RECHERCHE PAR ENTITÉS ===
 
     @Test
     void testGetByClientExpediteur_Success() throws Exception {
@@ -349,7 +344,6 @@ class ColisControllerTest {
         verify(colisService, times(1)).searchByVilleDestination(ville);
     }
 
-    // === TESTS RECHERCHE AVANCÉE ===
 
     @Test
     void testGetByPriorite_Success() throws Exception {

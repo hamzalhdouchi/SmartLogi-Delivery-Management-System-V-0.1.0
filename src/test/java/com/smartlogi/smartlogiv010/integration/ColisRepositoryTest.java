@@ -40,19 +40,16 @@ class ColisRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Créer la zone d'abord (sans ID fixe)
         zone = new Zone();
         zone.setNom("Zone Test");
         zone = entityManager.persistAndFlush(zone);
 
-        // Créer le client
         client = new ClientExpediteur();
         client.setNom("Client Test");
         client.setEmail("client@test.com");
         client.setTelephone("+212600000001");
         client = entityManager.persistAndFlush(client);
 
-        // Créer le destinataire
         destinataire = new Destinataire();
         destinataire.setNom("Destinataire Test");
         destinataire.setPrenom("Test");
@@ -61,7 +58,6 @@ class ColisRepositoryTest {
         destinataire.setAdresse("Adresse Test");
         destinataire = entityManager.persistAndFlush(destinataire);
 
-        // Créer le livreur (après la zone)
         livreur = new Livreur();
         livreur.setNom("Livreur Test");
         livreur.setPrenom("Test");
@@ -73,7 +69,7 @@ class ColisRepositoryTest {
     @Test
     @DisplayName("Test findByStatut - Should return colis with specific status")
     void testFindByStatut() {
-        // Arrange
+
         Colis colis1 = createColis(StatutColis.CREE, Priorite.NORMALE);
         Colis colis2 = createColis(StatutColis.EN_TRANSIT, Priorite.HAUTE);
         Colis colis3 = createColis(StatutColis.CREE, Priorite.BASSE);
@@ -83,10 +79,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByStatut(StatutColis.CREE);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).extracting(Colis::getStatut)
                 .containsOnly(StatutColis.CREE);
@@ -95,7 +89,7 @@ class ColisRepositoryTest {
     @Test
     @DisplayName("Test findByPriorite - Should filter by priority")
     void testFindByPriorite() {
-        // Arrange
+
         Colis colis1 = createColis(StatutColis.CREE, Priorite.HAUTE);
         Colis colis2 = createColis(StatutColis.CREE, Priorite.NORMALE);
         Colis colis3 = createColis(StatutColis.EN_TRANSIT, Priorite.HAUTE);
@@ -105,10 +99,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByPriorite(Priorite.HAUTE);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).extracting(Colis::getPriorite)
                 .containsOnly(Priorite.HAUTE);
@@ -127,11 +119,9 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByPrioriteAndStatut(
                 Priorite.HAUTE, StatutColis.CREE);
 
-        // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getPriorite()).isEqualTo(Priorite.HAUTE);
         assertThat(result.get(0).getStatut()).isEqualTo(StatutColis.CREE);
@@ -148,10 +138,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis2);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByLivreur(livreur);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).allMatch(c -> c.getLivreur().getId().equals(livreur.getId()));
     }
@@ -169,10 +157,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByLivreurAndStatut(livreur, StatutColis.EN_TRANSIT);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).allMatch(c -> c.getStatut().equals(StatutColis.EN_TRANSIT));
     }
@@ -188,10 +174,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis2);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByZone(zone);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).allMatch(c -> c.getZone().getId().equals(zone.getId()));
     }
@@ -209,10 +193,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByZoneAndStatut(zone, StatutColis.CREE);
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).allMatch(c -> c.getStatut().equals(StatutColis.CREE));
     }
@@ -235,10 +217,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByVilleDestination("Casablanca");
 
-        // Assert
         assertThat(result).hasSize(2);
         assertThat(result).extracting(Colis::getVilleDestination)
                 .containsOnly("Casablanca");
@@ -262,10 +242,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByVilleDestinationAndStatut("Casablanca", StatutColis.CREE);
 
-        // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getVilleDestination()).isEqualTo("Casablanca");
         assertThat(result.get(0).getStatut()).isEqualTo(StatutColis.CREE);
@@ -285,10 +263,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis2);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.searchByKeyword("urgente");
 
-        // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDescription()).contains("urgente");
     }
@@ -302,10 +278,8 @@ class ColisRepositoryTest {
         entityManager.persist(createColis(StatutColis.EN_TRANSIT, Priorite.NORMALE));
         entityManager.flush();
 
-        // Act
         long count = colisRepository.countByStatut(StatutColis.CREE);
 
-        // Assert
         assertEquals(2, count);
     }
 
@@ -318,10 +292,8 @@ class ColisRepositoryTest {
         entityManager.persist(createColis(StatutColis.EN_TRANSIT, Priorite.NORMALE));
         entityManager.flush();
 
-        // Act
         long count = colisRepository.countByZoneAndStatut(zone.getId(), StatutColis.CREE);
 
-        // Assert
         assertEquals(2, count);
     }
 
@@ -334,10 +306,8 @@ class ColisRepositoryTest {
         entityManager.persist(createColis(StatutColis.LIVRE, Priorite.NORMALE));
         entityManager.flush();
 
-        // Act
         long count = colisRepository.countByLivreurAndStatut(livreur.getId(), StatutColis.EN_TRANSIT);
 
-        // Assert
         assertEquals(2, count);
     }
 
@@ -359,10 +329,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis1);
         entityManager.flush();
 
-        // Act
         List<Colis> result = colisRepository.findByDateCreationBetween(yesterday, tomorrow);
 
-        // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDateCreation()).isAfterOrEqualTo(yesterday);
         assertThat(result.get(0).getDateCreation()).isBeforeOrEqualTo(tomorrow);
@@ -378,11 +346,9 @@ class ColisRepositoryTest {
         }
         entityManager.flush();
 
-        // Act
         Pageable pageable = PageRequest.of(0, 2);
         Page<Colis> page = colisRepository.findAll(pageable);
 
-        // Assert
         assertThat(page.getContent()).hasSize(2);
         assertThat(page.getTotalElements()).isEqualTo(5);
         assertThat(page.getTotalPages()).isEqualTo(3);
@@ -398,11 +364,9 @@ class ColisRepositoryTest {
         entityManager.persist(createColis(StatutColis.EN_TRANSIT, Priorite.NORMALE));
         entityManager.flush();
 
-        // Act
         Pageable pageable = PageRequest.of(0, 2);
         Page<Colis> page = colisRepository.findByStatut(StatutColis.CREE, pageable);
 
-        // Assert
         assertThat(page.getContent()).hasSize(2);
         assertThat(page.getTotalElements()).isEqualTo(5);
     }
@@ -416,11 +380,9 @@ class ColisRepositoryTest {
         }
         entityManager.flush();
 
-        // Act
         Pageable pageable = PageRequest.of(0, 2);
         Page<Colis> page = colisRepository.findByZoneId(zone.getId(), pageable);
 
-        // Assert
         assertThat(page.getContent()).hasSize(2);
         assertThat(page.getTotalElements()).isEqualTo(3);
     }
@@ -439,10 +401,8 @@ class ColisRepositoryTest {
         entityManager.persist(colis2);
         entityManager.flush();
 
-        // Act
         List<Object[]> result = colisRepository.findPoidsTotalParLivreur();
 
-        // Assert
         assertThat(result).isNotEmpty();
         Object[] firstRow = result.get(0);
         assertThat(firstRow[0]).isEqualTo(livreur);
@@ -467,17 +427,14 @@ class ColisRepositoryTest {
         entityManager.persist(colis3);
         entityManager.flush();
 
-        // Act
         List<Object[]> result = colisRepository.findPoidsTotalParLivreurAvecStatut(
                 Arrays.asList(StatutColis.EN_TRANSIT));
 
-        // Assert
         assertThat(result).isNotEmpty();
         Object[] firstRow = result.get(0);
         assertThat(firstRow[1]).isEqualTo(new BigDecimal("15.00"));
     }
 
-    // ========== Méthode Helper ==========
 
     private Colis createColis(StatutColis statut, Priorite priorite) {
         Colis colis = new Colis();

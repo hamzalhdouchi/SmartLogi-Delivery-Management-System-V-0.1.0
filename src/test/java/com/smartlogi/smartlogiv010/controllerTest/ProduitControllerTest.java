@@ -109,11 +109,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Créer un produit - Succès")
     void testCreateProduit_Success() throws Exception {
-        // Given
         when(produitService.create(any(ProduitCreateRequestDto.class)))
                 .thenReturn(simpleResponseDto);
 
-        // When & Then
         mockMvc.perform(post("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -133,10 +131,8 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Créer un produit - Validation échouée (nom vide)")
     void testCreateProduit_ValidationFailed_EmptyName() throws Exception {
-        // Given
         createDto.setNom("");
 
-        // When & Then
         mockMvc.perform(post("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -149,10 +145,8 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Créer un produit - Prix invalide (négatif)")
     void testCreateProduit_InvalidPrice() throws Exception {
-        // Given
         createDto.setPrix(new BigDecimal("-10.00"));
 
-        // When & Then
         mockMvc.perform(post("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -165,10 +159,8 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Créer un produit - Poids invalide")
     void testCreateProduit_InvalidWeight() throws Exception {
-        // Given
         createDto.setPoids(new BigDecimal("0.001"));
 
-        // When & Then
         mockMvc.perform(post("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -181,10 +173,8 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Créer un produit - Catégorie invalide (caractères spéciaux)")
     void testCreateProduit_InvalidCategory() throws Exception {
-        // Given
         createDto.setCategorie("Électronique@123");
 
-        // When & Then
         mockMvc.perform(post("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -197,7 +187,6 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Mettre à jour un produit - Succès")
     void testUpdateProduit_Success() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         ProduitSimpleResponseDto updatedResponse = new ProduitSimpleResponseDto(
                 produitId,
@@ -211,7 +200,6 @@ class ProduitControllerTest {
         when(produitService.update(eq(produitId), any(ProduitUpdateRequestDto.class)))
                 .thenReturn(updatedResponse);
 
-        // When & Then
         mockMvc.perform(put("/api/produits/{id}", produitId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
@@ -228,11 +216,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Obtenir un produit par ID - Succès")
     void testGetProduitById_Success() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         when(produitService.getById(produitId)).thenReturn(simpleResponseDto);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/{id}", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -248,11 +234,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Obtenir un produit avec statistiques - Succès")
     void testGetProduitByIdWithStats_Success() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         when(produitService.getByIdWithStats(produitId)).thenReturn(advancedResponseDto);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/{id}/advanced", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -270,11 +254,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Obtenir un produit avec ses colis - Succès")
     void testGetProduitByIdWithColis_Success() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         when(produitService.getByIdWithColis(produitId)).thenReturn(detailedResponseDto);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/{id}/detailed", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -290,7 +272,6 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Lister tous les produits - Succès")
     void testGetAllProduits_Success() throws Exception {
-        // Given
         ProduitSimpleResponseDto produit1 = new ProduitSimpleResponseDto(
                 "id1", "Samsung Galaxy S23", "Électronique",
                 new BigDecimal("0.168"), new BigDecimal("799.99"), LocalDateTime.now()
@@ -303,7 +284,6 @@ class ProduitControllerTest {
         List<ProduitSimpleResponseDto> produitsList = Arrays.asList(produit1, produit2);
         when(produitService.getAll()).thenReturn(produitsList);
 
-        // When & Then
         mockMvc.perform(get("/api/produits")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -320,7 +300,6 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Lister tous les produits paginés - Succès")
     void testGetAllProduitsPaginated_Success() throws Exception {
-        // Given
         ProduitSimpleResponseDto produit1 = new ProduitSimpleResponseDto(
                 "id1", "Samsung Galaxy S23", "Électronique",
                 new BigDecimal("0.168"), new BigDecimal("799.99"), LocalDateTime.now()
@@ -336,7 +315,6 @@ class ProduitControllerTest {
 
         when(produitService.getAll(any(Pageable.class))).thenReturn(produitsPage);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/paginated")
                         .param("page", "0")
                         .param("size", "10")
@@ -354,13 +332,11 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Rechercher des produits par nom - Succès")
     void testSearchProduitsByNom_Success() throws Exception {
-        // Given
         String searchNom = "Samsung";
         List<ProduitSimpleResponseDto> searchResults = Arrays.asList(simpleResponseDto);
 
         when(produitService.searchByNom(searchNom)).thenReturn(searchResults);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/search/nom")
                         .param("nom", searchNom)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -377,13 +353,11 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Rechercher des produits par catégorie - Succès")
     void testGetProduitsByCategorie_Success() throws Exception {
-        // Given
         String categorie = "Électronique";
         List<ProduitSimpleResponseDto> searchResults = Arrays.asList(simpleResponseDto);
 
         when(produitService.getByCategorie(categorie)).thenReturn(searchResults);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/categorie/{categorie}", categorie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -399,13 +373,11 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Rechercher des produits par mot-clé - Succès")
     void testSearchProduitsByKeyword_Success() throws Exception {
-        // Given
         String keyword = "galaxy";
         List<ProduitSimpleResponseDto> searchResults = Arrays.asList(simpleResponseDto);
 
         when(produitService.searchByKeyword(keyword)).thenReturn(searchResults);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/search/keyword")
                         .param("keyword", keyword)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -421,7 +393,6 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Rechercher des produits par plage de prix - Succès")
     void testGetProduitsByPrixBetween_Success() throws Exception {
-        // Given
         BigDecimal prixMin = new BigDecimal("500.00");
         BigDecimal prixMax = new BigDecimal("1000.00");
         List<ProduitSimpleResponseDto> searchResults = Arrays.asList(simpleResponseDto);
@@ -429,7 +400,6 @@ class ProduitControllerTest {
         when(produitService.getByPrixBetween(any(BigDecimal.class), any(BigDecimal.class)))
                 .thenReturn(searchResults);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/prix/range")
                         .param("prixMin", prixMin.toString())
                         .param("prixMax", prixMax.toString())
@@ -446,11 +416,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Obtenir toutes les catégories - Succès")
     void testGetAllCategories_Success() throws Exception {
-        // Given
         List<String> categories = Arrays.asList("Électronique", "Vêtements", "Alimentation");
         when(produitService.getAllCategories()).thenReturn(categories);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/categories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -468,11 +436,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Supprimer un produit - Succès")
     void testDeleteProduit_Success() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         doNothing().when(produitService).delete(produitId);
 
-        // When & Then
         mockMvc.perform(delete("/api/produits/{id}", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -487,11 +453,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Vérifier l'existence d'un produit - Existe")
     void testExistsById_ProduitExists() throws Exception {
-        // Given
         String produitId = "123e4567-e89b-12d3-a456-426614174000";
         when(produitService.existsById(produitId)).thenReturn(true);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/{id}/exists", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -506,11 +470,9 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Vérifier l'existence d'un produit - N'existe pas")
     void testExistsById_ProduitDoesNotExist() throws Exception {
-        // Given
         String produitId = "non-existent-id";
         when(produitService.existsById(produitId)).thenReturn(false);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/{id}/exists", produitId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -525,7 +487,6 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Lister les produits paginés avec tri - Succès")
     void testGetAllProduitsPaginatedSorted_Success() throws Exception {
-        // Given
         ProduitSimpleResponseDto produit1 = new ProduitSimpleResponseDto(
                 "id1", "iPhone 14 Pro", "Électronique",
                 new BigDecimal("0.206"), new BigDecimal("1099.99"), LocalDateTime.now()
@@ -541,7 +502,6 @@ class ProduitControllerTest {
 
         when(produitService.getAll(any(Pageable.class))).thenReturn(produitsPage);
 
-        // When & Then
         mockMvc.perform(get("/api/produits/paginated")
                         .param("page", "0")
                         .param("size", "10")
@@ -558,14 +518,12 @@ class ProduitControllerTest {
     @Test
     @DisplayName("Rechercher des produits par plage de prix - Prix minimum supérieur au prix maximum")
     void testGetProduitsByPrixBetween_InvalidRange() throws Exception {
-        // Given
         BigDecimal prixMin = new BigDecimal("1000.00");
         BigDecimal prixMax = new BigDecimal("500.00");
 
         when(produitService.getByPrixBetween(any(BigDecimal.class), any(BigDecimal.class)))
                 .thenReturn(Arrays.asList());
 
-        // When & Then
         mockMvc.perform(get("/api/produits/prix/range")
                         .param("prixMin", prixMin.toString())
                         .param("prixMax", prixMax.toString())
