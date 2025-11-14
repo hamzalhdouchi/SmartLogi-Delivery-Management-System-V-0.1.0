@@ -287,3 +287,9 @@ smartlogi-sdms/
 
 ## Digrame De Class
 ![img.png](img.png)
+
+## Jacoco Rapport
+<img width="1909" height="922" alt="Capture d&#39;écran 2025-11-14 161143" src="https://github.com/user-attachments/assets/4171a605-9148-4604-a233-cb6713691774" />
+
+## SonarQube
+<img width="1918" height="954" alt="Capture d&#39;écran 2025-11-14 161310" src="https://github.com/user-attachments/assets/1ec7d390-f8a9-41d1-890a-64b474de594a" />
