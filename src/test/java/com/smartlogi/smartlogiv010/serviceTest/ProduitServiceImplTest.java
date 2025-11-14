@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -692,13 +694,19 @@ class ProduitServiceImplTest {
         verify(produitRepository, never()).findByPrixBetween(any(), any());
     }
 
-    @Test
-    @DisplayName("GetByPrixBetween - Should throw exception when prixMin > prixMax")
     void testGetByPrixBetween_InvalidPriceRanges(BigDecimal prixMin, BigDecimal prixMax, String expectedMessage) {
         assertThatThrownBy(() -> produitService.getByPrixBetween(prixMin, prixMax))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage(expectedMessage);
         verify(produitRepository, never()).findByPrixBetween(any(), any());
+    }
+
+    private static Stream<Arguments> invalidPriceRanges() {
+        return Stream.of(
+                Arguments.of(new BigDecimal("100.0"), new BigDecimal("50.0"), "prixMin must be less than or equal to prixMax"),
+                Arguments.of(new BigDecimal("200.0"), new BigDecimal("100.0"), "prixMin must be less than or equal to prixMax"),
+                Arguments.of(new BigDecimal("999.99"), new BigDecimal("10.50"), "prixMin must be less than or equal to prixMax")
+        );
     }
 
     @Test
