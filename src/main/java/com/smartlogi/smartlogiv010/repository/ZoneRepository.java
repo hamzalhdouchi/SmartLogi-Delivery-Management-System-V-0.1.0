@@ -1,0 +1,28 @@
+package com.smartlogi.smartlogiv010.repository;
+
+
+import com.smartlogi.smartlogiv010.entity.Zone;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ZoneRepository extends JpaRepository<Zone, String> {
+
+    Optional<Zone> findByCodePostal(String codePostal);
+
+    Optional<Zone> findByNom(String nom);
+
+    List<Zone> findByNomContainingIgnoreCase(String nom);
+
+    @Query("SELECT z FROM Zone z WHERE z.nom LIKE %:keyword% OR z.codePostal LIKE %:keyword%")
+    List<Zone> searchByKeyword(@Param("keyword") String keyword);
+
+    boolean existsByCodePostal(String codePostal);
+
+    boolean existsByNom(String nom);
+}
