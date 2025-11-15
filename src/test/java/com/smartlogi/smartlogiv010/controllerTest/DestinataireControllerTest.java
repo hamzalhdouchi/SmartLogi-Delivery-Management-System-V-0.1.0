@@ -82,11 +82,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Créer un destinataire - Succès")
     void testCreateDestinataire_Success() throws Exception {
-        // Given
         when(destinataireService.create(any(DestinataireCreateDto.class)))
                 .thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(post("/api/destinataires")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -107,11 +105,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Créer un destinataire - Email déjà existant")
     void testCreateDestinataire_EmailAlreadyExists() throws Exception {
-        // Given
         when(destinataireService.create(any(DestinataireCreateDto.class)))
                 .thenThrow(new EmailAlreadyExistsException("L'email existe déjà"));
 
-        // When & Then
         mockMvc.perform(post("/api/destinataires")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -124,10 +120,8 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Créer un destinataire - Validation échouée (nom vide)")
     void testCreateDestinataire_ValidationFailed_EmptyName() throws Exception {
-        // Given
         createDto.setNom("");
 
-        // When & Then
         mockMvc.perform(post("/api/destinataires")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -140,10 +134,8 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Créer un destinataire - Email invalide")
     void testCreateDestinataire_InvalidEmail() throws Exception {
-        // Given
         createDto.setEmail("invalid-email");
 
-        // When & Then
         mockMvc.perform(post("/api/destinataires")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -156,10 +148,8 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Créer un destinataire - Téléphone invalide")
     void testCreateDestinataire_InvalidPhone() throws Exception {
-        // Given
         createDto.setTelephone("123456");
 
-        // When & Then
         mockMvc.perform(post("/api/destinataires")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -172,7 +162,6 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Mettre à jour un destinataire - Succès")
     void testUpdateDestinataire_Success() throws Exception {
-        // Given
         String destinataireId = "123e4567-e89b-12d3-a456-426614174000";
         DestinataireSimpleResponseDto updatedResponse = new DestinataireSimpleResponseDto(
                 destinataireId,
@@ -187,7 +176,6 @@ class DestinataireControllerTest {
         when(destinataireService.update(eq(destinataireId), any(DestinataireUpdateDto.class)))
                 .thenReturn(updatedResponse);
 
-        // When & Then
         mockMvc.perform(put("/api/destinataires/{id}", destinataireId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
@@ -205,11 +193,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Obtenir un destinataire par ID - Succès")
     void testGetDestinataireById_Success() throws Exception {
-        // Given
         String destinataireId = "123e4567-e89b-12d3-a456-426614174000";
         when(destinataireService.getById(destinataireId)).thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires/{id}", destinataireId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -226,7 +212,6 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Lister tous les destinataires avec pagination - Succès")
     void testGetAllDestinataires_Success() throws Exception {
-        // Given
         DestinataireSimpleResponseDto destinataire1 = new DestinataireSimpleResponseDto(
                 "id1", "Alami", "Mohammed", "m.alami@example.com",
                 "+212612345678", "Casablanca", LocalDateTime.now()
@@ -242,7 +227,6 @@ class DestinataireControllerTest {
 
         when(destinataireService.getAll(any(Pageable.class))).thenReturn(destinatairesPage);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires")
                         .param("page", "0")
                         .param("size", "10")
@@ -262,13 +246,11 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Rechercher des destinataires par nom - Succès")
     void testSearchDestinatairesByNom_Success() throws Exception {
-        // Given
         String searchNom = "Alami";
         List<DestinataireSimpleResponseDto> searchResults = Arrays.asList(responseDto);
 
         when(destinataireService.searchByNom(searchNom)).thenReturn(searchResults);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires/search")
                         .param("nom", searchNom)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -285,11 +267,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Rechercher un destinataire par mot-clé - Succès")
     void testFindDestinataireByKeyword_Success() throws Exception {
-        // Given
         String keyword = "mohammed.alami@example.com";
         when(destinataireService.findByKeyWord(keyword)).thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires/search-keyword")
                         .param("keyword", keyword)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -305,11 +285,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Supprimer un destinataire - Succès")
     void testDeleteDestinataire_Success() throws Exception {
-        // Given
         String destinataireId = "123e4567-e89b-12d3-a456-426614174000";
         doNothing().when(destinataireService).delete(destinataireId);
 
-        // When & Then
         mockMvc.perform(delete("/api/destinataires/{id}", destinataireId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -324,11 +302,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Vérifier l'existence d'un destinataire - Existe")
     void testExistsById_DestinataireExists() throws Exception {
-        // Given
         String destinataireId = "123e4567-e89b-12d3-a456-426614174000";
         when(destinataireService.existsById(destinataireId)).thenReturn(true);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires/{id}/exists", destinataireId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -343,11 +319,9 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Vérifier l'existence d'un destinataire - N'existe pas")
     void testExistsById_DestinataireDoesNotExist() throws Exception {
-        // Given
         String destinataireId = "non-existent-id";
         when(destinataireService.existsById(destinataireId)).thenReturn(false);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires/{id}/exists", destinataireId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -362,7 +336,6 @@ class DestinataireControllerTest {
     @Test
     @DisplayName("Lister tous les destinataires avec tri - Succès")
     void testGetAllDestinatairesSorted_Success() throws Exception {
-        // Given
         DestinataireSimpleResponseDto destinataire1 = new DestinataireSimpleResponseDto(
                 "id1", "Alami", "Mohammed", "m.alami@example.com",
                 "+212612345678", "Casablanca", LocalDateTime.now()
@@ -378,7 +351,6 @@ class DestinataireControllerTest {
 
         when(destinataireService.getAll(any(Pageable.class))).thenReturn(destinatairesPage);
 
-        // When & Then
         mockMvc.perform(get("/api/destinataires")
                         .param("page", "0")
                         .param("size", "10")
