@@ -17,17 +17,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Livreur {
+public class Livreur extends  User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    private String nom;
-
-    private String prenom;
-
-    private String telephone;
 
     private String vehicule;
 
