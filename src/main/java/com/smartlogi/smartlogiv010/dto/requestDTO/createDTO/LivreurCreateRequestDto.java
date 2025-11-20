@@ -1,5 +1,6 @@
 package com.smartlogi.smartlogiv010.dto.requestDTO.createDTO;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -30,6 +31,11 @@ public class LivreurCreateRequestDto {
             message = "Le numéro de téléphone doit être un numéro marocain valide (ex: +212612345678 ou 0612345678)")
     private String telephone;
 
+    @NotBlank(message = "L'email est obligatoire")
+    @Size(max = 150, message = "L'email ne doit pas dépasser 150 caractères")
+    @Email(message = "L'email doit être valide")
+    private String email;
+
     @NotBlank(message = "Le type de véhicule est obligatoire")
     @Size(max = 50, message = "Le type de véhicule ne doit pas dépasser 50 caractères")
     @Pattern(regexp = "^[a-zA-Z0-9À-ÿ\\s\\-]+$",
@@ -37,4 +43,8 @@ public class LivreurCreateRequestDto {
     private String vehicule;
 
     private String zoneId;
+
+    @NotBlank(message = "Le password est obligatoire")
+    @Size(min = 8,message = "Le password ne doit min 8  caractères")
+    private String password;
 }
