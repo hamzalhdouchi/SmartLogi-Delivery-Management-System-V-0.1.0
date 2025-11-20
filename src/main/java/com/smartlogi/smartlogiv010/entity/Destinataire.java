@@ -31,7 +31,6 @@ public class Destinataire {
     private String email;
 
     private String telephone;
-
     private String adresse;
 
     @CreationTimestamp

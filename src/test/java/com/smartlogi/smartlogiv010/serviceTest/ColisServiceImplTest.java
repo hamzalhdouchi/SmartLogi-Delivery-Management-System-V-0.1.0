@@ -78,7 +78,7 @@ class ColisServiceImplTest {
         destinataire = new Destinataire();
         destinataire.setId("dest-123");
         destinataire.setNom("Martin");
-        destinataire.setEmail("martin@example.com");
+          destinataire.setEmail("martin@example.com");
 
         livreur = new Livreur();
         livreur.setId("livreur-123");
@@ -399,7 +399,7 @@ class ColisServiceImplTest {
         when(colisRepository.findById("colis-123")).thenReturn(Optional.of(colis));
         when(produitRepository.findById("produit-123")).thenReturn(Optional.of(produit));
         when(colisProduitRepository.save(any())).thenReturn(colisProduit);
-        when(historiqueLivraisonRepository.save(any())).thenReturn(new HistoriqueLivraison());
+            when(historiqueLivraisonRepository.save(any())).thenReturn(new HistoriqueLivraison());
 
         colisService.ajouterProduit("colis-123", produitDto);
 
