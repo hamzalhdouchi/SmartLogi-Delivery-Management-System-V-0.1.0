@@ -14,20 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 
 @NoArgsConstructor
-public class ClientExpediteur {
+                                                                                                                                                                                        public class ClientExpediteur extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    private String nom;
-
-    private String prenom;
-
-    private String email;
-
-    private String telephone;
-
-    private String adresse;
 
     private LocalDateTime dateCreation =  LocalDateTime.now();
 
