@@ -40,4 +40,8 @@ public class ClientExpediteurCreateRequestDto {
     @Size(max = 255, message = "L'adresse ne doit pas dépasser 255 caractères")
     @Pattern(regexp = "^[a-zA-Z0-9À-ÿ\\s\\-,.'#&]+$", message = "L'adresse contient des caractères non autorisés")
     private String adresse;
+
+//    @NotBlank(message = "Le password est obligatoire")
+//    @Size(min = 8,message = "Le password ne doit min 8  caractères")
+//    private String password;
 }
