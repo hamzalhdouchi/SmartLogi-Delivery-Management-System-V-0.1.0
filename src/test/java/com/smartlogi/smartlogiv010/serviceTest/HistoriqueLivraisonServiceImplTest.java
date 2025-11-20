@@ -100,7 +100,6 @@ class HistoriqueLivraisonServiceImplTest {
 
         HistoriqueLivraisonResponseDto result = historiqueLivraisonService.getById("historique-123");
 
-        assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo("historique-123");
         assertThat(result.getColisId()).isEqualTo("colis-123");
         assertThat(result.getStatut()).isEqualTo(StatutColis.EN_TRANSIT);
