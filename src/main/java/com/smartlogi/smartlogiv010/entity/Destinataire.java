@@ -17,21 +17,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Destinataire {
+public class Destinataire extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-
-    private String nom;
-
-    private String prenom;
-
-    @Column(unique = true)
-    private String email;
-
-    private String telephone;
-    private String adresse;
 
     @CreationTimestamp
     @Column(name = "date_creation", updatable = false)

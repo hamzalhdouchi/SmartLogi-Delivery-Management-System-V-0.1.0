@@ -65,8 +65,14 @@ public interface SmartLogiMapper {
 
 
     // Request Mappings
-    @Mapping(target = "zone", ignore = true)
-    @Mapping(target = "colisAssignes", ignore = true)
+    @Mapping(target = "nom", source = "nom")
+    @Mapping(target = "prenom", source = "prenom")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "telephone", source = "telephone")
+    @Mapping(target = "password", source = "password")
+    @Mapping(target = "role", source = "role")
+    @Mapping(target = "vehicule", source = "vehicule")
+    @Mapping(target = "zone", source = "zoneId")
     Livreur toEntity(LivreurCreateRequestDto requestDto);
 
     @Mapping(target = "id", ignore = true)

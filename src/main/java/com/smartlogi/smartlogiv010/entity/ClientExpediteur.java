@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 
 @NoArgsConstructor
-                                                                                                                                                                                        public class ClientExpediteur extends User{
+public class ClientExpediteur extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

@@ -41,7 +41,7 @@ public class ColisController {
             summary = "Créer un nouveau colis",
             description = "Créer un colis avec possibilité d'ajouter des produits existants ou de créer de nouveaux produits"
     )
-    @PostMapping
+    @PostMapping("/demande-livraison")
     public ResponseEntity<ApiResponseDTO<ColisSimpleResponseDto>> create(
             @Parameter(description = "Données du colis à créer", required = true)
             @Valid @RequestBody ColisCreateRequestDto requestDto) {
@@ -315,7 +315,7 @@ public class ColisController {
             summary = "Rechercher les colis par client expéditeur",
             description = "Récupérer tous les colis d'un client expéditeur spécifique"
     )
-    @GetMapping("/client-expediteur/{clientId}")
+    @GetMapping("/mes-colis/client-expediteur/{clientId")
     public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByClientExpediteur(
             @Parameter(description = "ID du client expéditeur", required = true, example = "client-123")
             @PathVariable String clientId) {

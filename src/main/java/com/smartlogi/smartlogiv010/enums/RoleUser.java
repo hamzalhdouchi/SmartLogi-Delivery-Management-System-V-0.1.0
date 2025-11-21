@@ -2,8 +2,9 @@ package com.smartlogi.smartlogiv010.enums;
 
 public enum RoleUser {
 
-    Gestionner,
+    gestionnaire,
     Client,
+    Livreur,
     Destinataire
 
 }
