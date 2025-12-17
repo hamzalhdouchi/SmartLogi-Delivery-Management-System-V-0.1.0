@@ -1,19 +1,23 @@
 package com.smartlogi.smartlogiv010.security.dto;
 
-import com.smartlogi.smartlogiv010.enums.RoleUser;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class UserResponse {
+    private String id;
     private String nom;
     private String prenom;
-    private String telephone;
     private String email;
+    private String telephone;
     private String adresse;
-    private String password;
-    private RoleUser role;
+    private RoleResponse role;
+    private boolean enabled;
 }
+
