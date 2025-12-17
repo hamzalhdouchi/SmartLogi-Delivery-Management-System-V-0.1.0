@@ -111,6 +111,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
+
     // 400 - Bad Request (HttpMessageNotReadable)
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
@@ -160,6 +161,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationExceptionhandler.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationExceptionhandler ex, WebRequest request) {
+
+        log.warn("Erreur métier: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Business Error",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -294,4 +311,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }
