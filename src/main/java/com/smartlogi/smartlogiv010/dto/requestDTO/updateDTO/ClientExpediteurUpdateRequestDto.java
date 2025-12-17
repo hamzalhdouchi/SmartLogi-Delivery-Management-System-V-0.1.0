@@ -43,8 +43,4 @@ public class ClientExpediteurUpdateRequestDto {
     private String adresse;
 
 
-    @CreationTimestamp
-    @Column(name = "date_creation", updatable = false)
-    private LocalDateTime dateCreation;
-
 }
