@@ -18,14 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Destinataire extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
 
-
-    @CreationTimestamp
-    @Column(name = "date_creation", updatable = false)
-    private LocalDateTime dateCreation;
 
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL)
     private List<Colis> colis = new ArrayList<>();
