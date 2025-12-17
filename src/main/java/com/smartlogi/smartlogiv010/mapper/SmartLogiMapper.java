@@ -35,7 +35,6 @@ public interface SmartLogiMapper {
     ClientExpediteur toEntity(ClientExpediteurCreateRequestDto requestDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dateCreation", ignore = true)
     @Mapping(target = "colis", ignore = true)
     void updateEntityFromDto(ClientExpediteurUpdateRequestDto requestDto, @MappingTarget ClientExpediteur client);
 
@@ -51,7 +50,6 @@ public interface SmartLogiMapper {
     Destinataire toEntity(DestinataireCreateDto requestDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dateCreation", ignore = true)
     @Mapping(target = "colis", ignore = true)
     void updateEntityFromDto(DestinataireUpdateDto requestDto, @MappingTarget Destinataire destinataire);
 
@@ -70,13 +68,11 @@ public interface SmartLogiMapper {
     @Mapping(target = "email", source = "email")
     @Mapping(target = "telephone", source = "telephone")
     @Mapping(target = "password", source = "password")
-    @Mapping(target = "role", source = "role")
-    @Mapping(target = "vehicule", source = "vehicule")
-    @Mapping(target = "zone", source = "zoneId")
+    @Mapping(target = "role.name", source = "role")
+
     Livreur toEntity(LivreurCreateRequestDto requestDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dateCreation", ignore = true)
     @Mapping(target = "colisAssignes", ignore = true)
     void updateEntityFromDto(LivreurUpdateRequestDto requestDto, @MappingTarget Livreur livreur);
 
