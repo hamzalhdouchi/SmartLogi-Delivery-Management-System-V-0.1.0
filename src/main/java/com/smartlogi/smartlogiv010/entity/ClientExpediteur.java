@@ -15,11 +15,6 @@ import java.util.List;
 
 @NoArgsConstructor
 public class ClientExpediteur extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-
-    private LocalDateTime dateCreation =  LocalDateTime.now();
 
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL)
     private List<Colis> colis = new ArrayList<>();
