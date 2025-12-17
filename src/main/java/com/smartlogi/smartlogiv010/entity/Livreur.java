@@ -16,19 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class Livreur extends  User{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
 
     private String vehicule;
-
-    @CreationTimestamp
-    @Column(name = "date_creation", updatable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id", nullable = false)
-    private Zone zone;
 
     @OneToMany(mappedBy = "livreur", cascade = CascadeType.ALL)
     private List<Colis> colisAssignes = new ArrayList<>();
