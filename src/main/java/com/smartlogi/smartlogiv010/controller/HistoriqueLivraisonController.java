@@ -1,6 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
-import com.smartlogi.smartlogiv010.apiResponse.ApiResponseDTO;
+import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.responseDTO.HistoriqueLivraison.HistoriqueLivraisonResponseDto;
 import com.smartlogi.smartlogiv010.enums.StatutColis;
 import com.smartlogi.smartlogiv010.service.interfaces.HistoriqueLivraisonService;
@@ -30,12 +30,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les détails d'un enregistrement spécifique de l'historique de livraison"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<HistoriqueLivraisonResponseDto>> getById(
+    public ResponseEntity<ApiResponse<HistoriqueLivraisonResponseDto>> getById(
             @Parameter(description = "ID de l'historique de livraison", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         HistoriqueLivraisonResponseDto historique = historiqueLivraisonService.getById(id);
 
-        ApiResponseDTO<HistoriqueLivraisonResponseDto> response = ApiResponseDTO.<HistoriqueLivraisonResponseDto>builder()
+        ApiResponse<HistoriqueLivraisonResponseDto> response = ApiResponse.<HistoriqueLivraisonResponseDto>builder()
                 .success(true)
                 .message("Historique de livraison récupéré avec succès")
                 .data(historique)
@@ -49,10 +49,10 @@ public class HistoriqueLivraisonController {
             description = "Récupérer la liste complète de tous les enregistrements d'historique de livraison"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getAll() {
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getAll() {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getAll();
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Liste des historiques de livraison récupérée avec succès")
                 .data(historiques)
@@ -66,12 +66,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les historiques de livraison avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<HistoriqueLivraisonResponseDto>>> getAllPaginated(
+    public ResponseEntity<ApiResponse<Page<HistoriqueLivraisonResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
         Page<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getAll(pageable);
 
-        ApiResponseDTO<Page<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<Page<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<Page<HistoriqueLivraisonResponseDto>> response = ApiResponse.<Page<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historiques de livraison paginés récupérés avec succès")
                 .data(historiques)
@@ -85,12 +85,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer tous les enregistrements d'historique pour un colis spécifique"
     )
     @GetMapping("/colis/{colisId}")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByColis(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByColis(colisId);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historique du colis récupéré avec succès")
                 .data(historiques)
@@ -104,12 +104,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer l'historique d'un colis trié par date de changement (du plus ancien au plus récent)"
     )
     @GetMapping("/colis/{colisId}/asc")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByColisOrderByDateAsc(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByColisOrderByDateAsc(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByColisOrderByDateAsc(colisId);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historique du colis (ordre chronologique) récupéré avec succès")
                 .data(historiques)
@@ -123,12 +123,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer l'historique d'un colis trié par date de changement (du plus récent au plus ancien)"
     )
     @GetMapping("/colis/{colisId}/desc")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByColisOrderByDateDesc(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByColisOrderByDateDesc(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByColisOrderByDateDesc(colisId);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historique du colis (ordre anti-chronologique) récupéré avec succès")
                 .data(historiques)
@@ -142,12 +142,12 @@ public class HistoriqueLivraisonController {
             description = "Récupérer tous les historiques de livraison ayant un statut spécifique"
     )
     @GetMapping("/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByStatut(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByStatut(
             @Parameter(description = "Statut des livraisons", required = true, example = "EN_COURS")
             @PathVariable StatutColis statut) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByStatut(statut);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historiques par statut récupérés avec succès")
                 .data(historiques)
@@ -161,14 +161,14 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les historiques d'un colis spécifique avec un statut donné"
     )
     @GetMapping("/colis/{colisId}/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByColisIdAndStatut(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByColisIdAndStatut(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "Statut des livraisons", required = true, example = "LIVRE")
             @PathVariable StatutColis statut) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByColisIdAndStatut(colisId, statut);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historiques du colis par statut récupérés avec succès")
                 .data(historiques)
@@ -182,14 +182,14 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les historiques de livraison créés dans une période spécifique"
     )
     @GetMapping("/date-changement")
-    public ResponseEntity<ApiResponseDTO<List<HistoriqueLivraisonResponseDto>>> getByDateChangementBetween(
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByDateChangementBetween(
             @Parameter(description = "Date de début (format ISO)", required = true, example = "2024-01-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @Parameter(description = "Date de fin (format ISO)", required = true, example = "2024-12-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getByDateChangementBetween(startDate, endDate);
 
-        ApiResponseDTO<List<HistoriqueLivraisonResponseDto>> response = ApiResponseDTO.<List<HistoriqueLivraisonResponseDto>>builder()
+        ApiResponse<List<HistoriqueLivraisonResponseDto>> response = ApiResponse.<List<HistoriqueLivraisonResponseDto>>builder()
                 .success(true)
                 .message("Historiques par période de changement récupérés avec succès")
                 .data(historiques)
