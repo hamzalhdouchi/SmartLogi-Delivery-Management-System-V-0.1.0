@@ -1,9 +1,12 @@
 package com.smartlogi.smartlogiv010.security.config;
 
+import com.smartlogi.smartlogiv010.security.filter.JwtAccessDeniedHandler;
+import com.smartlogi.smartlogiv010.security.filter.JwtAuthenticationEntryPoint;
 import com.smartlogi.smartlogiv010.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,16 +28,49 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity // Active @PreAuthorize
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationEntryPoint authEntryPoint;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtAccessDeniedHandler accessDeniedHandler;
+
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -44,77 +80,5 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                // On désactive CSRF (stateless, JWT)
-                .csrf(csrf -> csrf.disable())
-                // On active CORS (stricte !)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // Mode API stateless
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Accès selon les droits et rôles
-                .authorizeHttpRequests(authz -> authz
-                        // Endpoints d’auth publics
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/register").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // (optionnel) Swagger/OpenAPI publics
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-
-                        // Gestionnaire
-                        .requestMatchers("/api/colis/**").hasRole("MANAGER")
-                        .requestMatchers("/api/livreurs/**").hasRole("MANAGER")
-                        .requestMatchers("/api/zones/**").hasRole("MANAGER")
-                        .requestMatchers("/api/stats/**").hasRole("MANAGER")
-                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
-
-                        // Livreur
-                        .requestMatchers("/api/livreur/mes-colis").hasRole("LIVREUR")
-                        .requestMatchers("/api/livreur/colis/*/statut").hasRole("LIVREUR")
-
-                        // Client expéditeur
-                        .requestMatchers("/api/client/demande-livraison").hasRole("CLIENT_EXPEDITEUR")
-                        .requestMatchers("/api/client/mes-colis").hasRole("CLIENT_EXPEDITEUR")
-
-                        // Destinataire
-                        .requestMatchers("/api/destinataire/colis/**").hasRole("DESTINATAIRE")
-
-                        // Toute autre requête : authentifiée
-                        .anyRequest().authenticated()
-                )
-                // Authent provider & filtre JWT
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:4200",
-                "http://localhost:8080"
-        ));
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-        ));
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization", "Content-Type", "Accept", "X-Requested-With"
-        ));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 }
+
