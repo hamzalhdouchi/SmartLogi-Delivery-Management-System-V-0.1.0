@@ -1,5 +1,6 @@
 package com.smartlogi.smartlogiv010.dto.requestDTO.createDTO;
 
+import com.smartlogi.smartlogiv010.entity.Role;
 import com.smartlogi.smartlogiv010.enums.RoleUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -45,7 +46,7 @@ public class LivreurCreateRequestDto {
 
     private String zoneId;
 
-    private RoleUser role;
+    private String role;
 
     @NotBlank(message = "Le password est obligatoire")
     @Size(min = 8,message = "Le password ne doit min 8  caractères")
