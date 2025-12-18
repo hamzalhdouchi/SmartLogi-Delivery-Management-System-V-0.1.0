@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Destinataires", description = "API pour la gestion des destinataires (création, modification, recherche)")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class DestinataireController {
 
     private final DestinataireServiceImpl destinataireService;
@@ -30,6 +32,7 @@ public class DestinataireController {
             description = "Récupérer les informations complètes d'un destinataire spécifique"
     )
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<DestinataireSimpleResponseDto>> getById(
             @Parameter(description = "ID du destinataire", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
