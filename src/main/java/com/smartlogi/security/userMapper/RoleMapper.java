@@ -1,8 +1,7 @@
-package com.smartlogi.smartlogiv010.security.userMapper;
+package com.smartlogi.security.userMapper;
 
 import com.smartlogi.smartlogiv010.entity.Role;
-import com.smartlogi.smartlogiv010.security.dto.RoleResponse;
-import com.smartlogi.smartlogiv010.security.userMapper.PermissionMapper;
+import com.smartlogi.security.dto.roleDTO.response.RoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
