@@ -1,8 +1,10 @@
-package com.smartlogi.smartlogiv010.security.service;
+package com.smartlogi.security.service;
 
 import com.smartlogi.smartlogiv010.entity.Permission;
 import com.smartlogi.smartlogiv010.entity.Role;
-import com.smartlogi.smartlogiv010.entity.User;
+import com.smartlogi.smartlogiv010.exception.BusinessException;
+import com.smartlogi.security.exception.DuplicateResourceException;
+import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.repository.PermissionRepository;
 import com.smartlogi.smartlogiv010.repository.RoleRepository;
 import com.smartlogi.smartlogiv010.repository.UserRepository;
@@ -12,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,7 +27,7 @@ public class RoleManagementService {
 
     public Role createRole(String roleName) {
         if (roleRepository.findByName(roleName).isPresent()) {
-            throw new RuntimeException("Role already exists: " + roleName);
+            throw new DuplicateResourceException("Role already exists: " + roleName);
         }
 
         Role role = new Role();
@@ -41,7 +42,7 @@ public class RoleManagementService {
         Set<Permission> permissions = new HashSet<>();
         for (String permissionId : permissionIds) {
             Permission permission = permissionRepository.findById(permissionId)
-                    .orElseThrow(() -> new RuntimeException("Permission not found: " + permissionId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Permission not found: " + permissionId));
             permissions.add(permission);
         }
 
@@ -55,19 +56,19 @@ public class RoleManagementService {
 
     public Role getRoleById(String roleId) {
         return roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Role not found with id: " + roleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + roleId));
     }
 
     public Role getRoleByName(String roleName) {
         return roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
     }
 
     public Role updateRoleName(String roleId, String newRoleName) {
         Role role = getRoleById(roleId);
 
         if (roleRepository.findByName(newRoleName).isPresent()) {
-            throw new RuntimeException("Role name already exists: " + newRoleName);
+            throw new DuplicateResourceException("Role name already exists: " + newRoleName);
         }
 
         role.setName(newRoleName);
@@ -78,20 +79,19 @@ public class RoleManagementService {
         Role role = getRoleById(roleId);
         if (userRepository.existsByRole(role)) {
             long count = userRepository.countByRole(role);
-            throw new RuntimeException("Cannot delete role. " + count + " users still have this role");
+            throw new BusinessException("Cannot delete role. " + count + " users still have this role");
         }
 
         roleRepository.delete(role);
     }
 
-    public Permission createPermission(String permissionName, String description) {
+    public Permission createPermission(String permissionName) {
         if (permissionRepository.findByName(permissionName).isPresent()) {
-            throw new RuntimeException("Permission already exists: " + permissionName);
+            throw new DuplicateResourceException("Permission already exists: " + permissionName);
         }
 
         Permission permission = new Permission();
         permission.setName(permissionName);
-        permission.setDescription(description);
         return permissionRepository.save(permission);
     }
 
@@ -101,7 +101,7 @@ public class RoleManagementService {
 
     public Permission getPermissionById(String permissionId) {
         return permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new RuntimeException("Permission not found with id: " + permissionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + permissionId));
     }
 
     public Permission updatePermission(String permissionId, String newName, String newDescription) {
@@ -109,13 +109,9 @@ public class RoleManagementService {
 
         if (newName != null && !newName.equals(permission.getName())) {
             if (permissionRepository.findByName(newName).isPresent()) {
-                throw new RuntimeException("Permission name already exists: " + newName);
+                throw new DuplicateResourceException("Permission name already exists: " + newName);
             }
             permission.setName(newName);
-        }
-
-        if (newDescription != null) {
-            permission.setDescription(newDescription);
         }
 
         return permissionRepository.save(permission);
@@ -141,7 +137,7 @@ public class RoleManagementService {
         Permission permission = getPermissionById(permissionId);
 
         if (role.getPermissions().contains(permission)) {
-            throw new RuntimeException("Role already has this permission");
+            throw new DuplicateResourceException("Role already has this permission");
         }
 
         role.getPermissions().add(permission);
@@ -164,7 +160,7 @@ public class RoleManagementService {
         Permission permission = getPermissionById(permissionId);
 
         if (!role.getPermissions().contains(permission)) {
-            throw new RuntimeException("Role does not have this permission");
+            throw new BusinessException("Role does not have this permission");
         }
 
         role.getPermissions().remove(permission);
@@ -200,74 +196,5 @@ public class RoleManagementService {
         return roleRepository.save(role);
     }
 
-    public User assignRoleToUser(String userId, String roleId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        Role role = getRoleById(roleId);
-
-        if (user.getRole() != null && user.getRole().equals(role)) {
-            throw new RuntimeException("User already has this role");
-        }
-
-        user.setRole(role);
-        return userRepository.save(user);
-    }
-
-    public User changeUserRole(String userId, String newRoleId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        Role newRole = getRoleById(newRoleId);
-        user.setRole(newRole);
-
-        return userRepository.save(user);
-    }
-
-    public User removeRoleFromUser(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        if (user.getRole() == null) {
-            throw new RuntimeException("User does not have any role");
-        }
-
-        user.setRole(null);
-        return userRepository.save(user);
-    }
-
-    public Role getUserRole(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return user.getRole();
-    }
-
-    public Set<Permission> getUserPermissions(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        if (user.getRole() == null) {
-            return new HashSet<>();
-        }
-
-        return user.getRole().getPermissions();
-    }
-
-    public boolean userHasPermission(String userId, String permissionName) {
-        Set<Permission> permissions = getUserPermissions(userId);
-        return permissions.stream()
-                .anyMatch(permission -> permission.getName().equals(permissionName));
-    }
-
-    public boolean userHasRole(String userId, String roleName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        return user.getRole() != null && user.getRole().getName().equals(roleName);
-    }
-
-    public Optional<User> getUsersByRole(String roleId) {
-        Role role = getRoleById(roleId);
-        return userRepository.findByRole(role);
-    }
 }
