@@ -1,4 +1,4 @@
-package com.smartlogi.smartlogiv010.security.dto;
+package com.smartlogi.security.dto.roleDTO.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
