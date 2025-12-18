@@ -1,7 +1,7 @@
-package com.smartlogi.smartlogiv010.security.userMapper;
+package com.smartlogi.security.userMapper;
 
 import com.smartlogi.smartlogiv010.entity.Permission;
-import com.smartlogi.smartlogiv010.security.dto.PermissionResponse;
+import com.smartlogi.security.dto.Permission.response.PermissionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
