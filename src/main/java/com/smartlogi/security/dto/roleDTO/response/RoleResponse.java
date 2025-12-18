@@ -1,11 +1,11 @@
-package com.smartlogi.smartlogiv010.security.dto;
+package com.smartlogi.security.dto.roleDTO.response;
 
+import com.smartlogi.security.dto.Permission.response.PermissionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
