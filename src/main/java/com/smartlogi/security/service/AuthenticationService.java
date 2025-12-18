@@ -1,15 +1,16 @@
-package com.smartlogi.smartlogiv010.security.service;
+package com.smartlogi.security.service;
 
+import com.smartlogi.security.exception.DuplicateResourceException;
 import com.smartlogi.smartlogiv010.entity.Role;
 import com.smartlogi.smartlogiv010.entity.User;
-import com.smartlogi.smartlogiv010.exception.AuthenticationExceptionhandler;
+import com.smartlogi.security.exception.AuthenticationExceptionhandler;
 import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.repository.RoleRepository;
 import com.smartlogi.smartlogiv010.repository.UserRepository;
-import com.smartlogi.smartlogiv010.security.config.JwtService;
-import com.smartlogi.smartlogiv010.security.dto.JwtAuthResponse;
-import com.smartlogi.smartlogiv010.security.dto.LoginRequest;
-import com.smartlogi.smartlogiv010.security.dto.SignupRequest;
+import com.smartlogi.security.config.JwtService;
+import com.smartlogi.security.dto.authDto.response.JwtAuthResponse;
+import com.smartlogi.security.dto.authDto.request.LoginRequest;
+import com.smartlogi.security.dto.authDto.request.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,17 +29,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public JwtAuthResponse login(LoginRequest request) {
-        try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
                             request.getPassword()
                     )
             );
-        } catch (RuntimeException e) {
-            throw new AuthenticationExceptionhandler("Email ou mot de passe incorrect. Veuillez réessayer.");
-
-        }
 
         User user = userRepository.findByEmail(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -47,7 +43,12 @@ public class AuthenticationService {
         return new JwtAuthResponse(token, "Bearer");
     }
 
+
     public User signup(SignupRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new DuplicateResourceException("User déga excité");
+        }
         User user = new User();
         user.setNom(request.getNom());
         user.setEmail(request.getEmail());
