@@ -1,8 +1,9 @@
-package com.smartlogi.smartlogiv010.security.config;
+package com.smartlogi.security.config;
 
 import com.smartlogi.smartlogiv010.entity.Permission;
 import com.smartlogi.smartlogiv010.entity.Role;
 import com.smartlogi.smartlogiv010.entity.User;
+import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         List<GrantedAuthority> authorities = getAuthorities(user);
 
@@ -38,9 +39,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(),
                 user.getPassword(),
                 user.isEnabled(),
-                true, // accountNonExpired
-                true, // credentialsNonExpired
-                true, // accountNonLocked
+                true,
+                true,
+                true,
                 authorities
         );
     }
