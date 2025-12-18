@@ -1,4 +1,4 @@
-package com.smartlogi.smartlogiv010.security.config;
+package com.smartlogi.security.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -26,11 +26,10 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
-    // Générer token avec rôles et permissions
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
 
-        // Extraire rôles et permissions
+
         List<String> roles = userDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
                 .map(GrantedAuthority::getAuthority)
@@ -53,18 +52,15 @@ public class JwtService {
                 .compact();
     }
 
-    // Extraire username du token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extraire un claim spécifique
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // NOUVELLE SYNTAXE pour JJWT 0.12.x
     private Claims extractAllClaims(String token) {
         return Jwts.parser()  // parser() au lieu de parserBuilder()
                 .verifyWith(getSigningKey())  // verifyWith() au lieu de setSigningKey()
