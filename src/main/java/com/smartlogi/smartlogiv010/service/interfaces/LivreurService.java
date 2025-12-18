@@ -25,7 +25,4 @@ public interface LivreurService {
     List<LivreurSimpleResponseDto> getByZone(String zoneId);
     List<LivreurSimpleResponseDto> searchByNom(String nom);
     List<LivreurSimpleResponseDto> searchByKeyword(String keyword);
-    Optional<LivreurSimpleResponseDto> getByTelephone(String telephone);
-    long countByZone(String zoneId);
-    boolean existsByTelephone(String telephone);
 }
