@@ -1,7 +1,6 @@
-package com.smartlogi.smartlogiv010.security.dto;
+package com.smartlogi.security.dto.Permission.response;
 
 
-import com.smartlogi.smartlogiv010.entity.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
 public class PermissionResponse {
     private String id;
     private String name;
-    private String description;
 
 }
 
