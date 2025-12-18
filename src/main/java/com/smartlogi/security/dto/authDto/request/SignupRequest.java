@@ -1,12 +1,9 @@
-package com.smartlogi.smartlogiv010.security.dto;
+package com.smartlogi.security.dto.authDto.request;
 
-import com.smartlogi.smartlogiv010.enums.RoleUser;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
