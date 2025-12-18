@@ -1,4 +1,4 @@
-package com.smartlogi.smartlogiv010.security.dto;
+package com.smartlogi.security.dto.roleDTO.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
