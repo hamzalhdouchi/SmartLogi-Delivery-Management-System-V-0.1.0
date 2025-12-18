@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,7 @@ public class ColisController {
             description = "Créer un colis avec possibilité d'ajouter des produits existants ou de créer de nouveaux produits"
     )
     @PostMapping("/demande-livraison")
+    @PreAuthorize("hasAuthority('CAN_CREATE_COLIS')")
     public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> create(
             @Parameter(description = "Données du colis à créer", required = true)
             @Valid @RequestBody ColisCreateRequestDto requestDto) {
@@ -74,6 +76,7 @@ public class ColisController {
             description = "Ajouter un produit existant ou créer un nouveau produit dans un colis existant"
     )
     @PostMapping("/{colisId}/produits")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_SENDER')")
     public ResponseEntity<ApiResponse<Void>> ajouterProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -101,6 +104,7 @@ public class ColisController {
             description = "Récupérer la liste de tous les produits associés à un colis spécifique"
     )
     @GetMapping("/{colisId}/produits")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<ColisProduit>>> getProduitsByColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
@@ -120,6 +124,7 @@ public class ColisController {
             description = "Mettre à jour la quantité d'un produit spécifique dans un colis"
     )
     @PutMapping("/{colisId}/produits/{produitId}/quantite")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<Void>> mettreAJourQuantiteProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -142,6 +147,7 @@ public class ColisController {
             description = "Retirer un produit spécifique d'un colis"
     )
     @DeleteMapping("/{colisId}/produits/{produitId}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<Void>> supprimerProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -162,6 +168,7 @@ public class ColisController {
             description = "Obtenir le prix total d'un colis basé sur les produits et leurs quantités"
     )
     @GetMapping("/{colisId}/total-prix")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<BigDecimal>> getTotalPrixColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
@@ -181,6 +188,7 @@ public class ColisController {
             description = "Vérifier si un produit spécifique existe dans un colis"
     )
     @GetMapping("/{colisId}/produits/{produitId}/existe")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_SENDER')")
     public ResponseEntity<ApiResponse<Boolean>> produitExisteDansColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -202,6 +210,7 @@ public class ColisController {
             description = "Modifier les informations d'un colis existant"
     )
     @PutMapping("/{id}/update")
+    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_FULL')")
     public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> update(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
@@ -223,6 +232,7 @@ public class ColisController {
             description = "Récupérer les informations de base d'un colis spécifique"
     )
     @GetMapping("/{id}/getColis")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> getById(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -242,6 +252,7 @@ public class ColisController {
             description = "Récupérer toutes les informations détaillées d'un colis (historique, produits, etc.)"
     )
     @GetMapping("/{id}/detailed")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<ColisAdvancedResponseDto>> getByIdWithDetails(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -261,6 +272,7 @@ public class ColisController {
             description = "Récupérer la liste complète de tous les colis"
     )
     @GetMapping
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getAll() {
         List<ColisSimpleResponseDto> colis = colisService.getAll(Pageable.unpaged()).getContent();
 
@@ -278,6 +290,7 @@ public class ColisController {
             description = "Récupérer les colis avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
@@ -297,6 +310,7 @@ public class ColisController {
             description = "Récupérer tous les colis ayant un statut spécifique"
     )
     @GetMapping("/statut/{statut}")
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByStatut(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
@@ -316,6 +330,7 @@ public class ColisController {
             description = "Récupérer tous les colis d'un client expéditeur spécifique"
     )
     @GetMapping("/client-expediteur/{clientId}")
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByClientExpediteur(
             @Parameter(description = "ID du client expéditeur", required = true, example = "client-123")
             @PathVariable String clientId) {
@@ -335,6 +350,7 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à un destinataire spécifique"
     )
     @GetMapping("/destinataire/{destinataireId}")
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByDestinataire(
             @Parameter(description = "ID du destinataire", required = true, example = "dest-456")
             @PathVariable String destinataireId) {
@@ -354,6 +370,7 @@ public class ColisController {
             description = "Récupérer tous les colis assignés à un livreur spécifique"
     )
     @GetMapping("/livreur/{livreurId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisAdvancedResponseDto>>> getByLivreur(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
@@ -373,6 +390,7 @@ public class ColisController {
             description = "Récupérer tous les colis d'une zone spécifique"
     )
     @GetMapping("/zone/{zoneId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZone(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId) {
@@ -392,6 +410,7 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à une ville spécifique"
     )
     @GetMapping("/ville-destination/{ville}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> searchByVilleDestination(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville) {
@@ -411,6 +430,7 @@ public class ColisController {
             description = "Assigner un livreur spécifique à un colis pour la livraison"
     )
     @PutMapping("/{colisId}/assigner-livreur/{livreurId}")
+    @PreAuthorize("hasAuthority('CAN_ASSIGN_LIVREUR')")
     public ResponseEntity<ApiResponse<Void>> assignerLivreur(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -431,6 +451,7 @@ public class ColisController {
             description = "Modifier le statut d'un colis avec un commentaire optionnel"
     )
     @PutMapping("/{colisId}/changer-statut")
+    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_STATUS')")
     public ResponseEntity<ApiResponse<Void>> changerStatut(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
@@ -453,6 +474,7 @@ public class ColisController {
             description = "Supprimer définitivement un colis du système"
     )
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du colis à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -473,6 +495,7 @@ public class ColisController {
             description = "Récupérer tous les colis ayant une priorité spécifique"
     )
     @GetMapping("/priorite/{priorite}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPriorite(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite) {
@@ -492,6 +515,7 @@ public class ColisController {
             description = "Récupérer les colis ayant une combinaison spécifique de priorité et statut"
     )
     @GetMapping("/priorite/{priorite}/statut/{statut}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPrioriteAndStatut(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite,
@@ -508,32 +532,13 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Rechercher les colis par livreur et statut",
-            description = "Récupérer les colis d'un livreur spécifique avec un statut donné"
-    )
-    @GetMapping("/livreur/{livreurId}/statut/{statut}")
-    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByLivreurAndStatut(
-            @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
-            @PathVariable String livreurId,
-            @Parameter(description = "Statut des colis", required = true, example = "EN_COURS")
-            @PathVariable StatutColis statut) {
-        List<ColisSimpleResponseDto> colis = colisService.getByLivreurAndStatut(livreurId, statut);
-
-        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
-                .success(true)
-                .message("Colis par livreur et statut récupérés avec succès")
-                .data(colis)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 
     @Operation(
             summary = "Rechercher les colis par zone et statut",
             description = "Récupérer les colis d'une zone spécifique avec un statut donné"
     )
     @GetMapping("/zone/{zoneId}/statut/{statut}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZoneAndStatut(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
@@ -555,6 +560,7 @@ public class ColisController {
             description = "Récupérer les colis destinés à une ville spécifique avec un statut donné"
     )
     @GetMapping("/ville-destination/{ville}/statut/{statut}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByVilleDestinationAndStatut(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville,
@@ -576,6 +582,7 @@ public class ColisController {
             description = "Rechercher des colis par mot-clé (description, ville, etc.)"
     )
     @GetMapping("/search/keyword")
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> searchByKeyword(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "electronique")
             @RequestParam String keyword) {
@@ -595,6 +602,7 @@ public class ColisController {
             description = "Récupérer la liste des colis considérés comme en retard"
     )
     @GetMapping("/en-retard")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getColisEnRetard() {
         List<ColisSimpleResponseDto> colis = colisService.getColisEnRetard();
 
@@ -607,32 +615,14 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Rechercher les colis par période de création",
-            description = "Récupérer les colis créés dans une période spécifique"
-    )
-    @GetMapping("/date-creation")
-    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByDateCreationBetween(
-            @Parameter(description = "Date de début (format ISO)", required = true, example = "2024-01-01T00:00:00")
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @Parameter(description = "Date de fin (format ISO)", required = true, example = "2024-12-31T23:59:59")
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        List<ColisSimpleResponseDto> colis = colisService.getByDateCreationBetween(startDate, endDate);
 
-        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
-                .success(true)
-                .message("Colis par période de création récupérés avec succès")
-                .data(colis)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 
     @Operation(
             summary = "Obtenir les colis par zone (paginés)",
             description = "Récupérer les colis d'une zone spécifique avec pagination"
     )
     @GetMapping("/zone/{zoneId}/paginated")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByZoneId(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
@@ -654,6 +644,7 @@ public class ColisController {
             description = "Récupérer les colis d'un statut spécifique avec pagination"
     )
     @GetMapping("/statut/{statut}/paginated")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByStatutPaginated(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut,
@@ -670,13 +661,13 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    // === ENDPOINTS DE STATISTIQUES ===
 
     @Operation(
             summary = "Compter les colis par statut",
             description = "Obtenir le nombre total de colis pour un statut spécifique"
     )
     @GetMapping("/statistiques/statut/{statut}/count")
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
     public ResponseEntity<ApiResponse<Long>> countByStatut(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
@@ -696,6 +687,7 @@ public class ColisController {
             description = "Obtenir le nombre de colis pour une combinaison zone/statut"
     )
     @GetMapping("/statistiques/zone/{zoneId}/statut/{statut}/count")
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
     public ResponseEntity<ApiResponse<Long>> countByZoneAndStatut(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
@@ -717,6 +709,7 @@ public class ColisController {
             description = "Obtenir le nombre de colis pour une combinaison livreur/statut"
     )
     @GetMapping("/statistiques/livreur/{livreurId}/statut/{statut}/count")
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
     public ResponseEntity<ApiResponse<Long>> countByLivreurAndStatut(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId,
@@ -734,6 +727,7 @@ public class ColisController {
     }
 
     @GetMapping("/poidstotal/colis/{colisId}")
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
     public ResponseEntity<ApiResponse<Double>> poidsTotal(@PathVariable String colisId) {
         Double poids = colisService.calculateTotal(colisId);
         ApiResponse<Double> response = ApiResponse.<Double>builder()
@@ -745,30 +739,20 @@ public class ColisController {
     }
 
     @GetMapping("/prixtotal/colis/{colisId}")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<Double>> getPrixTotal(@PathVariable String colisId) {
         Double poids = colisService.calculateTotalPrix(colisId);
 
         ApiResponse<Double> response = ApiResponse.<Double>builder()
                 .success(true)
-                .message("le prix recupere successfully")
+                .message("le prix recupere avec succes")
                 .data(poids)
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/poids-par-livreur")
-    public ResponseEntity<ApiResponse<List<PoidsParLivreurDTO>>> getPoidsTotalParLivreur() {
-        List<PoidsParLivreurDTO> result = colisService.getPoidsTotalParLivreur();
-
-        ApiResponse<List<PoidsParLivreurDTO>> response = ApiResponse.<List<PoidsParLivreurDTO>>builder()
-                .success(true)
-                .message("Poids total par livreur récupéré avec succès")
-                .data(result)
-                .build();
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/poids-par-livreur/detail")
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
     public ResponseEntity<ApiResponse<List<PoidsParLivreurDetailDTO>>> getPoidsDetailParLivreur() {
         List<PoidsParLivreurDetailDTO> result = colisService.getPoidsDetailParLivreur();
 
