@@ -120,18 +120,6 @@ public class LivreurServiceImpl implements LivreurService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<LivreurSimpleResponseDto> getByTelephone(String telephone) {
-        return livreurRepository.findByTelephone(telephone)
-                .map(smartLogiMapper::toSimpleResponseDto);
-    }
-
-    @Override
-    public long countByZone(String zoneId) {
-        Zone zone = zoneRepository.findById(zoneId)
-                .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
-        return livreurRepository.countByZone(zone);
-    }
 
     @Override
     public void delete(String id) {
@@ -145,9 +133,4 @@ public class LivreurServiceImpl implements LivreurService {
         return livreurRepository.existsById(id);
     }
 
-
-    @Override
-    public boolean existsByTelephone(String telephone) {
-        return livreurRepository.existsByTelephone(telephone);
-    }
 }
