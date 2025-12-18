@@ -1,4 +1,4 @@
-package com.smartlogi.smartlogiv010.exception;
+package com.smartlogi.security.exception;
 
 public class AuthenticationExceptionhandler extends RuntimeException {
     public AuthenticationExceptionhandler(String message) {
