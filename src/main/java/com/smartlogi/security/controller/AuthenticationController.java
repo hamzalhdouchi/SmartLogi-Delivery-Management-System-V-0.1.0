@@ -1,5 +1,7 @@
 package com.smartlogi.security.controller;
 
+import com.smartlogi.security.dto.authDto.response.UserResponse;
+import com.smartlogi.security.userMapper.UserMapper;
 import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.entity.User;
 import com.smartlogi.security.dto.authDto.response.JwtAuthResponse;
@@ -17,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    @Autowired
     private final AuthenticationService authService;
+    private final UserMapper userMapper;
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginRequest request) {
@@ -27,14 +29,13 @@ public class AuthenticationController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<User>> signup(@Valid @RequestBody SignupRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> signup(@Valid @RequestBody SignupRequest request) {
         User user = authService.signup(request);
-        ApiResponse<User> response = ApiResponse.<User>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("User récupérer avec succès")
-                .data(user)
+                .data(userMapper.toResponse(user))
                 .build();
-
         return ResponseEntity.ok(response);
     }
 }

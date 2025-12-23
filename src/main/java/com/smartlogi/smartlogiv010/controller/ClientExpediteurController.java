@@ -1,5 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ClientExpediteurUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.ClientExpediteur.ClientExpediteurSimpleResponseDto;
@@ -35,14 +36,14 @@ public class ClientExpediteurController {
     )
     @PutMapping("/{id}/update")
     @PreAuthorize("hasRole('ROLE_SENDER')")
-    public ResponseEntity<ApiResponse<ClientExpediteurSimpleResponseDto>> update(
+    public ResponseEntity<ApiResponse<UserResponse>> update(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
             @Parameter(description = "Données de mise à jour du client", required = true)
             @Valid @RequestBody ClientExpediteurUpdateRequestDto requestDto) {
-        ClientExpediteurSimpleResponseDto updatedClient = clientExpediteurService.update(id, requestDto);
+        UserResponse updatedClient = clientExpediteurService.update(id, requestDto);
 
-        ApiResponse<ClientExpediteurSimpleResponseDto> response = ApiResponse.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur mis à jour avec succès")
                 .data(updatedClient)
@@ -57,12 +58,12 @@ public class ClientExpediteurController {
     )
     @GetMapping("/{id}/getClient")
     @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
-    public ResponseEntity<ApiResponse<ClientExpediteurSimpleResponseDto>> getById(
+    public ResponseEntity<ApiResponse<UserResponse>> getById(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        ClientExpediteurSimpleResponseDto client = clientExpediteurService.getById(id);
+        UserResponse client = clientExpediteurService.getById(id);
 
-        ApiResponse<ClientExpediteurSimpleResponseDto> response = ApiResponse.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur récupéré avec succès")
                 .data(client)
@@ -77,12 +78,12 @@ public class ClientExpediteurController {
     )
     @GetMapping
     @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
-    public ResponseEntity<ApiResponse<Page<ClientExpediteurSimpleResponseDto>>> getAll(
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
-        Page<ClientExpediteurSimpleResponseDto> clients = clientExpediteurService.getAll(pageable);
+        Page<UserResponse> clients = clientExpediteurService.getAll(pageable);
 
-        ApiResponse<Page<ClientExpediteurSimpleResponseDto>> response = ApiResponse.<Page<ClientExpediteurSimpleResponseDto>>builder()
+        ApiResponse<Page<UserResponse>> response = ApiResponse.<Page<UserResponse>>builder()
                 .success(true)
                 .message("Liste des clients expéditeurs récupérée avec succès")
                 .data(clients)
@@ -97,12 +98,12 @@ public class ClientExpediteurController {
     )
     @GetMapping("/search-keyword")
     @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
-    public ResponseEntity<ApiResponse<ClientExpediteurSimpleResponseDto>> findByKeyWord(
+    public ResponseEntity<ApiResponse<UserResponse>> findByKeyWord(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
             @RequestParam String keyword) {
-        ClientExpediteurSimpleResponseDto clientExpediteurSimpleResponseDto = clientExpediteurService.findByKeyWord(keyword);
+        UserResponse clientExpediteurSimpleResponseDto = clientExpediteurService.findByKeyWord(keyword);
 
-        ApiResponse<ClientExpediteurSimpleResponseDto> response = ApiResponse.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur trouvé avec succès")
                 .data(clientExpediteurSimpleResponseDto)

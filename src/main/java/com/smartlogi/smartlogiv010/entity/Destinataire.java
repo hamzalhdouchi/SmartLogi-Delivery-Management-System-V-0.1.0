@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@DiscriminatorValue(value = "destinataire")
 @NoArgsConstructor
 public class Destinataire extends User{
 

@@ -276,7 +276,7 @@ public class ProduitController {
             description = "Vérifier si un produit existe dans le catalogue par son ID"
     )
     @GetMapping("/{id}/exists")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Boolean>> existsById(
             @Parameter(description = "ID du produit à vérifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {

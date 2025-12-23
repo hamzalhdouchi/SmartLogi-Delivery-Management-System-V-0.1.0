@@ -370,7 +370,7 @@ public class ColisController {
             description = "Récupérer tous les colis assignés à un livreur spécifique"
     )
     @GetMapping("/livreur/{livreurId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisAdvancedResponseDto>>> getByLivreur(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
@@ -390,7 +390,7 @@ public class ColisController {
             description = "Récupérer tous les colis d'une zone spécifique"
     )
     @GetMapping("/zone/{zoneId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZone(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId) {
@@ -410,7 +410,7 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à une ville spécifique"
     )
     @GetMapping("/ville-destination/{ville}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> searchByVilleDestination(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville) {
@@ -474,7 +474,7 @@ public class ColisController {
             description = "Supprimer définitivement un colis du système"
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du colis à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -495,7 +495,7 @@ public class ColisController {
             description = "Récupérer tous les colis ayant une priorité spécifique"
     )
     @GetMapping("/priorite/{priorite}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPriorite(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite) {
@@ -515,7 +515,7 @@ public class ColisController {
             description = "Récupérer les colis ayant une combinaison spécifique de priorité et statut"
     )
     @GetMapping("/priorite/{priorite}/statut/{statut}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPrioriteAndStatut(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite,
@@ -538,7 +538,7 @@ public class ColisController {
             description = "Récupérer les colis d'une zone spécifique avec un statut donné"
     )
     @GetMapping("/zone/{zoneId}/statut/{statut}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZoneAndStatut(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
@@ -560,7 +560,7 @@ public class ColisController {
             description = "Récupérer les colis destinés à une ville spécifique avec un statut donné"
     )
     @GetMapping("/ville-destination/{ville}/statut/{statut}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByVilleDestinationAndStatut(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville,
@@ -602,7 +602,7 @@ public class ColisController {
             description = "Récupérer la liste des colis considérés comme en retard"
     )
     @GetMapping("/en-retard")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getColisEnRetard() {
         List<ColisSimpleResponseDto> colis = colisService.getColisEnRetard();
 
@@ -622,7 +622,7 @@ public class ColisController {
             description = "Récupérer les colis d'une zone spécifique avec pagination"
     )
     @GetMapping("/zone/{zoneId}/paginated")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByZoneId(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
@@ -644,7 +644,7 @@ public class ColisController {
             description = "Récupérer les colis d'un statut spécifique avec pagination"
     )
     @GetMapping("/statut/{statut}/paginated")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByStatutPaginated(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut,

@@ -1,6 +1,6 @@
 package com.smartlogi.smartlogiv010.service.interfaces;
 
-import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.LivreurCreateRequestDto;
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.LivreurUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Livreur.LivreurAdvancedResponseDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Livreur.LivreurDetailedResponseDto;
@@ -9,20 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LivreurService {
 
-    LivreurSimpleResponseDto create(LivreurCreateRequestDto requestDto);
-    LivreurSimpleResponseDto update(String id, LivreurUpdateRequestDto requestDto);
-    LivreurSimpleResponseDto getById(String id);
+    UserResponse update(String id, LivreurUpdateRequestDto requestDto);
+    UserResponse getById(String id);
     void delete(String id);
     boolean existsById(String id);
-    LivreurAdvancedResponseDto getByIdWithStats(String id);
-    LivreurDetailedResponseDto getByIdWithColis(String id);
-    Page<LivreurSimpleResponseDto> getAll(Pageable pageable);
-    List<LivreurSimpleResponseDto> getAll();
-    List<LivreurSimpleResponseDto> getByZone(String zoneId);
-    List<LivreurSimpleResponseDto> searchByNom(String nom);
-    List<LivreurSimpleResponseDto> searchByKeyword(String keyword);
+    UserResponse getByIdWithStats(String id);
+    UserResponse getByIdWithColis(String id);
+    Page<UserResponse> getAll(Pageable pageable);
+    List<UserResponse> getAll();
+    List<UserResponse> getByZone(String zoneId);
+//    List<UserResponse> searchByKeyword(String keyword);
 }

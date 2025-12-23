@@ -14,7 +14,7 @@ public class UserResponse {
     private String email;
     private String telephone;
     private String adresse;
-    private RoleResponse role;
+    private String role;
     private boolean enabled;
 }
 

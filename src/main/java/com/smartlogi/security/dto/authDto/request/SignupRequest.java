@@ -47,4 +47,6 @@ public class SignupRequest {
     @NotNull(message = "Le rôle est obligatoire")
     private String role;
 
+    private String zoneId;
+
 }

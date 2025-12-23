@@ -1,5 +1,6 @@
 package com.smartlogi.smartlogiv010.service;
 
+import com.smartlogi.security.exception.DuplicateResourceException;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ColisCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ProduitCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
@@ -12,6 +13,8 @@ import com.smartlogi.smartlogiv010.entity.*;
 import com.smartlogi.smartlogiv010.enums.Priorite;
 import com.smartlogi.smartlogiv010.enums.StatutColis;
 import com.smartlogi.smartlogiv010.exception.ArgementNotFoundExption;
+import com.smartlogi.smartlogiv010.exception.BusinessException;
+import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.mapper.SmartLogiMapper;
 import com.smartlogi.smartlogiv010.repository.*;
 import com.smartlogi.smartlogiv010.service.interfaces.ColisService;
@@ -45,9 +48,9 @@ public class ColisServiceImpl implements ColisService {
     @Transactional
     public ColisSimpleResponseDto create(ColisCreateRequestDto requestDto) {
         ClientExpediteur client = clientExpediteurRepository.findById(requestDto.getClientExpediteurId())
-                .orElseThrow(() -> new RuntimeException("Client expéditeur non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Client expéditeur non trouvé"));
         Destinataire destinataire = destinataireRepository.findById(requestDto.getDestinataireId())
-                .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Destinataire non trouvé"));
 
         Colis colis = smartLogiMapper.toEntity(requestDto);
         colis.setClientExpediteur(client);
@@ -55,13 +58,13 @@ public class ColisServiceImpl implements ColisService {
 
         if (requestDto.getLivreurId() != null) {
             Livreur livreur = livreurRepository.findById(requestDto.getLivreurId())
-                    .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Livreur non trouvé"));
             colis.setLivreur(livreur);
         }
 
         if (requestDto.getZoneId() != null) {
             Zone zone = zoneRepository.findById(requestDto.getZoneId())
-                    .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Zone non trouvée"));
             colis.setZone(zone);
         }
 
@@ -88,13 +91,13 @@ public class ColisServiceImpl implements ColisService {
 
         if (produitDto.getProduitId() != null && !produitDto.getProduitId().isBlank()) {
             produit = produitRepository.findById(produitDto.getProduitId())
-                    .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + produitDto.getProduitId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + produitDto.getProduitId()));
         } else {
             produit = creerNouveauProduit(produitDto.getNouveauProduit());
         }
 
         if (produitDto.getQuantite() == null || produitDto.getQuantite() <= 0) {
-            throw new RuntimeException("La quantité doit être supérieure à 0 pour le produit: " + produit.getNom());
+            throw new BusinessException("La quantité doit être supérieure à 0 pour le produit: " + produit.getNom());
         }
 
         BigDecimal prixTotal = produit.getPrix().multiply(BigDecimal.valueOf(produitDto.getQuantite()));
@@ -115,11 +118,11 @@ public class ColisServiceImpl implements ColisService {
         boolean aNouveauProduit = produitDto.getNouveauProduit() != null;
 
         if (aProduitId && aNouveauProduit) {
-            throw new RuntimeException("Vous ne pouvez pas fournir à la fois un produitId et un nouveauProduit");
+            throw new BusinessException("Vous ne pouvez pas fournir à la fois un produitId et un nouveauProduit");
         }
 
         if (!aProduitId && !aNouveauProduit) {
-            throw new RuntimeException("Vous devez fournir soit un produitId soit un nouveauProduit");
+            throw new BusinessException("Vous devez fournir soit un produitId soit un nouveauProduit");
         }
 
         if (aNouveauProduit) {
@@ -135,7 +138,7 @@ public class ColisServiceImpl implements ColisService {
 
     private Produit creerNouveauProduit(ProduitCreateRequestDto nouveauProduitDto) {
         if (produitRepository.existsByNomContainingIgnoreCase(nouveauProduitDto.getNom())) {
-            throw new RuntimeException("Un produit avec le nom '" + nouveauProduitDto.getNom() + "' existe déjà");
+            throw new DuplicateResourceException("Un produit avec le nom '" + nouveauProduitDto.getNom() + "' existe déjà");
         }
 
         Produit produit = new Produit();
@@ -159,7 +162,7 @@ public class ColisServiceImpl implements ColisService {
     @Transactional
     public void ajouterProduit(String colisId, ColisCreateRequestDto.ProduitColisDto produitDto) {
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         ajouterProduitAuColis(colis, produitDto);
 
         String produitInfo = produitDto.getProduitId() != null ?
@@ -176,7 +179,7 @@ public class ColisServiceImpl implements ColisService {
             colisProduitRepository.deleteById(colisProduitId);
 
             Colis colis = colisRepository.findById(colisId)
-                    .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
             creerHistoriqueLivraison(colis, colis.getStatut(),
                     "Produit retiré du colis: " + produitId);
         } else {
@@ -188,10 +191,10 @@ public class ColisServiceImpl implements ColisService {
     public void mettreAJourQuantiteProduit(String colisId, String produitId, Integer nouvelleQuantite) {
         ColisProduitId colisProduitId = new ColisProduitId(colisId, produitId);
         ColisProduit colisProduit = colisProduitRepository.findById(colisProduitId)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé dans ce colis"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé dans ce colis"));
 
         if (nouvelleQuantite == null || nouvelleQuantite <= 0) {
-            throw new RuntimeException("La quantité doit être supérieure à 0");
+            throw new BusinessException("La quantité doit être supérieure à 0");
         }
 
         BigDecimal nouveauPrix = colisProduit.getProduit().getPrix().multiply(BigDecimal.valueOf(nouvelleQuantite));
@@ -201,7 +204,7 @@ public class ColisServiceImpl implements ColisService {
         colisProduitRepository.save(colisProduit);
 
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         creerHistoriqueLivraison(colis, colis.getStatut(),
                 "Quantité mise à jour pour le produit: " + produitId + " (nouvelle quantité: " + nouvelleQuantite + ")");
     }
@@ -237,14 +240,14 @@ public class ColisServiceImpl implements ColisService {
     @Override
     public ColisSimpleResponseDto getById(String id) {
         Colis colis = colisRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         return smartLogiMapper.toSimpleResponseDto(colis);
     }
 
     @Override
     public ColisAdvancedResponseDto getByIdWithDetails(String id) {
         Colis colis = colisRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         return smartLogiMapper.toAdvancedResponseDto(colis);
     }
 
@@ -283,7 +286,7 @@ public class ColisServiceImpl implements ColisService {
     @Override
     public List<ColisAdvancedResponseDto> getByLivreur(String livreurId) {
         Livreur livreur = livreurRepository.findById(livreurId)
-                .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Livreur non trouvé"));
         return colisRepository.findByLivreur(livreur)
                 .stream()
                 .map(smartLogiMapper::toAdvancedResponseDto)
@@ -293,7 +296,7 @@ public class ColisServiceImpl implements ColisService {
     @Override
     public List<ColisSimpleResponseDto> getByZone(String zoneId) {
         Zone zone = zoneRepository.findById(zoneId)
-                .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
+                .orElseThrow(() -> new ResourceNotFoundException("Zone non trouvée"));
         return colisRepository.findByZone(zone)
                 .stream()
                 .map(smartLogiMapper::toSimpleResponseDto)
@@ -312,9 +315,9 @@ public class ColisServiceImpl implements ColisService {
     @Transactional
     public void assignerLivreur(String colisId, String livreurId) {
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         Livreur livreur = livreurRepository.findById(livreurId)
-                .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Livreur non trouvé"));
 
         colis.setLivreur(livreur);
         colisRepository.save(colis);
@@ -331,7 +334,7 @@ public class ColisServiceImpl implements ColisService {
     @Transactional
     public void changerStatut(String colisId, StatutColis nouveauStatut, String commentaire) {
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
 
         Destinataire destinataire = colis.getDestinataire();
 
@@ -355,7 +358,7 @@ public class ColisServiceImpl implements ColisService {
     @Transactional
     public void delete(String id) {
         Colis colis = colisRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Colis non trouvé"));
         colisRepository.delete(colis);
     }
 
@@ -375,7 +378,7 @@ public class ColisServiceImpl implements ColisService {
 
     public List<ColisSimpleResponseDto> getByLivreurAndStatut(String livreurId, StatutColis statut) {
         Livreur livreur = livreurRepository.findById(livreurId)
-                .orElseThrow(() -> new RuntimeException("Livreur non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Livreur non trouvé"));
         return colisRepository.findByLivreurAndStatut(livreur, statut)
                 .stream()
                 .map(smartLogiMapper::toSimpleResponseDto)
@@ -384,7 +387,7 @@ public class ColisServiceImpl implements ColisService {
 
     public List<ColisSimpleResponseDto> getByZoneAndStatut(String zoneId, StatutColis statut) {
         Zone zone = zoneRepository.findById(zoneId)
-                .orElseThrow(() -> new RuntimeException("Zone non trouvée"));
+                .orElseThrow(() -> new ResourceNotFoundException("Zone non trouvée"));
         return colisRepository.findByZoneAndStatut(zone, statut)
                 .stream()
                 .map(smartLogiMapper::toSimpleResponseDto)
@@ -481,7 +484,7 @@ public class ColisServiceImpl implements ColisService {
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
-            throw new RuntimeException("Impossible de calculer le poids par livreur", e);
+            throw new BusinessException("Impossible de calculer le poids par livreur", e);
         }
     }
 
@@ -495,7 +498,7 @@ public class ColisServiceImpl implements ColisService {
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
-            throw new RuntimeException("Impossible de calculer le détail poids par livreur", e);
+            throw new BusinessException("Impossible de calculer le détail poids par livreur", e);
         }
     }
 }

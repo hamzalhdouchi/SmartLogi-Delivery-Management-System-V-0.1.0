@@ -1,5 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Destinataire.DestinataireSimpleResponseDto;
 import com.smartlogi.smartlogiv010.service.DestinataireServiceImpl;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Destinataires", description = "API pour la gestion des destinataires (création, modification, recherche)")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_MANAGER')")
 public class DestinataireController {
 
     private final DestinataireServiceImpl destinataireService;
@@ -32,13 +33,13 @@ public class DestinataireController {
             description = "Récupérer les informations complètes d'un destinataire spécifique"
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<DestinataireSimpleResponseDto>> getById(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<UserResponse>> getById(
             @Parameter(description = "ID du destinataire", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        DestinataireSimpleResponseDto destinataire = destinataireService.getById(id);
+        UserResponse destinataire = destinataireService.getById(id);
 
-        ApiResponse<DestinataireSimpleResponseDto> response = ApiResponse.<DestinataireSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Destinataire récupéré avec succès")
                 .data(destinataire)
@@ -52,33 +53,14 @@ public class DestinataireController {
             description = "Obtenir la liste paginée de tous les destinataires avec possibilité de tri et de pagination"
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<DestinataireSimpleResponseDto>>> getAll(
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
-        Page<DestinataireSimpleResponseDto> destinataires = destinataireService.getAll(pageable);
+        Page<UserResponse> destinataires = destinataireService.getAll(pageable);
 
-        ApiResponse<Page<DestinataireSimpleResponseDto>> response = ApiResponse.<Page<DestinataireSimpleResponseDto>>builder()
+        ApiResponse<Page<UserResponse>> response = ApiResponse.<Page<UserResponse>>builder()
                 .success(true)
                 .message("Liste des destinataires récupérée avec succès")
-                .data(destinataires)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "Rechercher des destinataires par nom",
-            description = "Rechercher des destinataires par leur nom (recherche partielle)"
-    )
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<DestinataireSimpleResponseDto>>> searchByNom(
-            @Parameter(description = "Nom ou partie du nom à rechercher", required = true, example = "Dupont")
-            @RequestParam String nom) {
-        List<DestinataireSimpleResponseDto> destinataires = destinataireService.searchByNom(nom);
-
-        ApiResponse<List<DestinataireSimpleResponseDto>> response = ApiResponse.<List<DestinataireSimpleResponseDto>>builder()
-                .success(true)
-                .message("Recherche de destinataires par nom effectuée avec succès")
                 .data(destinataires)
                 .build();
 
@@ -90,12 +72,12 @@ public class DestinataireController {
             description = "Rechercher un destinataire par mot-clé (nom, email, téléphone, etc.)"
     )
     @GetMapping("/search-keyword")
-    public ResponseEntity<ApiResponse<DestinataireSimpleResponseDto>> findByKeyWord(
+    public ResponseEntity<ApiResponse<UserResponse>> findByKeyWord(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
             @RequestParam String keyword) {
-        DestinataireSimpleResponseDto destinataire = destinataireService.findByKeyWord(keyword);
+        UserResponse destinataire = destinataireService.findByKeyWord(keyword);
 
-        ApiResponse<DestinataireSimpleResponseDto> response = ApiResponse.<DestinataireSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Destinataire trouvé avec succès")
                 .data(destinataire)

@@ -1,8 +1,7 @@
-package com.smartlogi.security.config;
+package com.smartlogi.security.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,11 +43,11 @@ public class JwtService {
         claims.put("permissions", permissions);
 
         return Jwts.builder()
-                .claims(claims)  // Changé de setClaims() à claims()
-                .subject(userDetails.getUsername())  // Changé de setSubject()
-                .issuedAt(new Date())  // Changé de setIssuedAt()
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))  // Changé de setExpiration()
-                .signWith(getSigningKey())  // Plus besoin de SignatureAlgorithm
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -62,11 +61,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()  // parser() au lieu de parserBuilder()
-                .verifyWith(getSigningKey())  // verifyWith() au lieu de setSigningKey()
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token)  // parseSignedClaims() au lieu de parseClaimsJws()
-                .getPayload();  // getPayload() au lieu de getBody()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

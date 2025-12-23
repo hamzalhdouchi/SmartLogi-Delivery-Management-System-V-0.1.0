@@ -13,6 +13,8 @@
     @AllArgsConstructor
     @NoArgsConstructor
     @Entity
+    @Inheritance(strategy = InheritanceType.JOINED)
+    @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
     @Table(name = "users")
     public class User implements UserDetails {
 

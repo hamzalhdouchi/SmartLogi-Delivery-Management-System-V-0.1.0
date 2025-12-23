@@ -1,10 +1,10 @@
 package com.smartlogi.smartlogiv010.controller;
 
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
-import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.LivreurCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.LivreurUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Livreur.LivreurAdvancedResponseDto;
-import com.smartlogi.smartlogiv010.dto.responseDTO.Livreur.LivreurDetailedResponseDto;
+        ;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Livreur.LivreurSimpleResponseDto;
 import com.smartlogi.smartlogiv010.service.interfaces.LivreurService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,21 +14,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/livreurs")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Livreurs", description = "API pour la gestion complète des livreurs (création, affectation, statistiques)")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_MANAGER')")
 public class LivreurController {
 
     private final LivreurService livreurService;
@@ -39,14 +37,15 @@ public class LivreurController {
     )
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS') && hasRole('ROLE_LIVREUR')")
-    public ResponseEntity<ApiResponse<LivreurSimpleResponseDto>> update(
+    public ResponseEntity<ApiResponse<UserResponse>> update(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
             @Parameter(description = "Données de mise à jour du livreur", required = true)
             @Valid @RequestBody LivreurUpdateRequestDto requestDto) {
-        LivreurSimpleResponseDto updatedLivreur = livreurService.update(id, requestDto);
+        UserResponse
+                updatedLivreur = livreurService.update(id, requestDto);
 
-        ApiResponse<LivreurSimpleResponseDto> response = ApiResponse.<LivreurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Livreur mis à jour avec succès")
                 .data(updatedLivreur)
@@ -61,12 +60,16 @@ public class LivreurController {
     )
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_LIVREUR')")
-    public ResponseEntity<ApiResponse<LivreurSimpleResponseDto>> getById(
+    public ResponseEntity<ApiResponse<UserResponse
+            >> getById(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        LivreurSimpleResponseDto livreur = livreurService.getById(id);
+        UserResponse
+                livreur = livreurService.getById(id);
 
-        ApiResponse<LivreurSimpleResponseDto> response = ApiResponse.<LivreurSimpleResponseDto>builder()
+        ApiResponse<UserResponse
+                > response = ApiResponse.<UserResponse
+                        >builder()
                 .success(true)
                 .message("Livreur récupéré avec succès")
                 .data(livreur)
@@ -81,12 +84,12 @@ public class LivreurController {
     )
     @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     @GetMapping("/{id}/advanced")
-    public ResponseEntity<ApiResponse<LivreurAdvancedResponseDto>> getByIdWithStats(
+    public ResponseEntity<ApiResponse<UserResponse>> getByIdWithStats(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        LivreurAdvancedResponseDto livreur = livreurService.getByIdWithStats(id);
+        UserResponse livreur = livreurService.getByIdWithStats(id);
 
-        ApiResponse<LivreurAdvancedResponseDto> response = ApiResponse.<LivreurAdvancedResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Livreur avec statistiques récupéré avec succès")
                 .data(livreur)
@@ -101,12 +104,12 @@ public class LivreurController {
     )
     @GetMapping("/{id}/detailed")
     @PreAuthorize("hasRole('ROLE_LIVREUR')")
-    public ResponseEntity<ApiResponse<LivreurDetailedResponseDto>> getByIdWithColis(
+    public ResponseEntity<ApiResponse<UserResponse>> getByIdWithColis(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        LivreurDetailedResponseDto livreur = livreurService.getByIdWithColis(id);
+        UserResponse livreur = livreurService.getByIdWithColis(id);
 
-        ApiResponse<LivreurDetailedResponseDto> response = ApiResponse.<LivreurDetailedResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Livreur avec colis récupéré avec succès")
                 .data(livreur)
@@ -121,12 +124,16 @@ public class LivreurController {
     )
     @GetMapping("/paginated")
     @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
-    public ResponseEntity<ApiResponse<Page<LivreurSimpleResponseDto>>> getAllPaginated(
+    public ResponseEntity<ApiResponse<Page<UserResponse
+            >>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
-        Page<LivreurSimpleResponseDto> livreurs = livreurService.getAll(pageable);
+        Page<UserResponse
+                > livreurs = livreurService.getAll(pageable);
 
-        ApiResponse<Page<LivreurSimpleResponseDto>> response = ApiResponse.<Page<LivreurSimpleResponseDto>>builder()
+        ApiResponse<Page<UserResponse
+                >> response = ApiResponse.<Page<UserResponse
+                        >>builder()
                 .success(true)
                 .message("Livreurs paginés récupérés avec succès")
                 .data(livreurs)
@@ -141,12 +148,16 @@ public class LivreurController {
     )
     @GetMapping("/zone/{zoneId}")
     @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
-    public ResponseEntity<ApiResponse<List<LivreurSimpleResponseDto>>> getByZone(
+    public ResponseEntity<ApiResponse<List<UserResponse
+            >>> getByZone(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId) {
-        List<LivreurSimpleResponseDto> livreurs = livreurService.getByZone(zoneId);
+        List<UserResponse
+                > livreurs = livreurService.getByZone(zoneId);
 
-        ApiResponse<List<LivreurSimpleResponseDto>> response = ApiResponse.<List<LivreurSimpleResponseDto>>builder()
+        ApiResponse<List<UserResponse
+                >> response = ApiResponse.<List<UserResponse
+                        >>builder()
                 .success(true)
                 .message("Livreurs de la zone récupérés avec succès")
                 .data(livreurs)
@@ -155,25 +166,28 @@ public class LivreurController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Rechercher des livreurs par mot-clé",
-            description = "Rechercher des livreurs par mot-clé (nom, prénom, email, téléphone, etc.)"
-    )
-    @GetMapping("/search/keyword")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
-    public ResponseEntity<ApiResponse<List<LivreurSimpleResponseDto>>> searchByKeyword(
-            @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
-            @RequestParam String keyword) {
-        List<LivreurSimpleResponseDto> livreurs = livreurService.searchByKeyword(keyword);
-
-        ApiResponse<List<LivreurSimpleResponseDto>> response = ApiResponse.<List<LivreurSimpleResponseDto>>builder()
-                .success(true)
-                .message("Recherche par mot-clé effectuée avec succès")
-                .data(livreurs)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
+//    @Operation(
+//            summary = "Rechercher des livreurs par mot-clé",
+//            description = "Rechercher des livreurs par mot-clé (nom, prénom, email, téléphone, etc.)"
+//    )
+//    @GetMapping("/search/keyword")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
+//    public ResponseEntity<ApiResponse<List<UserResponse
+//            >>> searchByKeyword(
+//            @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
+//            @RequestParam String keyword) {
+//        List<UserResponse> livreurs = livreurService.searchByKeyword(keyword);
+//
+//        ApiResponse<List<UserResponse
+//                >> response = ApiResponse.<List<UserResponse
+//                        >>builder()
+//                .success(true)
+//                .message("Recherche par mot-clé effectuée avec succès")
+//                .data(livreurs)
+//                .build();
+//
+//        return ResponseEntity.ok(response);
+//    }
 
     @Operation(
             summary = "Supprimer un livreur",

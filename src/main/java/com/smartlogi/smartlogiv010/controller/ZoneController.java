@@ -27,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Zones", description = "API pour la gestion des zones de livraison (création, modification, recherche, statistiques)")
-@PreAuthorize("hasRole('ROLE_ADMIN') && hasAuthority('CAN_MANAGE_ZONES')")
+@PreAuthorize("hasRole('ROLE_MANAGER') && hasAuthority('CAN_MANAGE_ZONES')")
 public class ZoneController {
 
     private final ZoneService zoneService;

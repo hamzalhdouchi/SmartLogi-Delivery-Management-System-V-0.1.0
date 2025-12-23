@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@DiscriminatorValue(value = "livreur")
 @NoArgsConstructor
 public class Livreur extends  User{
 

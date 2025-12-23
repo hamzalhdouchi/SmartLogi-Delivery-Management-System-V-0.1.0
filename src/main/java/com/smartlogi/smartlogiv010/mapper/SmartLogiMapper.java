@@ -1,5 +1,7 @@
 package com.smartlogi.smartlogiv010.mapper;
 
+import com.smartlogi.security.dto.authDto.request.SignupRequest;
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.*;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.*;
 import com.smartlogi.smartlogiv010.dto.responseDTO.ClientExpediteur.*;
@@ -31,69 +33,63 @@ public interface SmartLogiMapper {
     SmartLogiMapper INSTANCE = Mappers.getMapper(SmartLogiMapper.class);
 
 
-    // Request Mappings
-    ClientExpediteur toEntity(ClientExpediteurCreateRequestDto requestDto);
-
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "colis", ignore = true)
-    void updateEntityFromDto(ClientExpediteurUpdateRequestDto requestDto, @MappingTarget ClientExpediteur client);
+//    @Mapping(target = "colis", ignore = true)
+    void updateEntityFromDto(ClientExpediteurUpdateRequestDto requestDto, @MappingTarget User client);
 
-    ClientExpediteurSimpleResponseDto toSimpleResponseDto(ClientExpediteur client);
+    @Mapping(target = "role",source = "role.name")
+    UserResponse toSimpleResponseDto(User client);
 
-    @Mapping(source = "colis", target = "colis")
-    ClientExpediteurAdvancedResponseDto toAdvancedResponseDto(ClientExpediteur client);
+    @Mapping(source = "role.name", target = "role")
+    UserResponse toAdvancedResponseDto(User client);
+
+    @Mapping(source = "role", target = "role.name")
+    ClientExpediteur toEntityClient(SignupRequest request);
+    @Mapping(source = "role", target = "role.name")
+    Livreur toEntityLivrer(SignupRequest request);
+    @Mapping(source = "role", target = "role.name")
+    Destinataire toEntityDesdtinataire(SignupRequest request);
 
     List<ClientExpediteurSimpleResponseDto> toClientExpediteurSimpleResponseDtos(List<ClientExpediteur> clients);
 
 
-    // Request Mappings
-    Destinataire toEntity(DestinataireCreateDto requestDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "colis", ignore = true)
-    void updateEntityFromDto(DestinataireUpdateDto requestDto, @MappingTarget Destinataire destinataire);
+    @Mapping(target = "role", ignore = true)
+    void updateEntityFromDto(DestinataireUpdateDto requestDto, @MappingTarget User destinataire);
 
     // Response Mappings
-    DestinataireSimpleResponseDto toSimpleResponseDto(Destinataire destinataire);
-
-    @Mapping(source = "colis", target = "colis")
-    DestinataireAdvancedResponseDto toAdvancedResponseDto(Destinataire destinataire);
+//    DestinataireSimpleResponseDto toSimpleResponseDto(User destinataire);
+//
+//    @Mapping(source = "colis", target = "colis")
+//    DestinataireAdvancedResponseDto toAdvancedResponseDto(User destinataire);
 
     List<DestinataireSimpleResponseDto> toDestinataireSimpleResponseDtos(List<Destinataire> destinataires);
 
 
-    // Request Mappings
-    @Mapping(target = "nom", source = "nom")
-    @Mapping(target = "prenom", source = "prenom")
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "telephone", source = "telephone")
-    @Mapping(target = "password", source = "password")
-    @Mapping(target = "role.name", source = "role")
-
-    Livreur toEntity(LivreurCreateRequestDto requestDto);
-
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "colisAssignes", ignore = true)
-    void updateEntityFromDto(LivreurUpdateRequestDto requestDto, @MappingTarget Livreur livreur);
+    void updateEntityFromDto(LivreurUpdateRequestDto requestDto, @MappingTarget User livreur);
 
-    @Mapping(source = "zone.id", target = "zoneId")
-    @Mapping(source = "zone.nom", target = "zoneNom")
-    LivreurSimpleResponseDto toSimpleResponseDto(Livreur livreur);
+//    @Mapping(source = "zone.id", target = "zoneId")
+//    @Mapping(source = "zone.nom", target = "zoneNom")
+//    LivreurSimpleResponseDto toSimpleResponseDto(Livreur livreur);
 
-    @Mapping(source = "zone.id", target = "zoneId")
-    @Mapping(source = "zone.nom", target = "zoneNom")
-    @Mapping(source = "colisAssignes", target = "nombreColisAssignes", qualifiedByName = "countColis")
-    @Mapping(source = "colisAssignes", target = "nombreColisLives", qualifiedByName = "countColisLives")
-    @Mapping(source = "colisAssignes", target = "nombreColisEnCours", qualifiedByName = "countColisEnCours")
-    LivreurAdvancedResponseDto toAdvancedResponseDto(Livreur livreur);
+//    @Mapping(source = "zone.id", target = "zoneId")
+//    @Mapping(source = "zone.nom", target = "zoneNom")
+//    @Mapping(source = "colisAssignes", target = "nombreColisAssignes", qualifiedByName = "countColis")
+//    @Mapping(source = "colisAssignes", target = "nombreColisLives", qualifiedByName = "countColisLives")
+//    @Mapping(source = "colisAssignes", target = "nombreColisEnCours", qualifiedByName = "countColisEnCours")
+//    LivreurAdvancedResponseDto toAdvancedResponseDto( livreur);
 
-    @Mapping(source = "zone.id", target = "zoneId")
-    @Mapping(source = "zone.nom", target = "zoneNom")
-    @Mapping(source = "colisAssignes", target = "nombreColisAssignes", qualifiedByName = "countColis")
-    @Mapping(source = "colisAssignes", target = "nombreColisLives", qualifiedByName = "countColisLives")
-    @Mapping(source = "colisAssignes", target = "nombreColisEnCours", qualifiedByName = "countColisEnCours")
-    @Mapping(source = "colisAssignes", target = "colisAssignes")
-    LivreurDetailedResponseDto toDetailedResponseDto(Livreur livreur);
+//    @Mapping(source = "zone.id", target = "zoneId")
+//    @Mapping(source = "zone.nom", target = "zoneNom")
+//    @Mapping(source = "colisAssignes", target = "nombreColisAssignes", qualifiedByName = "countColis")
+//    @Mapping(source = "colisAssignes", target = "nombreColisLives", qualifiedByName = "countColisLives")
+//    @Mapping(source = "colisAssignes", target = "nombreColisEnCours", qualifiedByName = "countColisEnCours")
+//    @Mapping(source = "colisAssignes", target = "colisAssignes")
+@Mapping(target = "role",source = "role.name")
+
+UserResponse toDetailedResponseDto(User livreur);
 
     List<LivreurSimpleResponseDto> toLivreurSimpleResponseDtos(List<Livreur> livreurs);
 

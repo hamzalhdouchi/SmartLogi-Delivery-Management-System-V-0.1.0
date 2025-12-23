@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-
+@DiscriminatorValue(value = "client")
 @NoArgsConstructor
 public class ClientExpediteur extends User{
 

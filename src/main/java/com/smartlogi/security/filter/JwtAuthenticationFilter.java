@@ -1,7 +1,7 @@
 package com.smartlogi.security.filter;
 
 import com.smartlogi.security.config.CustomUserDetailsService;
-import com.smartlogi.security.config.JwtService;
+import com.smartlogi.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
