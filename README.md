@@ -288,8 +288,49 @@ smartlogi-sdms/
 ## Digrame De Class
 ![img.png](img.png)
 
-## Jacoco Rapport
-<img width="1909" height="922" alt="Capture d&#39;écran 2025-11-14 161143" src="https://github.com/user-attachments/assets/4171a605-9148-4604-a233-cb6713691774" />
+# SmartLogi - Guide Docker
 
-## SonarQube
-<img width="1918" height="954" alt="Capture d&#39;écran 2025-11-14 161310" src="https://github.com/user-attachments/assets/1ec7d390-f8a9-41d1-890a-64b474de594a" />
+## Prérequis
+- Docker Desktop installé et en cours d'exécution
+- Java 17
+- Maven
+
+## Build l'Application
+```mvn clean package -DskipTests```
+
+## Commandes Docker Compose
+
+### Démarrer l'application
+```
+docker-compose up -d --build
+```
+### Voir les conteneurs en cours d'exécution
+```
+docker-compose ps
+```
+### Voir les logs
+
+``` 
+docker-compose logs -f
+docker-compose logs -f app
+docker-compose logs -f postgres
+```
+
+### Arrêter l'application
+```
+docker-compose down
+```
+
+### Arrêter et supprimer les volumes (reset complet)
+
+```
+mvn clean package -DskipTests
+docker-compose up -d --build
+```
+
+## Commandes Docker Basiques
+
+### Lister les images
+```
+docker images
+```

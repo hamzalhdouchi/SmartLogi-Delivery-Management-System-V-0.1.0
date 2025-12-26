@@ -15,9 +15,4 @@ public interface HistoriqueLivraisonService {
     Page<HistoriqueLivraisonResponseDto> getAll(Pageable pageable);
     List<HistoriqueLivraisonResponseDto> getAll();
     List<HistoriqueLivraisonResponseDto> getByColis(String colisId);
-    List<HistoriqueLivraisonResponseDto> getByColisOrderByDateAsc(String colisId);
-    List<HistoriqueLivraisonResponseDto> getByColisOrderByDateDesc(String colisId);
-    List<HistoriqueLivraisonResponseDto> getByStatut(StatutColis statut);
-    List<HistoriqueLivraisonResponseDto> getByColisIdAndStatut(String colisId, StatutColis statut);
-    List<HistoriqueLivraisonResponseDto> getByDateChangementBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

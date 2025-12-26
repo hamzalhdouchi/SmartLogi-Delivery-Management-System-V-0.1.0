@@ -3,6 +3,7 @@ package com.smartlogi.smartlogiv010.service;
 import com.smartlogi.smartlogiv010.entity.ClientExpediteur;
 import com.smartlogi.smartlogiv010.entity.Colis;
 import com.smartlogi.smartlogiv010.entity.Destinataire;
+import com.smartlogi.smartlogiv010.entity.User;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class NotificationService {
     private String emailFrom;
 
 
-    public void envoyerNotificationCollecte(ClientExpediteur client, Colis colis) {
+    public void envoyerNotificationCollecte(User client, Colis colis) {
         try {
             Context context = new Context();
             context.setVariable("client", client);

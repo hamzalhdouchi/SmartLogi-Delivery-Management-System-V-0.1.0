@@ -3,6 +3,7 @@ package com.smartlogi.smartlogiv010.repository;
 
 import com.smartlogi.smartlogiv010.entity.Colis;
 import com.smartlogi.smartlogiv010.entity.Livreur;
+import com.smartlogi.smartlogiv010.entity.User;
 import com.smartlogi.smartlogiv010.entity.Zone;
 import com.smartlogi.smartlogiv010.enums.Priorite;
 import com.smartlogi.smartlogiv010.enums.StatutColis;
@@ -23,7 +24,7 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
     Page<Colis> findByStatut(StatutColis statut, Pageable pageable);
     List<Colis> findByPriorite(Priorite priorite);
     List<Colis> findByPrioriteAndStatut(Priorite priorite, StatutColis statut);
-    List<Colis> findByLivreur(Livreur livreur);
+    List<Colis> findByLivreur(User livreur);
     List<Colis> findByLivreurAndStatut(Livreur livreur, StatutColis statut);
     List<Colis> findByZone(Zone zone);
     List<Colis> findByZoneAndStatut(Zone zone, StatutColis statut);

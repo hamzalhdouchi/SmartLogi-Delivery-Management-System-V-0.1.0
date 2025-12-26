@@ -1,6 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
-import com.smartlogi.smartlogiv010.apiResponse.ApiResponseDTO;
+import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ProduitCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ProduitUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Produit.ProduitAdvancedResponseDto;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +37,13 @@ public class ProduitController {
             description = "Ajouter un nouveau produit dans le catalogue avec ses caractéristiques (nom, catégorie, poids, prix)"
     )
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<ProduitSimpleResponseDto>> create(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> create(
             @Parameter(description = "Données du produit à créer", required = true)
             @Valid @RequestBody ProduitCreateRequestDto requestDto) {
         ProduitSimpleResponseDto createdProduit = produitService.create(requestDto);
 
-        ApiResponseDTO<ProduitSimpleResponseDto> response = ApiResponseDTO.<ProduitSimpleResponseDto>builder()
+        ApiResponse<ProduitSimpleResponseDto> response = ApiResponse.<ProduitSimpleResponseDto>builder()
                 .success(true)
                 .message("Produit créé avec succès")
                 .data(createdProduit)
@@ -55,14 +57,15 @@ public class ProduitController {
             description = "Mettre à jour les informations d'un produit existant"
     )
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ProduitSimpleResponseDto>> update(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> update(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
             @Parameter(description = "Données de mise à jour du produit", required = true)
             @Valid @RequestBody ProduitUpdateRequestDto requestDto) {
         ProduitSimpleResponseDto updatedProduit = produitService.update(id, requestDto);
 
-        ApiResponseDTO<ProduitSimpleResponseDto> response = ApiResponseDTO.<ProduitSimpleResponseDto>builder()
+        ApiResponse<ProduitSimpleResponseDto> response = ApiResponse.<ProduitSimpleResponseDto>builder()
                 .success(true)
                 .message("Produit mis à jour avec succès")
                 .data(updatedProduit)
@@ -76,12 +79,13 @@ public class ProduitController {
             description = "Récupérer les informations de base d'un produit spécifique"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ProduitSimpleResponseDto>> getById(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> getById(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ProduitSimpleResponseDto produit = produitService.getById(id);
 
-        ApiResponseDTO<ProduitSimpleResponseDto> response = ApiResponseDTO.<ProduitSimpleResponseDto>builder()
+        ApiResponse<ProduitSimpleResponseDto> response = ApiResponse.<ProduitSimpleResponseDto>builder()
                 .success(true)
                 .message("Produit récupéré avec succès")
                 .data(produit)
@@ -95,12 +99,13 @@ public class ProduitController {
             description = "Récupérer les informations détaillées d'un produit incluant ses statistiques d'utilisation"
     )
     @GetMapping("/{id}/advanced")
-    public ResponseEntity<ApiResponseDTO<ProduitAdvancedResponseDto>> getByIdWithStats(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<ProduitAdvancedResponseDto>> getByIdWithStats(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ProduitAdvancedResponseDto produit = produitService.getByIdWithStats(id);
 
-        ApiResponseDTO<ProduitAdvancedResponseDto> response = ApiResponseDTO.<ProduitAdvancedResponseDto>builder()
+        ApiResponse<ProduitAdvancedResponseDto> response = ApiResponse.<ProduitAdvancedResponseDto>builder()
                 .success(true)
                 .message("Produit avec statistiques récupéré avec succès")
                 .data(produit)
@@ -114,12 +119,13 @@ public class ProduitController {
             description = "Récupérer les informations complètes d'un produit incluant la liste des colis où il est utilisé"
     )
     @GetMapping("/{id}/detailed")
-    public ResponseEntity<ApiResponseDTO<ProduitDetailedResponseDto>> getByIdWithColis(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<ProduitDetailedResponseDto>> getByIdWithColis(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ProduitDetailedResponseDto produit = produitService.getByIdWithColis(id);
 
-        ApiResponseDTO<ProduitDetailedResponseDto> response = ApiResponseDTO.<ProduitDetailedResponseDto>builder()
+        ApiResponse<ProduitDetailedResponseDto> response = ApiResponse.<ProduitDetailedResponseDto>builder()
                 .success(true)
                 .message("Produit avec colis récupéré avec succès")
                 .data(produit)
@@ -133,10 +139,11 @@ public class ProduitController {
             description = "Récupérer la liste complète de tous les produits du catalogue"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<ProduitSimpleResponseDto>>> getAll() {
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getAll() {
         List<ProduitSimpleResponseDto> produits = produitService.getAll();
 
-        ApiResponseDTO<List<ProduitSimpleResponseDto>> response = ApiResponseDTO.<List<ProduitSimpleResponseDto>>builder()
+        ApiResponse<List<ProduitSimpleResponseDto>> response = ApiResponse.<List<ProduitSimpleResponseDto>>builder()
                 .success(true)
                 .message("Liste des produits récupérée avec succès")
                 .data(produits)
@@ -150,33 +157,15 @@ public class ProduitController {
             description = "Récupérer les produits avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<ProduitSimpleResponseDto>>> getAllPaginated(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<Page<ProduitSimpleResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
         Page<ProduitSimpleResponseDto> produits = produitService.getAll(pageable);
 
-        ApiResponseDTO<Page<ProduitSimpleResponseDto>> response = ApiResponseDTO.<Page<ProduitSimpleResponseDto>>builder()
+        ApiResponse<Page<ProduitSimpleResponseDto>> response = ApiResponse.<Page<ProduitSimpleResponseDto>>builder()
                 .success(true)
                 .message("Produits paginés récupérés avec succès")
-                .data(produits)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "Rechercher des produits par nom",
-            description = "Rechercher des produits par leur nom (recherche partielle)"
-    )
-    @GetMapping("/search/nom")
-    public ResponseEntity<ApiResponseDTO<List<ProduitSimpleResponseDto>>> searchByNom(
-            @Parameter(description = "Nom ou partie du nom à rechercher", required = true, example = "Smartphone")
-            @RequestParam String nom) {
-        List<ProduitSimpleResponseDto> produits = produitService.searchByNom(nom);
-
-        ApiResponseDTO<List<ProduitSimpleResponseDto>> response = ApiResponseDTO.<List<ProduitSimpleResponseDto>>builder()
-                .success(true)
-                .message("Recherche par nom effectuée avec succès")
                 .data(produits)
                 .build();
 
@@ -188,12 +177,13 @@ public class ProduitController {
             description = "Récupérer tous les produits d'une catégorie spécifique"
     )
     @GetMapping("/categorie/{categorie}")
-    public ResponseEntity<ApiResponseDTO<List<ProduitSimpleResponseDto>>> getByCategorie(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getByCategorie(
             @Parameter(description = "Catégorie des produits", required = true, example = "Électronique")
             @PathVariable String categorie) {
         List<ProduitSimpleResponseDto> produits = produitService.getByCategorie(categorie);
 
-        ApiResponseDTO<List<ProduitSimpleResponseDto>> response = ApiResponseDTO.<List<ProduitSimpleResponseDto>>builder()
+        ApiResponse<List<ProduitSimpleResponseDto>> response = ApiResponse.<List<ProduitSimpleResponseDto>>builder()
                 .success(true)
                 .message("Produits par catégorie récupérés avec succès")
                 .data(produits)
@@ -207,12 +197,13 @@ public class ProduitController {
             description = "Rechercher des produits par mot-clé (nom, catégorie, description, etc.)"
     )
     @GetMapping("/search/keyword")
-    public ResponseEntity<ApiResponseDTO<List<ProduitSimpleResponseDto>>> searchByKeyword(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> searchByKeyword(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "samsung")
             @RequestParam String keyword) {
         List<ProduitSimpleResponseDto> produits = produitService.searchByKeyword(keyword);
 
-        ApiResponseDTO<List<ProduitSimpleResponseDto>> response = ApiResponseDTO.<List<ProduitSimpleResponseDto>>builder()
+        ApiResponse<List<ProduitSimpleResponseDto>> response = ApiResponse.<List<ProduitSimpleResponseDto>>builder()
                 .success(true)
                 .message("Recherche par mot-clé effectuée avec succès")
                 .data(produits)
@@ -226,14 +217,15 @@ public class ProduitController {
             description = "Récupérer les produits dont le prix est compris dans une plage spécifique"
     )
     @GetMapping("/prix/range")
-    public ResponseEntity<ApiResponseDTO<List<ProduitSimpleResponseDto>>> getByPrixBetween(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getByPrixBetween(
             @Parameter(description = "Prix minimum", required = true, example = "100.00")
             @RequestParam BigDecimal prixMin,
             @Parameter(description = "Prix maximum", required = true, example = "500.00")
             @RequestParam BigDecimal prixMax) {
         List<ProduitSimpleResponseDto> produits = produitService.getByPrixBetween(prixMin, prixMax);
 
-        ApiResponseDTO<List<ProduitSimpleResponseDto>> response = ApiResponseDTO.<List<ProduitSimpleResponseDto>>builder()
+        ApiResponse<List<ProduitSimpleResponseDto>> response = ApiResponse.<List<ProduitSimpleResponseDto>>builder()
                 .success(true)
                 .message("Produits par plage de prix récupérés avec succès")
                 .data(produits)
@@ -247,10 +239,11 @@ public class ProduitController {
             description = "Récupérer la liste de toutes les catégories de produits disponibles"
     )
     @GetMapping("/categories")
-    public ResponseEntity<ApiResponseDTO<List<String>>> getAllCategories() {
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<String>>> getAllCategories() {
         List<String> categories = produitService.getAllCategories();
 
-        ApiResponseDTO<List<String>> response = ApiResponseDTO.<List<String>>builder()
+        ApiResponse<List<String>> response = ApiResponse.<List<String>>builder()
                 .success(true)
                 .message("Liste des catégories récupérée avec succès")
                 .data(categories)
@@ -264,12 +257,13 @@ public class ProduitController {
             description = "Supprimer définitivement un produit du catalogue"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Void>> delete(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du produit à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         produitService.delete(id);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Produit supprimé avec succès")
                 .build();
@@ -282,7 +276,8 @@ public class ProduitController {
             description = "Vérifier si un produit existe dans le catalogue par son ID"
     )
     @GetMapping("/{id}/exists")
-    public ResponseEntity<ApiResponseDTO<Boolean>> existsById(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<Boolean>> existsById(
             @Parameter(description = "ID du produit à vérifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         boolean exists = produitService.existsById(id);
@@ -291,7 +286,7 @@ public class ProduitController {
                 "Le produit existe" :
                 "Le produit n'existe pas";
 
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
                 .success(true)
                 .message(message)
                 .data(exists)

@@ -12,24 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-
+@DiscriminatorValue(value = "client")
 @NoArgsConstructor
-public class ClientExpediteur {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-
-    private String nom;
-
-    private String prenom;
-
-    private String email;
-
-    private String telephone;
-
-    private String adresse;
-
-    private LocalDateTime dateCreation =  LocalDateTime.now();
+public class ClientExpediteur extends User{
 
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL)
     private List<Colis> colis = new ArrayList<>();

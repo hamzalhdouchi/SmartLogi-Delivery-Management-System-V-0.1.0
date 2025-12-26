@@ -1,7 +1,7 @@
 package com.smartlogi.smartlogiv010.controller;
 
-import com.smartlogi.smartlogiv010.apiResponse.ApiResponseDTO;
-import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ClientExpediteurCreateRequestDto;
+import com.smartlogi.security.dto.authDto.response.UserResponse;
+import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ClientExpediteurUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.ClientExpediteur.ClientExpediteurSimpleResponseDto;
 import com.smartlogi.smartlogiv010.service.clientExpsditeurInterfaceImpl;
@@ -12,8 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,38 +28,22 @@ public class ClientExpediteurController {
 
     private final clientExpsditeurInterfaceImpl clientExpediteurService;
 
-    @Operation(
-            summary = "Créer un client expéditeur",
-            description = "Créer un nouveau client expéditeur dans le système"
-    )
-    @PostMapping
-    public ResponseEntity<ApiResponseDTO<ClientExpediteurSimpleResponseDto>> create(
-            @Parameter(description = "Données du client expéditeur à créer", required = true)
-            @Valid @RequestBody ClientExpediteurCreateRequestDto requestDto) {
-        ClientExpediteurSimpleResponseDto createdClient = clientExpediteurService.create(requestDto);
 
-        ApiResponseDTO<ClientExpediteurSimpleResponseDto> response = ApiResponseDTO.<ClientExpediteurSimpleResponseDto>builder()
-                .success(true)
-                .message("Client expéditeur créé avec succès")
-                .data(createdClient)
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
 
     @Operation(
             summary = "Modifier un client expéditeur",
             description = "Mettre à jour les informations d'un client expéditeur existant"
     )
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ClientExpediteurSimpleResponseDto>> update(
+    @PutMapping("/{id}/update")
+    @PreAuthorize("hasRole('ROLE_SENDER')")
+    public ResponseEntity<ApiResponse<UserResponse>> update(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
             @Parameter(description = "Données de mise à jour du client", required = true)
             @Valid @RequestBody ClientExpediteurUpdateRequestDto requestDto) {
-        ClientExpediteurSimpleResponseDto updatedClient = clientExpediteurService.update(id, requestDto);
+        UserResponse updatedClient = clientExpediteurService.update(id, requestDto);
 
-        ApiResponseDTO<ClientExpediteurSimpleResponseDto> response = ApiResponseDTO.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur mis à jour avec succès")
                 .data(updatedClient)
@@ -72,13 +56,14 @@ public class ClientExpediteurController {
             summary = "Obtenir un client expéditeur par ID",
             description = "Récupérer les détails complets d'un client expéditeur spécifique"
     )
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ClientExpediteurSimpleResponseDto>> getById(
+    @GetMapping("/{id}/getClient")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+    public ResponseEntity<ApiResponse<UserResponse>> getById(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
-        ClientExpediteurSimpleResponseDto client = clientExpediteurService.getById(id);
+        UserResponse client = clientExpediteurService.getById(id);
 
-        ApiResponseDTO<ClientExpediteurSimpleResponseDto> response = ApiResponseDTO.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur récupéré avec succès")
                 .data(client)
@@ -92,33 +77,15 @@ public class ClientExpediteurController {
             description = "Obtenir la liste paginée de tous les clients expéditeurs avec possibilité de tri et de pagination"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<Page<ClientExpediteurSimpleResponseDto>>> getAll(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
-        Page<ClientExpediteurSimpleResponseDto> clients = clientExpediteurService.getAll(pageable);
+        Page<UserResponse> clients = clientExpediteurService.getAll(pageable);
 
-        ApiResponseDTO<Page<ClientExpediteurSimpleResponseDto>> response = ApiResponseDTO.<Page<ClientExpediteurSimpleResponseDto>>builder()
+        ApiResponse<Page<UserResponse>> response = ApiResponse.<Page<UserResponse>>builder()
                 .success(true)
                 .message("Liste des clients expéditeurs récupérée avec succès")
-                .data(clients)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "Rechercher des clients par nom",
-            description = "Rechercher des clients expéditeurs par leur nom (recherche partielle)"
-    )
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponseDTO<List<ClientExpediteurSimpleResponseDto>>> searchByNom(
-            @Parameter(description = "Nom ou partie du nom à rechercher", required = true, example = "Dupont")
-            @RequestParam String nom) {
-        List<ClientExpediteurSimpleResponseDto> clients = clientExpediteurService.searchByNom(nom);
-
-        ApiResponseDTO<List<ClientExpediteurSimpleResponseDto>> response = ApiResponseDTO.<List<ClientExpediteurSimpleResponseDto>>builder()
-                .success(true)
-                .message("Recherche de clients expéditeurs effectuée avec succès")
                 .data(clients)
                 .build();
 
@@ -130,12 +97,13 @@ public class ClientExpediteurController {
             description = "Rechercher un client expéditeur par mot-clé (nom, email, téléphone, etc.)"
     )
     @GetMapping("/search-keyword")
-    public ResponseEntity<ApiResponseDTO<ClientExpediteurSimpleResponseDto>> findByKeyWord(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+    public ResponseEntity<ApiResponse<UserResponse>> findByKeyWord(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
             @RequestParam String keyword) {
-        ClientExpediteurSimpleResponseDto clientExpediteurSimpleResponseDto = clientExpediteurService.findByKeyWord(keyword);
+        UserResponse clientExpediteurSimpleResponseDto = clientExpediteurService.findByKeyWord(keyword);
 
-        ApiResponseDTO<ClientExpediteurSimpleResponseDto> response = ApiResponseDTO.<ClientExpediteurSimpleResponseDto>builder()
+        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Client expéditeur trouvé avec succès")
                 .data(clientExpediteurSimpleResponseDto)
@@ -149,12 +117,13 @@ public class ClientExpediteurController {
             description = "Supprimer définitivement un client expéditeur du système"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Void>> delete(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+    public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du client expéditeur à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         clientExpediteurService.delete(id);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Client expéditeur supprimé avec succès")
                 .build();
@@ -162,26 +131,4 @@ public class ClientExpediteurController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Vérifier l'existence d'un client",
-            description = "Vérifier si un client expéditeur existe dans le système par son ID"
-    )
-    @GetMapping("/{id}/exists")
-    public ResponseEntity<ApiResponseDTO<Boolean>> existsById(
-            @Parameter(description = "ID du client expéditeur à vérifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-            @PathVariable String id) {
-        boolean exists = clientExpediteurService.existsById(id);
-
-        String message = exists ?
-                "Le client expéditeur existe" :
-                "Le client expéditeur n'existe pas";
-
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
-                .success(true)
-                .message(message)
-                .data(exists)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 }

@@ -60,49 +60,4 @@ public class HistoriqueLivraisonServiceImpl implements HistoriqueLivraisonServic
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<HistoriqueLivraisonResponseDto> getByColisOrderByDateAsc(String colisId) {
-        Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
-        return historiqueLivraisonRepository.findByColisOrderByDateChangementAsc(colis)
-                .stream()
-                .map(smartLogiMapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<HistoriqueLivraisonResponseDto> getByColisOrderByDateDesc(String colisId) {
-        Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
-        return historiqueLivraisonRepository.findByColisOrderByDateChangementDesc(colis)
-                .stream()
-                .map(smartLogiMapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<HistoriqueLivraisonResponseDto> getByStatut(StatutColis statut) {
-        return historiqueLivraisonRepository.findByStatut(statut)
-                .stream()
-                .map(smartLogiMapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<HistoriqueLivraisonResponseDto> getByColisIdAndStatut(String colisId, StatutColis statut) {
-        return historiqueLivraisonRepository.findByColisIdAndStatut(colisId, statut)
-                .stream()
-                .map(smartLogiMapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<HistoriqueLivraisonResponseDto> getByDateChangementBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        return historiqueLivraisonRepository.findByDateChangementBetween(startDate, endDate)
-                .stream()
-                .map(smartLogiMapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-
 }

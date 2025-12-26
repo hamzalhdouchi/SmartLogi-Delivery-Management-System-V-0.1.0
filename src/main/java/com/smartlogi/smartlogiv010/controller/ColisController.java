@@ -1,6 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
-import com.smartlogi.smartlogiv010.apiResponse.ApiResponseDTO;
+import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ColisCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ColisUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Colis.ColisAdvancedResponseDto;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,9 @@ public class ColisController {
             summary = "Créer un nouveau colis",
             description = "Créer un colis avec possibilité d'ajouter des produits existants ou de créer de nouveaux produits"
     )
-    @PostMapping
-    public ResponseEntity<ApiResponseDTO<ColisSimpleResponseDto>> create(
+    @PostMapping("/demande-livraison")
+    @PreAuthorize("hasAuthority('CAN_CREATE_COLIS')")
+    public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> create(
             @Parameter(description = "Données du colis à créer", required = true)
             @Valid @RequestBody ColisCreateRequestDto requestDto) {
         ColisSimpleResponseDto createdColis = colisService.create(requestDto);
@@ -60,7 +62,7 @@ public class ColisController {
             }
         }
 
-        ApiResponseDTO<ColisSimpleResponseDto> response = ApiResponseDTO.<ColisSimpleResponseDto>builder()
+        ApiResponse<ColisSimpleResponseDto> response = ApiResponse.<ColisSimpleResponseDto>builder()
                 .success(true)
                 .message(message)
                 .data(createdColis)
@@ -74,7 +76,8 @@ public class ColisController {
             description = "Ajouter un produit existant ou créer un nouveau produit dans un colis existant"
     )
     @PostMapping("/{colisId}/produits")
-    public ResponseEntity<ApiResponseDTO<Void>> ajouterProduit(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_SENDER')")
+    public ResponseEntity<ApiResponse<Void>> ajouterProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "Données du produit à ajouter", required = true)
@@ -88,7 +91,7 @@ public class ColisController {
             message += "créé et ajouté au colis avec succès";
         }
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message(message)
                 .build();
@@ -101,12 +104,13 @@ public class ColisController {
             description = "Récupérer la liste de tous les produits associés à un colis spécifique"
     )
     @GetMapping("/{colisId}/produits")
-    public ResponseEntity<ApiResponseDTO<List<ColisProduit>>> getProduitsByColis(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<List<ColisProduit>>> getProduitsByColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
         List<ColisProduit> produits = colisService.getProduitsByColis(colisId);
 
-        ApiResponseDTO<List<ColisProduit>> response = ApiResponseDTO.<List<ColisProduit>>builder()
+        ApiResponse<List<ColisProduit>> response = ApiResponse.<List<ColisProduit>>builder()
                 .success(true)
                 .message("Produits du colis récupérés avec succès")
                 .data(produits)
@@ -120,7 +124,8 @@ public class ColisController {
             description = "Mettre à jour la quantité d'un produit spécifique dans un colis"
     )
     @PutMapping("/{colisId}/produits/{produitId}/quantite")
-    public ResponseEntity<ApiResponseDTO<Void>> mettreAJourQuantiteProduit(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<Void>> mettreAJourQuantiteProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174001")
@@ -129,7 +134,7 @@ public class ColisController {
             @RequestParam @Valid @jakarta.validation.constraints.Min(value = 1, message = "La quantité doit être au moins 1") Integer nouvelleQuantite) {
         colisService.mettreAJourQuantiteProduit(colisId, produitId, nouvelleQuantite);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Quantité du produit mise à jour avec succès")
                 .build();
@@ -142,14 +147,15 @@ public class ColisController {
             description = "Retirer un produit spécifique d'un colis"
     )
     @DeleteMapping("/{colisId}/produits/{produitId}")
-    public ResponseEntity<ApiResponseDTO<Void>> supprimerProduit(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+    public ResponseEntity<ApiResponse<Void>> supprimerProduit(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174001")
             @PathVariable String produitId) {
         colisService.supprimerProduit(colisId, produitId);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Produit retiré du colis avec succès")
                 .build();
@@ -162,12 +168,13 @@ public class ColisController {
             description = "Obtenir le prix total d'un colis basé sur les produits et leurs quantités"
     )
     @GetMapping("/{colisId}/total-prix")
-    public ResponseEntity<ApiResponseDTO<BigDecimal>> getTotalPrixColis(
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+    public ResponseEntity<ApiResponse<BigDecimal>> getTotalPrixColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
         BigDecimal totalPrix = colisService.getPrixTotalColis(colisId);
 
-        ApiResponseDTO<BigDecimal> response = ApiResponseDTO.<BigDecimal>builder()
+        ApiResponse<BigDecimal> response = ApiResponse.<BigDecimal>builder()
                 .success(true)
                 .message("Prix total du colis calculé avec succès")
                 .data(totalPrix)
@@ -181,14 +188,15 @@ public class ColisController {
             description = "Vérifier si un produit spécifique existe dans un colis"
     )
     @GetMapping("/{colisId}/produits/{produitId}/existe")
-    public ResponseEntity<ApiResponseDTO<Boolean>> produitExisteDansColis(
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_SENDER')")
+    public ResponseEntity<ApiResponse<Boolean>> produitExisteDansColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174001")
             @PathVariable String produitId) {
         boolean existe = colisService.produitExisteDansColis(colisId, produitId);
 
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
                 .success(true)
                 .message("Vérification d'existence du produit dans le colis effectuée avec succès")
                 .data(existe)
@@ -201,15 +209,16 @@ public class ColisController {
             summary = "Mettre à jour un colis",
             description = "Modifier les informations d'un colis existant"
     )
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ColisSimpleResponseDto>> update(
+    @PutMapping("/{id}/update")
+    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_FULL')")
+    public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> update(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
             @Parameter(description = "Données de mise à jour du colis", required = true)
             @Valid @RequestBody ColisUpdateRequestDto requestDto) {
         ColisSimpleResponseDto updatedColis = colisService.update(id, requestDto);
 
-        ApiResponseDTO<ColisSimpleResponseDto> response = ApiResponseDTO.<ColisSimpleResponseDto>builder()
+        ApiResponse<ColisSimpleResponseDto> response = ApiResponse.<ColisSimpleResponseDto>builder()
                 .success(true)
                 .message("Colis mis à jour avec succès")
                 .data(updatedColis)
@@ -222,13 +231,14 @@ public class ColisController {
             summary = "Obtenir un colis par ID",
             description = "Récupérer les informations de base d'un colis spécifique"
     )
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ColisSimpleResponseDto>> getById(
+    @GetMapping("/{id}/getColis")
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+    public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> getById(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ColisSimpleResponseDto colis = colisService.getById(id);
 
-        ApiResponseDTO<ColisSimpleResponseDto> response = ApiResponseDTO.<ColisSimpleResponseDto>builder()
+        ApiResponse<ColisSimpleResponseDto> response = ApiResponse.<ColisSimpleResponseDto>builder()
                 .success(true)
                 .message("Colis récupéré avec succès")
                 .data(colis)
@@ -242,12 +252,13 @@ public class ColisController {
             description = "Récupérer toutes les informations détaillées d'un colis (historique, produits, etc.)"
     )
     @GetMapping("/{id}/detailed")
-    public ResponseEntity<ApiResponseDTO<ColisAdvancedResponseDto>> getByIdWithDetails(
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+    public ResponseEntity<ApiResponse<ColisAdvancedResponseDto>> getByIdWithDetails(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ColisAdvancedResponseDto colis = colisService.getByIdWithDetails(id);
 
-        ApiResponseDTO<ColisAdvancedResponseDto> response = ApiResponseDTO.<ColisAdvancedResponseDto>builder()
+        ApiResponse<ColisAdvancedResponseDto> response = ApiResponse.<ColisAdvancedResponseDto>builder()
                 .success(true)
                 .message("Colis détaillé récupéré avec succès")
                 .data(colis)
@@ -261,10 +272,11 @@ public class ColisController {
             description = "Récupérer la liste complète de tous les colis"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getAll() {
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getAll() {
         List<ColisSimpleResponseDto> colis = colisService.getAll(Pageable.unpaged()).getContent();
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Liste des colis récupérée avec succès")
                 .data(colis)
@@ -278,12 +290,13 @@ public class ColisController {
             description = "Récupérer les colis avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<ColisSimpleResponseDto>>> getAllPaginated(
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
         Page<ColisSimpleResponseDto> colis = colisService.getAll(pageable);
 
-        ApiResponseDTO<Page<ColisSimpleResponseDto>> response = ApiResponseDTO.<Page<ColisSimpleResponseDto>>builder()
+        ApiResponse<Page<ColisSimpleResponseDto>> response = ApiResponse.<Page<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis paginés récupérés avec succès")
                 .data(colis)
@@ -297,12 +310,13 @@ public class ColisController {
             description = "Récupérer tous les colis ayant un statut spécifique"
     )
     @GetMapping("/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByStatut(
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByStatut(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
         List<ColisSimpleResponseDto> colis = colisService.getByStatut(statut);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par statut récupérés avec succès")
                 .data(colis)
@@ -316,12 +330,13 @@ public class ColisController {
             description = "Récupérer tous les colis d'un client expéditeur spécifique"
     )
     @GetMapping("/client-expediteur/{clientId}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByClientExpediteur(
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByClientExpediteur(
             @Parameter(description = "ID du client expéditeur", required = true, example = "client-123")
             @PathVariable String clientId) {
         List<ColisSimpleResponseDto> colis = colisService.getByClientExpediteur(clientId);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par client expéditeur récupérés avec succès")
                 .data(colis)
@@ -335,12 +350,13 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à un destinataire spécifique"
     )
     @GetMapping("/destinataire/{destinataireId}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByDestinataire(
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByDestinataire(
             @Parameter(description = "ID du destinataire", required = true, example = "dest-456")
             @PathVariable String destinataireId) {
         List<ColisSimpleResponseDto> colis = colisService.getByDestinataire(destinataireId);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par destinataire récupérés avec succès")
                 .data(colis)
@@ -354,12 +370,13 @@ public class ColisController {
             description = "Récupérer tous les colis assignés à un livreur spécifique"
     )
     @GetMapping("/livreur/{livreurId}")
-    public ResponseEntity<ApiResponseDTO<List<ColisAdvancedResponseDto>>> getByLivreur(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisAdvancedResponseDto>>> getByLivreur(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
         List<ColisAdvancedResponseDto> colis = colisService.getByLivreur(livreurId);
 
-        ApiResponseDTO<List<ColisAdvancedResponseDto>> response = ApiResponseDTO.<List<ColisAdvancedResponseDto>>builder()
+        ApiResponse<List<ColisAdvancedResponseDto>> response = ApiResponse.<List<ColisAdvancedResponseDto>>builder()
                 .success(true)
                 .message("Colis par livreur récupérés avec succès")
                 .data(colis)
@@ -373,12 +390,13 @@ public class ColisController {
             description = "Récupérer tous les colis d'une zone spécifique"
     )
     @GetMapping("/zone/{zoneId}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByZone(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZone(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId) {
         List<ColisSimpleResponseDto> colis = colisService.getByZone(zoneId);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par zone récupérés avec succès")
                 .data(colis)
@@ -392,12 +410,13 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à une ville spécifique"
     )
     @GetMapping("/ville-destination/{ville}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> searchByVilleDestination(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> searchByVilleDestination(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville) {
         List<ColisSimpleResponseDto> colis = colisService.searchByVilleDestination(ville);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par ville de destination récupérés avec succès")
                 .data(colis)
@@ -411,14 +430,15 @@ public class ColisController {
             description = "Assigner un livreur spécifique à un colis pour la livraison"
     )
     @PutMapping("/{colisId}/assigner-livreur/{livreurId}")
-    public ResponseEntity<ApiResponseDTO<Void>> assignerLivreur(
+    @PreAuthorize("hasAuthority('CAN_ASSIGN_LIVREUR')")
+    public ResponseEntity<ApiResponse<Void>> assignerLivreur(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
         colisService.assignerLivreur(colisId, livreurId);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Livreur assigné au colis avec succès")
                 .build();
@@ -431,7 +451,8 @@ public class ColisController {
             description = "Modifier le statut d'un colis avec un commentaire optionnel"
     )
     @PutMapping("/{colisId}/changer-statut")
-    public ResponseEntity<ApiResponseDTO<Void>> changerStatut(
+    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_STATUS')")
+    public ResponseEntity<ApiResponse<Void>> changerStatut(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
             @Parameter(description = "Nouveau statut", required = true, example = "EN_COURS")
@@ -440,7 +461,7 @@ public class ColisController {
             @RequestParam(required = false) String commentaire) {
         colisService.changerStatut(colisId, nouveauStatut, commentaire);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Statut du colis modifié avec succès")
                 .build();
@@ -453,12 +474,13 @@ public class ColisController {
             description = "Supprimer définitivement un colis du système"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Void>> delete(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du colis à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         colisService.delete(id);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Colis supprimé avec succès")
                 .build();
@@ -473,12 +495,13 @@ public class ColisController {
             description = "Récupérer tous les colis ayant une priorité spécifique"
     )
     @GetMapping("/priorite/{priorite}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByPriorite(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPriorite(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite) {
         List<ColisSimpleResponseDto> colis = colisService.getByPriorite(priorite);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par priorité récupérés avec succès")
                 .data(colis)
@@ -492,14 +515,15 @@ public class ColisController {
             description = "Récupérer les colis ayant une combinaison spécifique de priorité et statut"
     )
     @GetMapping("/priorite/{priorite}/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByPrioriteAndStatut(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByPrioriteAndStatut(
             @Parameter(description = "Priorité des colis", required = true, example = "HAUTE")
             @PathVariable Priorite priorite,
             @Parameter(description = "Statut des colis", required = true, example = "EN_COURS")
             @PathVariable StatutColis statut) {
         List<ColisSimpleResponseDto> colis = colisService.getByPrioriteAndStatut(priorite, statut);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par priorité et statut récupérés avec succès")
                 .data(colis)
@@ -508,40 +532,21 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Rechercher les colis par livreur et statut",
-            description = "Récupérer les colis d'un livreur spécifique avec un statut donné"
-    )
-    @GetMapping("/livreur/{livreurId}/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByLivreurAndStatut(
-            @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
-            @PathVariable String livreurId,
-            @Parameter(description = "Statut des colis", required = true, example = "EN_COURS")
-            @PathVariable StatutColis statut) {
-        List<ColisSimpleResponseDto> colis = colisService.getByLivreurAndStatut(livreurId, statut);
-
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
-                .success(true)
-                .message("Colis par livreur et statut récupérés avec succès")
-                .data(colis)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 
     @Operation(
             summary = "Rechercher les colis par zone et statut",
             description = "Récupérer les colis d'une zone spécifique avec un statut donné"
     )
     @GetMapping("/zone/{zoneId}/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByZoneAndStatut(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByZoneAndStatut(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
         List<ColisSimpleResponseDto> colis = colisService.getByZoneAndStatut(zoneId, statut);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par zone et statut récupérés avec succès")
                 .data(colis)
@@ -555,14 +560,15 @@ public class ColisController {
             description = "Récupérer les colis destinés à une ville spécifique avec un statut donné"
     )
     @GetMapping("/ville-destination/{ville}/statut/{statut}")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByVilleDestinationAndStatut(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByVilleDestinationAndStatut(
             @Parameter(description = "Ville de destination", required = true, example = "Paris")
             @PathVariable String ville,
             @Parameter(description = "Statut des colis", required = true, example = "EN_COURS")
             @PathVariable StatutColis statut) {
         List<ColisSimpleResponseDto> colis = colisService.getByVilleDestinationAndStatut(ville, statut);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par ville destination et statut récupérés avec succès")
                 .data(colis)
@@ -576,12 +582,13 @@ public class ColisController {
             description = "Rechercher des colis par mot-clé (description, ville, etc.)"
     )
     @GetMapping("/search/keyword")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> searchByKeyword(
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> searchByKeyword(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "electronique")
             @RequestParam String keyword) {
         List<ColisSimpleResponseDto> colis = colisService.searchByKeyword(keyword);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Recherche par mot-clé effectuée avec succès")
                 .data(colis)
@@ -595,10 +602,11 @@ public class ColisController {
             description = "Récupérer la liste des colis considérés comme en retard"
     )
     @GetMapping("/en-retard")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getColisEnRetard() {
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getColisEnRetard() {
         List<ColisSimpleResponseDto> colis = colisService.getColisEnRetard();
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
+        ApiResponse<List<ColisSimpleResponseDto>> response = ApiResponse.<List<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis en retard récupérés avec succès")
                 .data(colis)
@@ -607,40 +615,22 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Rechercher les colis par période de création",
-            description = "Récupérer les colis créés dans une période spécifique"
-    )
-    @GetMapping("/date-creation")
-    public ResponseEntity<ApiResponseDTO<List<ColisSimpleResponseDto>>> getByDateCreationBetween(
-            @Parameter(description = "Date de début (format ISO)", required = true, example = "2024-01-01T00:00:00")
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @Parameter(description = "Date de fin (format ISO)", required = true, example = "2024-12-31T23:59:59")
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        List<ColisSimpleResponseDto> colis = colisService.getByDateCreationBetween(startDate, endDate);
 
-        ApiResponseDTO<List<ColisSimpleResponseDto>> response = ApiResponseDTO.<List<ColisSimpleResponseDto>>builder()
-                .success(true)
-                .message("Colis par période de création récupérés avec succès")
-                .data(colis)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 
     @Operation(
             summary = "Obtenir les colis par zone (paginés)",
             description = "Récupérer les colis d'une zone spécifique avec pagination"
     )
     @GetMapping("/zone/{zoneId}/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<ColisSimpleResponseDto>>> getByZoneId(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByZoneId(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
             @Parameter(description = "Paramètres de pagination")
             Pageable pageable) {
         Page<ColisSimpleResponseDto> colis = colisService.getByZoneId(zoneId, pageable);
 
-        ApiResponseDTO<Page<ColisSimpleResponseDto>> response = ApiResponseDTO.<Page<ColisSimpleResponseDto>>builder()
+        ApiResponse<Page<ColisSimpleResponseDto>> response = ApiResponse.<Page<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par zone paginés récupérés avec succès")
                 .data(colis)
@@ -654,14 +644,15 @@ public class ColisController {
             description = "Récupérer les colis d'un statut spécifique avec pagination"
     )
     @GetMapping("/statut/{statut}/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<ColisSimpleResponseDto>>> getByStatutPaginated(
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getByStatutPaginated(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut,
             @Parameter(description = "Paramètres de pagination")
             Pageable pageable) {
         Page<ColisSimpleResponseDto> colis = colisService.getByStatut(statut, pageable);
 
-        ApiResponseDTO<Page<ColisSimpleResponseDto>> response = ApiResponseDTO.<Page<ColisSimpleResponseDto>>builder()
+        ApiResponse<Page<ColisSimpleResponseDto>> response = ApiResponse.<Page<ColisSimpleResponseDto>>builder()
                 .success(true)
                 .message("Colis par statut paginés récupérés avec succès")
                 .data(colis)
@@ -670,19 +661,19 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    // === ENDPOINTS DE STATISTIQUES ===
 
     @Operation(
             summary = "Compter les colis par statut",
             description = "Obtenir le nombre total de colis pour un statut spécifique"
     )
     @GetMapping("/statistiques/statut/{statut}/count")
-    public ResponseEntity<ApiResponseDTO<Long>> countByStatut(
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
+    public ResponseEntity<ApiResponse<Long>> countByStatut(
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
         long count = colisService.countByStatut(statut);
 
-        ApiResponseDTO<Long> response = ApiResponseDTO.<Long>builder()
+        ApiResponse<Long> response = ApiResponse.<Long>builder()
                 .success(true)
                 .message("Nombre de colis par statut récupéré avec succès")
                 .data(count)
@@ -696,14 +687,15 @@ public class ColisController {
             description = "Obtenir le nombre de colis pour une combinaison zone/statut"
     )
     @GetMapping("/statistiques/zone/{zoneId}/statut/{statut}/count")
-    public ResponseEntity<ApiResponseDTO<Long>> countByZoneAndStatut(
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
+    public ResponseEntity<ApiResponse<Long>> countByZoneAndStatut(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
             @PathVariable String zoneId,
             @Parameter(description = "Statut des colis", required = true, example = "CREE")
             @PathVariable StatutColis statut) {
         long count = colisService.countByZoneAndStatut(zoneId, statut);
 
-        ApiResponseDTO<Long> response = ApiResponseDTO.<Long>builder()
+        ApiResponse<Long> response = ApiResponse.<Long>builder()
                 .success(true)
                 .message("Nombre de colis par zone et statut récupéré avec succès")
                 .data(count)
@@ -717,14 +709,15 @@ public class ColisController {
             description = "Obtenir le nombre de colis pour une combinaison livreur/statut"
     )
     @GetMapping("/statistiques/livreur/{livreurId}/statut/{statut}/count")
-    public ResponseEntity<ApiResponseDTO<Long>> countByLivreurAndStatut(
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
+    public ResponseEntity<ApiResponse<Long>> countByLivreurAndStatut(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId,
             @Parameter(description = "Statut des colis", required = true, example = "EN_COURS")
             @PathVariable StatutColis statut) {
         long count = colisService.countByLivreurAndStatut(livreurId, statut);
 
-        ApiResponseDTO<Long> response = ApiResponseDTO.<Long>builder()
+        ApiResponse<Long> response = ApiResponse.<Long>builder()
                 .success(true)
                 .message("Nombre de colis par livreur et statut récupéré avec succès")
                 .data(count)
@@ -734,9 +727,10 @@ public class ColisController {
     }
 
     @GetMapping("/poidstotal/colis/{colisId}")
-    public ResponseEntity<ApiResponseDTO<Double>> poidsTotal(@PathVariable String colisId) {
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
+    public ResponseEntity<ApiResponse<Double>> poidsTotal(@PathVariable String colisId) {
         Double poids = colisService.calculateTotal(colisId);
-        ApiResponseDTO<Double> response = ApiResponseDTO.<Double>builder()
+        ApiResponse<Double> response = ApiResponse.<Double>builder()
                 .success(true)
                 .message("le Poids recupere successfully")
                 .data(poids)
@@ -745,34 +739,24 @@ public class ColisController {
     }
 
     @GetMapping("/prixtotal/colis/{colisId}")
-    public ResponseEntity<ApiResponseDTO<Double>> getPrixTotal(@PathVariable String colisId) {
+    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+    public ResponseEntity<ApiResponse<Double>> getPrixTotal(@PathVariable String colisId) {
         Double poids = colisService.calculateTotalPrix(colisId);
 
-        ApiResponseDTO<Double> response = ApiResponseDTO.<Double>builder()
+        ApiResponse<Double> response = ApiResponse.<Double>builder()
                 .success(true)
-                .message("le prix recupere successfully")
+                .message("le prix recupere avec succes")
                 .data(poids)
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/poids-par-livreur")
-    public ResponseEntity<ApiResponseDTO<List<PoidsParLivreurDTO>>> getPoidsTotalParLivreur() {
-        List<PoidsParLivreurDTO> result = colisService.getPoidsTotalParLivreur();
-
-        ApiResponseDTO<List<PoidsParLivreurDTO>> response = ApiResponseDTO.<List<PoidsParLivreurDTO>>builder()
-                .success(true)
-                .message("Poids total par livreur récupéré avec succès")
-                .data(result)
-                .build();
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/poids-par-livreur/detail")
-    public ResponseEntity<ApiResponseDTO<List<PoidsParLivreurDetailDTO>>> getPoidsDetailParLivreur() {
+    @PreAuthorize("hasAuthority('CAN_VIEW_STATS')")
+    public ResponseEntity<ApiResponse<List<PoidsParLivreurDetailDTO>>> getPoidsDetailParLivreur() {
         List<PoidsParLivreurDetailDTO> result = colisService.getPoidsDetailParLivreur();
 
-        ApiResponseDTO<List<PoidsParLivreurDetailDTO>> response = ApiResponseDTO.<List<PoidsParLivreurDetailDTO>>builder()
+        ApiResponse<List<PoidsParLivreurDetailDTO>> response = ApiResponse.<List<PoidsParLivreurDetailDTO>>builder()
                 .success(true)
                 .message("Détail poids par livreur récupéré avec succès")
                 .data(result)

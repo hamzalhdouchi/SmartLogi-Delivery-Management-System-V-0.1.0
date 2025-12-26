@@ -1,84 +1,65 @@
 package com.smartlogi.smartlogiv010.service;
 
-import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.DestinataireCreateDto;
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.DestinataireUpdateDto;
+import com.smartlogi.smartlogiv010.dto.responseDTO.ClientExpediteur.ClientExpediteurSimpleResponseDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Destinataire.DestinataireSimpleResponseDto;
 import com.smartlogi.smartlogiv010.entity.Destinataire;
+import com.smartlogi.smartlogiv010.entity.User;
 import com.smartlogi.smartlogiv010.exception.ArgementNotFoundExption;
-import com.smartlogi.smartlogiv010.exception.EmailAlreadyExistsException;
 import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.mapper.SmartLogiMapper;
-import com.smartlogi.smartlogiv010.repository.DestinataireRepository;
+import com.smartlogi.smartlogiv010.repository.UserRepository;
 import com.smartlogi.smartlogiv010.service.interfaces.DestinataireService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class DestinataireServiceImpl implements DestinataireService {
 
-    private final DestinataireRepository destinataireRepository;
+    private final UserRepository destinataireRepository;
     private final SmartLogiMapper smartLogiMapper;
 
-    @Override
-    public DestinataireSimpleResponseDto create(DestinataireCreateDto requestDto) throws EmailAlreadyExistsException {
-
-        if (destinataireRepository.existsDestinataireByEmail(requestDto.getEmail())) {
-            throw new EmailAlreadyExistsException(requestDto.getEmail());
-        }
-        Destinataire destinataire = smartLogiMapper.toEntity(requestDto);
-        Destinataire savedDestinataire = destinataireRepository.save(destinataire);
-        return smartLogiMapper.toSimpleResponseDto(savedDestinataire);
-    }
 
     @Override
-    public DestinataireSimpleResponseDto update(String id, DestinataireUpdateDto requestDto) {
-        Destinataire destinataire = destinataireRepository.findById(id)
+    public UserResponse update(String id, DestinataireUpdateDto requestDto) {
+        User destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new ArgementNotFoundExption(id,"the destinataire id not found"));
         smartLogiMapper.updateEntityFromDto(requestDto, destinataire);
-        Destinataire updatedDestinataire = destinataireRepository.save(destinataire);
+        User updatedDestinataire = destinataireRepository.save(destinataire);
         return smartLogiMapper.toSimpleResponseDto(updatedDestinataire);
     }
 
     @Override
-    public DestinataireSimpleResponseDto getById(String id) {
-        Destinataire destinataire = destinataireRepository.findById(id)
+    public UserResponse getById(String id) {
+        User destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
         return smartLogiMapper.toSimpleResponseDto(destinataire);
     }
 
     @Override
-    public Page<DestinataireSimpleResponseDto> getAll(Pageable pageable) {
+    public Page<UserResponse> getAll(Pageable pageable) {
         return destinataireRepository.findAll(pageable)
                 .map(smartLogiMapper::toSimpleResponseDto);
     }
+    
 
     @Override
-    public List<DestinataireSimpleResponseDto> searchByNom(String nom) {
-        return destinataireRepository.findByNomContainingIgnoreCase(nom)
-                .stream()
-                .map(smartLogiMapper::toSimpleResponseDto)
-                .collect(Collectors.toList());
-    }
+    public UserResponse findByKeyWord(String keyword) {
 
-    @Override
-    public DestinataireSimpleResponseDto findByKeyWord(String keyword) {
-
-        Destinataire destinataire = destinataireRepository.searchByKeyword(keyword);
+        User destinataire = destinataireRepository.searchByKeyword(keyword);
         if (destinataire == null) {
             throw new ResourceNotFoundException("le Destinataire pas trouve");
         }
-        DestinataireSimpleResponseDto dto = smartLogiMapper.toSimpleResponseDto(destinataire);
+        UserResponse dto = smartLogiMapper.toSimpleResponseDto(destinataire);
         return dto;
     }
     @Override
     public void delete(String id) {
-        Destinataire destinataire = destinataireRepository.findById(id)
+        User destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
         destinataireRepository.delete(destinataire);
     }

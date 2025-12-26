@@ -16,27 +16,10 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@DiscriminatorValue(value = "destinataire")
 @NoArgsConstructor
-public class Destinataire {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class Destinataire extends User{
 
-
-    private String nom;
-
-    private String prenom;
-
-    @Column(unique = true)
-    private String email;
-
-    private String telephone;
-
-    private String adresse;
-
-    @CreationTimestamp
-    @Column(name = "date_creation", updatable = false)
-    private LocalDateTime dateCreation;
 
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL)
     private List<Colis> colis = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.smartlogi.smartlogiv010.controller;
 
-import com.smartlogi.smartlogiv010.apiResponse.ApiResponseDTO;
+import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
 import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ZoneCreateRequestDto;
 import com.smartlogi.smartlogiv010.dto.requestDTO.updateDTO.ZoneUpdateRequestDto;
 import com.smartlogi.smartlogiv010.dto.responseDTO.Zone.ZoneDetailedResponseDto;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Zones", description = "API pour la gestion des zones de livraison (création, modification, recherche, statistiques)")
+@PreAuthorize("hasRole('ROLE_MANAGER') && hasAuthority('CAN_MANAGE_ZONES')")
 public class ZoneController {
 
     private final ZoneService zoneService;
@@ -35,12 +37,12 @@ public class ZoneController {
             description = "Ajouter une nouvelle zone de livraison avec ses informations géographiques et opérationnelles"
     )
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<ZoneSimpleResponseDto>> create(
+    public ResponseEntity<ApiResponse<ZoneSimpleResponseDto>> create(
             @Parameter(description = "Données de la zone à créer", required = true)
             @Valid @RequestBody ZoneCreateRequestDto requestDto) {
         ZoneSimpleResponseDto createdZone = zoneService.create(requestDto);
 
-        ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+        ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                 .success(true)
                 .message("Zone créée avec succès")
                 .data(createdZone)
@@ -54,14 +56,14 @@ public class ZoneController {
             description = "Mettre à jour les informations d'une zone existante"
     )
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ZoneSimpleResponseDto>> update(
+    public ResponseEntity<ApiResponse<ZoneSimpleResponseDto>> update(
             @Parameter(description = "ID de la zone", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id,
             @Parameter(description = "Données de mise à jour de la zone", required = true)
             @Valid @RequestBody ZoneUpdateRequestDto requestDto) {
         ZoneSimpleResponseDto updatedZone = zoneService.update(id, requestDto);
 
-        ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+        ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                 .success(true)
                 .message("Zone mise à jour avec succès")
                 .data(updatedZone)
@@ -75,12 +77,12 @@ public class ZoneController {
             description = "Récupérer les informations de base d'une zone spécifique"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<ZoneSimpleResponseDto>> getById(
+    public ResponseEntity<ApiResponse<ZoneSimpleResponseDto>> getById(
             @Parameter(description = "ID de la zone", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ZoneSimpleResponseDto zone = zoneService.getById(id);
 
-        ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+        ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                 .success(true)
                 .message("Zone récupérée avec succès")
                 .data(zone)
@@ -94,12 +96,12 @@ public class ZoneController {
             description = "Récupérer les informations détaillées d'une zone incluant ses livreurs et colis associés"
     )
     @GetMapping("/{id}/detailed")
-    public ResponseEntity<ApiResponseDTO<ZoneDetailedResponseDto>> getByIdWithDetails(
+    public ResponseEntity<ApiResponse<ZoneDetailedResponseDto>> getByIdWithDetails(
             @Parameter(description = "ID de la zone", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         ZoneDetailedResponseDto zone = zoneService.getByIdWithDetails(id);
 
-        ApiResponseDTO<ZoneDetailedResponseDto> response = ApiResponseDTO.<ZoneDetailedResponseDto>builder()
+        ApiResponse<ZoneDetailedResponseDto> response = ApiResponse.<ZoneDetailedResponseDto>builder()
                 .success(true)
                 .message("Zone détaillée récupérée avec succès")
                 .data(zone)
@@ -113,10 +115,10 @@ public class ZoneController {
             description = "Récupérer la liste complète de toutes les zones de livraison"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<ZoneSimpleResponseDto>>> getAll() {
+    public ResponseEntity<ApiResponse<List<ZoneSimpleResponseDto>>> getAll() {
         List<ZoneSimpleResponseDto> zones = zoneService.getAll();
 
-        ApiResponseDTO<List<ZoneSimpleResponseDto>> response = ApiResponseDTO.<List<ZoneSimpleResponseDto>>builder()
+        ApiResponse<List<ZoneSimpleResponseDto>> response = ApiResponse.<List<ZoneSimpleResponseDto>>builder()
                 .success(true)
                 .message("Liste des zones récupérée avec succès")
                 .data(zones)
@@ -130,12 +132,12 @@ public class ZoneController {
             description = "Récupérer les zones avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    public ResponseEntity<ApiResponseDTO<Page<ZoneSimpleResponseDto>>> getAllPaginated(
+    public ResponseEntity<ApiResponse<Page<ZoneSimpleResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
         Page<ZoneSimpleResponseDto> zones = zoneService.getAll(pageable);
 
-        ApiResponseDTO<Page<ZoneSimpleResponseDto>> response = ApiResponseDTO.<Page<ZoneSimpleResponseDto>>builder()
+        ApiResponse<Page<ZoneSimpleResponseDto>> response = ApiResponse.<Page<ZoneSimpleResponseDto>>builder()
                 .success(true)
                 .message("Zones paginées récupérées avec succès")
                 .data(zones)
@@ -149,20 +151,20 @@ public class ZoneController {
             description = "Rechercher une zone spécifique par son code postal"
     )
     @GetMapping("/code-postal/{codePostal}")
-    public ResponseEntity<ApiResponseDTO<ZoneSimpleResponseDto>> getByCodePostal(
+    public ResponseEntity<ApiResponse<ZoneSimpleResponseDto>> getByCodePostal(
             @Parameter(description = "Code postal de la zone", required = true, example = "20000")
             @PathVariable String codePostal) {
         Optional<ZoneSimpleResponseDto> zone = zoneService.getByCodePostal(codePostal);
 
         if (zone.isPresent()) {
-            ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+            ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                     .success(true)
                     .message("Zone trouvée par code postal")
                     .data(zone.get())
                     .build();
             return ResponseEntity.ok(response);
         } else {
-            ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+            ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                     .success(false)
                     .message("Aucune zone trouvée avec ce code postal")
                     .build();
@@ -175,20 +177,20 @@ public class ZoneController {
             description = "Rechercher une zone spécifique par son nom exact"
     )
     @GetMapping("/nom/{nom}")
-    public ResponseEntity<ApiResponseDTO<ZoneSimpleResponseDto>> getByNom(
+    public ResponseEntity<ApiResponse<ZoneSimpleResponseDto>> getByNom(
             @Parameter(description = "Nom exact de la zone", required = true, example = "Casablanca Centre")
             @PathVariable String nom) {
         Optional<ZoneSimpleResponseDto> zone = zoneService.getByNom(nom);
 
         if (zone.isPresent()) {
-            ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+            ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                     .success(true)
                     .message("Zone trouvée par nom")
                     .data(zone.get())
                     .build();
             return ResponseEntity.ok(response);
         } else {
-            ApiResponseDTO<ZoneSimpleResponseDto> response = ApiResponseDTO.<ZoneSimpleResponseDto>builder()
+            ApiResponse<ZoneSimpleResponseDto> response = ApiResponse.<ZoneSimpleResponseDto>builder()
                     .success(false)
                     .message("Aucune zone trouvée avec ce nom")
                     .build();
@@ -201,12 +203,12 @@ public class ZoneController {
             description = "Rechercher des zones par leur nom (recherche partielle)"
     )
     @GetMapping("/search/nom")
-    public ResponseEntity<ApiResponseDTO<List<ZoneSimpleResponseDto>>> searchByNom(
+    public ResponseEntity<ApiResponse<List<ZoneSimpleResponseDto>>> searchByNom(
             @Parameter(description = "Nom ou partie du nom à rechercher", required = true, example = "casa")
             @RequestParam String nom) {
         List<ZoneSimpleResponseDto> zones = zoneService.searchByNom(nom);
 
-        ApiResponseDTO<List<ZoneSimpleResponseDto>> response = ApiResponseDTO.<List<ZoneSimpleResponseDto>>builder()
+        ApiResponse<List<ZoneSimpleResponseDto>> response = ApiResponse.<List<ZoneSimpleResponseDto>>builder()
                 .success(true)
                 .message("Recherche par nom effectuée avec succès")
                 .data(zones)
@@ -220,12 +222,12 @@ public class ZoneController {
             description = "Rechercher des zones par mot-clé (nom, ville, code postal, etc.)"
     )
     @GetMapping("/search/keyword")
-    public ResponseEntity<ApiResponseDTO<List<ZoneSimpleResponseDto>>> searchByKeyword(
+    public ResponseEntity<ApiResponse<List<ZoneSimpleResponseDto>>> searchByKeyword(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "20000")
             @RequestParam String keyword) {
         List<ZoneSimpleResponseDto> zones = zoneService.searchByKeyword(keyword);
 
-        ApiResponseDTO<List<ZoneSimpleResponseDto>> response = ApiResponseDTO.<List<ZoneSimpleResponseDto>>builder()
+        ApiResponse<List<ZoneSimpleResponseDto>> response = ApiResponse.<List<ZoneSimpleResponseDto>>builder()
                 .success(true)
                 .message("Recherche par mot-clé effectuée avec succès")
                 .data(zones)
@@ -239,7 +241,7 @@ public class ZoneController {
             description = "Vérifier si un code postal est déjà associé à une zone"
     )
     @GetMapping("/code-postal/{codePostal}/exists")
-    public ResponseEntity<ApiResponseDTO<Boolean>> existsByCodePostal(
+    public ResponseEntity<ApiResponse<Boolean>> existsByCodePostal(
             @Parameter(description = "Code postal à vérifier", required = true, example = "20000")
             @PathVariable String codePostal) {
         boolean exists = zoneService.existsByCodePostal(codePostal);
@@ -248,7 +250,7 @@ public class ZoneController {
                 "Une zone existe avec ce code postal" :
                 "Aucune zone avec ce code postal";
 
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
                 .success(true)
                 .message(message)
                 .data(exists)
@@ -262,12 +264,12 @@ public class ZoneController {
             description = "Supprimer définitivement une zone du système"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Void>> delete(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID de la zone à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         zoneService.delete(id);
 
-        ApiResponseDTO<Void> response = ApiResponseDTO.<Void>builder()
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Zone supprimée avec succès")
                 .build();
@@ -280,7 +282,7 @@ public class ZoneController {
             description = "Vérifier si une zone existe dans le système par son ID"
     )
     @GetMapping("/{id}/exists")
-    public ResponseEntity<ApiResponseDTO<Boolean>> existsById(
+    public ResponseEntity<ApiResponse<Boolean>> existsById(
             @Parameter(description = "ID de la zone à vérifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
         boolean exists = zoneService.existsById(id);
@@ -289,7 +291,7 @@ public class ZoneController {
                 "La zone existe" :
                 "La zone n'existe pas";
 
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
                 .success(true)
                 .message(message)
                 .data(exists)
@@ -303,7 +305,7 @@ public class ZoneController {
             description = "Vérifier si une zone avec un nom spécifique existe déjà"
     )
     @GetMapping("/nom/{nom}/exists")
-    public ResponseEntity<ApiResponseDTO<Boolean>> existsByNom(
+    public ResponseEntity<ApiResponse<Boolean>> existsByNom(
             @Parameter(description = "Nom de la zone à vérifier", required = true, example = "Casablanca Centre")
             @PathVariable String nom) {
         boolean exists = zoneService.existsByNom(nom);
@@ -312,7 +314,7 @@ public class ZoneController {
                 "Une zone existe avec ce nom" :
                 "Aucune zone avec ce nom";
 
-        ApiResponseDTO<Boolean> response = ApiResponseDTO.<Boolean>builder()
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
                 .success(true)
                 .message(message)
                 .data(exists)
