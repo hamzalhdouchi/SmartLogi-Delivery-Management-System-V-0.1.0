@@ -1,5 +1,6 @@
     package com.smartlogi.smartlogiv010.entity;
 
+    import com.smartlogi.security.enums.AuthProvider;
     import jakarta.persistence.*;
     import lombok.AllArgsConstructor;
     import lombok.Data;
@@ -53,6 +54,12 @@
         public String getPassword() {
             return password;
         }
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private AuthProvider provider = AuthProvider.LOCAL;
+
+        private String providerId;
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {

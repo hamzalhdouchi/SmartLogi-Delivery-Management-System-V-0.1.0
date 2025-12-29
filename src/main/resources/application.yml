@@ -12,6 +12,24 @@ spring:
             enable: true
         debug: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 221542782722-uborns2qs7207roumlc9hcljuk9d3b2f.apps.googleusercontent.com
+            client-secret: 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
+            scope: email,profile
+          auth0:
+            client-id: BJPFxAkn3AjglYXaZrg1l9RlI70Ok72g
+            client-secret: A3Y1hQYLkN4Zos6rbrpJEHHoZBy_jalbTBrO9fohcKjhAiS_4qrRTp6i4fVZxcZ0
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          auth0:
+            issuer-uri: https://dev-cm63pns5hee5oeda.us.auth0.com/
+
 smartlogi:
   email:
     from: "hamzaalhadouchi@gmail.com"
@@ -21,3 +39,4 @@ smartlogi:
     name: "SmartLogi"
     phone: "+212 5 20 123 456"
     website: "www.smartlogi.ma"
+
