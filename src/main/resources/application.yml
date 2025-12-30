@@ -2,8 +2,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: hamzaalhadouchi@gmail.com
-    password: your_app_password
+    username: ${MAIL_USERNAME:hamzaalhadouchi@gmail.com}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -12,12 +12,39 @@ spring:
             enable: true
         debug: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: email,profile
+          auth0:
+            client-id: ${AUTH0_CLIENT_ID}
+            client-secret: ${AUTH0_CLIENT_SECRET}
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          auth0:
+            issuer-uri: ${AUTH0_ISSUER_URI:https://dev-cm63pns5hee5oeda.us.auth0.com/}
+
 smartlogi:
   email:
-    from: "hamzaalhadouchi@gmail.com"
-    support: "hamzaalhadouchi@gmail.com"
-    noreply: "hamzaalhadouchi@gmail.com"
+    from: ${SMARTLOGI_EMAIL_FROM:hamzaalhadouchi@gmail.com}
+    support: ${SMARTLOGI_EMAIL_SUPPORT:hamzaalhadouchi@gmail.com}
+    noreply: ${SMARTLOGI_EMAIL_NOREPLY:hamzaalhadouchi@gmail.com}
   company:
     name: "SmartLogi"
     phone: "+212 5 20 123 456"
     website: "www.smartlogi.ma"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

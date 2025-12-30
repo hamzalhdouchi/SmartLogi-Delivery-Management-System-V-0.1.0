@@ -1,4 +1,4 @@
-//package com.smartlogi.smartlogiv010.integration;
+package com.smartlogi.smartlogiv010.integration;//package com.smartlogi.smartlogiv010.integration;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.smartlogi.smartlogiv010.dto.requestDTO.createDTO.ColisCreateRequestDto;
