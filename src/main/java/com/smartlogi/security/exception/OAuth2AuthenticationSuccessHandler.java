@@ -29,11 +29,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        if (response.isCommitted()) {
-            logger.debug("Response has already been committed.");
-            return;
-        }
-
         clearAuthenticationAttributes(request);
 
         User user = extractUserFromAuthentication(authentication);
