@@ -2,10 +2,7 @@ package com.smartlogi.security.dto.oauth2;
 
 import java.util.Map;
 
-/**
- * Abstract class representing OAuth2 user information.
- * Each provider (Google, Facebook, Apple, Okta) extends this class.
- */
+
 public abstract class OAuth2UserInfo {
     
     protected Map<String, Object> attributes;

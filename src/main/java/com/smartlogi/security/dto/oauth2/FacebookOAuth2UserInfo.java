@@ -2,10 +2,7 @@ package com.smartlogi.security.dto.oauth2;
 
 import java.util.Map;
 
-/**
- * Facebook OAuth2 user information extractor.
- * Extracts user details from Facebook's OAuth2 response.
- */
+
 public class FacebookOAuth2UserInfo extends OAuth2UserInfo {
 
     public FacebookOAuth2UserInfo(Map<String, Object> attributes) {

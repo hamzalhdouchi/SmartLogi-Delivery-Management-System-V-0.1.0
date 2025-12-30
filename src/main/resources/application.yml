@@ -40,3 +40,13 @@ smartlogi:
     phone: "+212 5 20 123 456"
     website: "www.smartlogi.ma"
 
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+

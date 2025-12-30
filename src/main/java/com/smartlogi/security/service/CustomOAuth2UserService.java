@@ -21,10 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Custom OAuth2 user service that processes OAuth2 user info and
- * creates/updates users in the local database.
- */
+
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -91,7 +88,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             }
         }
         
-        user.setPassword(UUID.randomUUID().toString());
+        user.setPassword("YOUCODE_CODE");
 
         Role defaultRole = roleRepository.findByName(DEFAULT_OAUTH2_ROLE)
                 .orElseThrow(() -> new OAuth2AuthenticationProcessingException(

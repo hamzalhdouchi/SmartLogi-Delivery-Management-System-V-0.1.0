@@ -2,10 +2,7 @@ package com.smartlogi.security.dto.oauth2;
 
 import java.util.Map;
 
-/**
- * Apple Sign In OAuth2 user information extractor.
- * Extracts user details from Apple's OAuth2 response.
- */
+
 public class AppleOAuth2UserInfo extends OAuth2UserInfo {
 
     public AppleOAuth2UserInfo(Map<String, Object> attributes) {

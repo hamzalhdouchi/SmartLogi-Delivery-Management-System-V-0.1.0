@@ -2,10 +2,6 @@ package com.smartlogi.security.dto.oauth2;
 
 import java.util.Map;
 
-/**
- * Okta OAuth2/OIDC user information extractor.
- * Extracts user details from Okta's OAuth2 response.
- */
 public class OktaOAuth2UserInfo extends OAuth2UserInfo {
 
     public OktaOAuth2UserInfo(Map<String, Object> attributes) {

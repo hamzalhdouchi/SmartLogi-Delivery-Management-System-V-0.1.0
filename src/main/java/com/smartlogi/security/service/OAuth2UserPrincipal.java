@@ -7,10 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
-/**
- * OAuth2User principal that wraps the User entity.
- * Combines Spring Security's OAuth2User with our User entity.
- */
+
 public class OAuth2UserPrincipal implements OAuth2User {
 
     private final User user;

@@ -5,9 +5,6 @@ import com.smartlogi.security.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;
 
-/**
- * Factory class to create appropriate OAuth2UserInfo based on provider.
- */
 public class OAuth2UserInfoFactory {
 
     public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {

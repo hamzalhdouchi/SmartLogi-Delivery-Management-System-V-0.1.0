@@ -2,10 +2,6 @@ package com.smartlogi.security.dto.oauth2;
 
 import java.util.Map;
 
-/**
- * Google OAuth2 user information extractor.
- * Extracts user details from Google's OAuth2 response.
- */
 public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
 
     public GoogleOAuth2UserInfo(Map<String, Object> attributes) {
