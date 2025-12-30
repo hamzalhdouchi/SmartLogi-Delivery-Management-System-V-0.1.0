@@ -98,6 +98,8 @@ pipeline {
                     '''
                 }
             }
+
+
             post {
                 success {
                     echo 'SonarQube analysis completed'
