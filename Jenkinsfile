@@ -1,9 +1,11 @@
 pipeline {
     agent any
     
-    environment {
-        DOCKER_IMAGE = 'smartlogi/smartlogi-app'
-    }
+      environment {
+            DOCKER_IMAGE = 'smartlogi/smartlogi-app'
+            MAVEN_HOME = 'C:\\Program Files\\Apache\\Maven\\apache-maven-3.9.11'
+            PATH = "${MAVEN_HOME}\\bin;${env.PATH}"
+        }
 
     stages {
         stage('Checkout') {
