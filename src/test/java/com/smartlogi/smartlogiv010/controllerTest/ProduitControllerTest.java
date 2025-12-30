@@ -1,4 +1,4 @@
-//package com.smartlogi.smartlogiv010.controllerTest;
+package com.smartlogi.smartlogiv010.controllerTest;//package com.smartlogi.smartlogiv010.controllerTest;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.smartlogi.smartlogiv010.controller.ProduitController;

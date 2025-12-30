@@ -1,4 +1,4 @@
-//package com.smartlogi.smartlogiv010.integration;
+package com.smartlogi.smartlogiv010.integration;//package com.smartlogi.smartlogiv010.integration;
 //
 //import com.smartlogi.smartlogiv010.entity.*;
 //import com.smartlogi.smartlogiv010.enums.Priorite;

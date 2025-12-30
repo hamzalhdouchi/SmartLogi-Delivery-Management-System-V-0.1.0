@@ -1,4 +1,4 @@
-//package com.smartlogi.smartlogiv010.serviceTest;
+package com.smartlogi.smartlogiv010.serviceTest;//package com.smartlogi.smartlogiv010.serviceTest;
 //
 //import com.smartlogi.smartlogiv010.entity.ClientExpediteur;
 //import com.smartlogi.smartlogiv010.entity.Colis;

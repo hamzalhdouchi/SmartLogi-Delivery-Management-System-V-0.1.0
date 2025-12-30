@@ -27,8 +27,6 @@ pipeline {
     
     stages {
 
-
-
         stage('Checkout') {
             steps {
                 echo 'Cloning repository from GitHub...'
