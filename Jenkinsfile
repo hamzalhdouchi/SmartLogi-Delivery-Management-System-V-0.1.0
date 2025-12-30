@@ -39,7 +39,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials',
                                     usernameVariable: 'smartlogi',
-                                    passwordVariable: 'dckr_pat_c18w_Numhh14uVKd0m1f2hZ6Q7E')]) {
+                                    passwordVariable: "${DOCKER_PASSWORD}")]) {
                         bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
                         bat "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
                         bat "docker push ${DOCKER_IMAGE}:latest"
