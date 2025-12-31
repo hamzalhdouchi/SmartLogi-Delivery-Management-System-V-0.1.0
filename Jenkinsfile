@@ -47,7 +47,27 @@ pipeline {
                 }
             }
         }
+//         stage('Deploy to AWS EC2') {
+//             steps {
+//                 script {
+//                     withCredentials([sshUserPrivateKey(
+//                         credentialsId: 'aws-ec2-ssh-key',
+//                         keyFileVariable: 'SSH_KEY',
+//                         usernameVariable: 'SSH_USER'
+//                     )]) {
+//                         bat """
+//                             ssh -i %SSH_KEY% %SSH_USER%@your-ec2-ip "docker pull ${DOCKER_IMAGE}:latest"
+//                             ssh -i %SSH_KEY% %SSH_USER%@your-ec2-ip "docker stop smartlogi-container || true"
+//                             ssh -i %SSH_KEY% %SSH_USER%@your-ec2-ip "docker rm smartlogi-container || true"
+//                             ssh -i %SSH_KEY% %SSH_USER%@your-ec2-ip "docker run -d --name smartlogi-container -p 8080:8080 ${DOCKER_IMAGE}:latest"
+//                         """
+//                     }
+//                 }
+//             }
+//         }
+
     }
+
 
 
     post {
