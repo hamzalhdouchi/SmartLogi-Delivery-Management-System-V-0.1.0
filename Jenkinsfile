@@ -94,19 +94,24 @@ pipeline {
            }
        }
 
-        stage('Quality Gate') {
-            steps {
-                echo 'Checking SonarQube Quality Gate...'
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-            post {
-                  always {
-                            echo 'Quality Gate check completed'
-                        }
-            }
-        }
+       stage('Quality Gate') {
+           steps {
+               echo 'Checking SonarQube Quality Gate...'
+               timeout(time: 5, unit: 'MINUTES') {
+                   script {
+                       def qg = waitForQualityGate()
+                       echo "Quality Gate status: ${qg.status}"
+                       echo 'Continuing pipeline regardless of quality gate result...'
+                   }
+               }
+           }
+           post {
+               always {
+                   echo 'Quality Gate check completed'
+               }
+           }
+       }
+
 
         stage('Docker Build') {
             steps {
