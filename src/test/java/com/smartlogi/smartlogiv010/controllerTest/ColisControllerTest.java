@@ -1,4 +1,4 @@
-package com.smartlogi.smartlogiv010.controllerTest;//package com.smartlogi.smartlogiv010.controllerTest;
+//package com.smartlogi.smartlogiv010.controllerTest;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.smartlogi.smartlogiv010.controller.ColisController;
@@ -377,21 +377,6 @@ package com.smartlogi.smartlogiv010.controllerTest;//package com.smartlogi.smart
 //        verify(colisService, times(1)).getByPrioriteAndStatut(priorite, statut);
 //    }
 //
-//    @Test
-//    void testGetByLivreurAndStatut_Success() throws Exception {
-//        String livreurId = "livreur-789";
-//        StatutColis statut = StatutColis.COLLECTE;
-//        List<ColisSimpleResponseDto> colisList = Arrays.asList(colisSimpleDto);
-//        when(colisService.getByLivreurAndStatut(livreurId, statut)).thenReturn(colisList);
-//
-//        mockMvc.perform(get("/api/colis/livreur/{livreurId}/statut/{statut}", livreurId, statut)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.success").value(true))
-//                .andExpect(jsonPath("$.message").value("Colis par livreur et statut récupérés avec succès"));
-//
-//        verify(colisService, times(1)).getByLivreurAndStatut(livreurId, statut);
-//    }
 //
 //    @Test
 //    void testGetByZoneAndStatut_Success() throws Exception {
@@ -455,24 +440,6 @@ package com.smartlogi.smartlogiv010.controllerTest;//package com.smartlogi.smart
 //        verify(colisService, times(1)).getColisEnRetard();
 //    }
 //
-//    @Test
-//    void testGetByDateCreationBetween_Success() throws Exception {
-//        LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0);
-//        LocalDateTime endDate = LocalDateTime.of(2024, 12, 31, 23, 59);
-//        List<ColisSimpleResponseDto> colisList = Arrays.asList(colisSimpleDto);
-//        when(colisService.getByDateCreationBetween(any(LocalDateTime.class), any(LocalDateTime.class)))
-//                .thenReturn(colisList);
-//
-//        mockMvc.perform(get("/api/colis/date-creation")
-//                        .param("startDate", startDate.toString())
-//                        .param("endDate", endDate.toString())
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.success").value(true))
-//                .andExpect(jsonPath("$.message").value("Colis par période de création récupérés avec succès"));
-//
-//        verify(colisService, times(1)).getByDateCreationBetween(any(LocalDateTime.class), any(LocalDateTime.class));
-//    }
 //
 //    // === TESTS MODIFICATION ===
 //
@@ -699,20 +666,7 @@ package com.smartlogi.smartlogiv010.controllerTest;//package com.smartlogi.smart
 //        verify(colisService, times(1)).calculateTotalPrix(colisId);
 //    }
 //
-//    @Test
-//    void testGetPoidsTotalParLivreur_Success() throws Exception {
-//        PoidsParLivreurDTO dto = new PoidsParLivreurDTO();
-//        List<PoidsParLivreurDTO> result = Arrays.asList(dto);
-//        when(colisService.getPoidsTotalParLivreur()).thenReturn(result);
 //
-//        mockMvc.perform(get("/api/colis/poids-par-livreur")
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.success").value(true))
-//                .andExpect(jsonPath("$.message").value("Poids total par livreur récupéré avec succès"));
-//
-//        verify(colisService, times(1)).getPoidsTotalParLivreur();
-//    }
 //
 //    @Test
 //    void testGetPoidsDetailParLivreur_Success() throws Exception {
