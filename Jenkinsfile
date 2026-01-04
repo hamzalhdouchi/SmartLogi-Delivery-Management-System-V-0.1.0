@@ -113,25 +113,29 @@ pipeline {
        }
 
 
-        stage('Docker Build') {
-            steps {
-                echo 'Building Docker image...'
-                script {
-                    bat 'mvn package -DskipTests'
+stage('Docker Build') {
+    steps {
+        echo 'Building Docker image...'
+        script {
+            def gitCommit = bat(script: '@git rev-parse --short HEAD', returnStdout: true).trim()
 
-                    bat "docker build -t ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} ."
-                    bat "docker tag ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} ${DOCKER_IMAGE}:latest"
-                }
-            }
-            post {
-                success {
-                    echo "Docker image built: ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}"
-                }
-                failure {
-                    echo 'Docker build failed'
-                }
-            }
+            bat 'mvn package -DskipTests'
+
+            bat "docker build -t hamzalh2/smartlogi-app:${gitCommit} -t hamzalh2/smartlogi-app:latest ."
+
+            env.GIT_COMMIT_SHORT = gitCommit
         }
+    }
+    post {
+        success {
+            echo "Docker image built: hamzalh2/smartlogi-app:${env.GIT_COMMIT_SHORT}"
+        }
+        failure {
+            echo 'Docker build failed'
+        }
+    }
+}
+
 
 
        stage('Docker Push') {
