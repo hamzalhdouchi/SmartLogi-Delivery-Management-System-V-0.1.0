@@ -134,23 +134,32 @@ pipeline {
         }
 
 
-        stage('Docker Push') {
-            steps {
-                echo 'Pushing Docker image to registry...'
-                script {
-                    bat "docker push ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}"
-                    bat "docker push ${DOCKER_IMAGE}:latest"
-                }
-            }
-            post {
-                success {
-                    echo "Docker images pushed: ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} and ${DOCKER_IMAGE}:latest"
-                }
-                failure {
-                    echo 'Docker push failed'
-                }
-            }
-        }
+       stage('Docker Push') {
+           steps {
+               echo 'Pushing Docker image to registry...'
+               script {
+                   withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials',
+                                                     usernameVariable: 'DOCKER_USER',
+                                                     passwordVariable: 'DOCKER_PASS')]) {
+                       bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
+
+                       bat "docker push smartlogi/smartlogi-app:${env.GIT_COMMIT_SHORT}"
+                       bat "docker push smartlogi/smartlogi-app:latest"
+
+                       bat "docker logout"
+                   }
+               }
+           }
+           post {
+               success {
+                   echo "Docker images pushed successfully"
+               }
+               failure {
+                   echo 'Docker push failed'
+               }
+           }
+       }
+
 
     }
 
