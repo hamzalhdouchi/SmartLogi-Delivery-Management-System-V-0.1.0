@@ -119,8 +119,8 @@ pipeline {
                 script {
                     bat 'mvn package -DskipTests'
 
-                    docker.build("${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}")
-                    docker.build("${DOCKER_IMAGE}:latest")
+                    bat "docker build -t ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} ."
+                    bat "docker tag ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} ${DOCKER_IMAGE}:latest"
                 }
             }
             post {
@@ -133,28 +133,25 @@ pipeline {
             }
         }
 
+
         stage('Docker Push') {
-            when {
-                branch 'main'
-            }
             steps {
                 echo 'Pushing Docker image to registry...'
                 script {
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", DOCKER_CREDENTIALS_ID) {
-                        docker.image("${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}").push()
-                        docker.image("${DOCKER_IMAGE}:latest").push()
-                    }
+                    bat "docker push ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}"
+                    bat "docker push ${DOCKER_IMAGE}:latest"
                 }
             }
             post {
                 success {
-                    echo "Docker image pushed to ${DOCKER_REGISTRY}"
+                    echo "Docker images pushed: ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} and ${DOCKER_IMAGE}:latest"
                 }
                 failure {
                     echo 'Docker push failed'
                 }
             }
         }
+
     }
 
     post {
