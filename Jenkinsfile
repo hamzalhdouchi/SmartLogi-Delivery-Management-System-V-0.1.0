@@ -80,17 +80,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo 'Analyzing code quality with SonarQube...'
-                withSonarQubeEnv('SonarQube') {
-                    bat """
-                        mvn sonar:sonar ^
-                            -Dsonar.projectKey=smartlogi ^
-                            -Dsonar.projectName="SmartLogi" ^
-                            -Dsonar.host.url=%SONAR_HOST_URL% ^
-                            -Dsonar.login=%SONAR_TOKEN% ^
-                            -Dsonar.java.coveragePlugin=jacoco ^
-                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                    """
-                }
+               withSonarQubeEnv('SonarQube') {
+                          sh 'mvn clean verify sonar:sonar'
+                      }
             }
             post {
                 success {
