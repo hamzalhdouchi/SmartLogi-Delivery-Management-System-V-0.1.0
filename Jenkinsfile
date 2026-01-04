@@ -77,22 +77,22 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                echo 'Analyzing code quality with SonarQube...'
+       stage('SonarQube Analysis') {
+           steps {
+               echo 'Analyzing code quality with SonarQube...'
                withSonarQubeEnv('SonarQube') {
-                          sh 'mvn clean verify sonar:sonar'
-                      }
-            }
-            post {
-                success {
-                    echo 'SonarQube analysis completed'
-                }
-                failure {
-                    echo 'SonarQube analysis failed'
-                }
-            }
-        }
+                   bat 'mvn clean verify sonar:sonar'
+               }
+           }
+           post {
+               failure {
+                   echo 'SonarQube analysis failed'
+               }
+               success {
+                   echo 'SonarQube analysis completed successfully'
+               }
+           }
+       }
 
         stage('Quality Gate') {
             steps {
