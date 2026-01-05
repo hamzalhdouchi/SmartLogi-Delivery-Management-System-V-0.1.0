@@ -138,6 +138,8 @@ stage('Docker Build') {
 
 
 
+
+
        stage('Docker Push') {
            steps {
                echo 'Pushing Docker image to registry...'
