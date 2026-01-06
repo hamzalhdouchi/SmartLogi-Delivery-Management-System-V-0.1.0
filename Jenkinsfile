@@ -37,6 +37,11 @@ pipeline {
             }
         }
 
+
+
+
+
+
         stage('Build') {
             steps {
                 echo 'Building application with Maven...'
@@ -112,33 +117,28 @@ pipeline {
            }
        }
 
+        stage('Docker Build') {
+            steps {
+                echo 'Building Docker image...'
+                script {
+                    def gitCommit = bat(script: '@git rev-parse --short HEAD', returnStdout: true).trim()
 
-stage('Docker Build') {
-    steps {
-        echo 'Building Docker image...'
-        script {
-            def gitCommit = bat(script: '@git rev-parse --short HEAD', returnStdout: true).trim()
+                    bat 'mvn package -DskipTests'
 
-            bat 'mvn package -DskipTests'
+                    bat "docker build -t hamzalh2/smartlogi-app:${gitCommit} -t hamzalh2/smartlogi-app:latest ."
 
-            bat "docker build -t hamzalh2/smartlogi-app:${gitCommit} -t hamzalh2/smartlogi-app:latest ."
-
-            env.GIT_COMMIT_SHORT = gitCommit
+                    env.GIT_COMMIT_SHORT = gitCommit
+                }
+            }
+            post {
+                success {
+                    echo "Docker image built: hamzalh2/smartlogi-app:${env.GIT_COMMIT_SHORT}"
+                }
+                failure {
+                    echo 'Docker build failed'
+                }
+            }
         }
-    }
-    post {
-        success {
-            echo "Docker image built: hamzalh2/smartlogi-app:${env.GIT_COMMIT_SHORT}"
-        }
-        failure {
-            echo 'Docker build failed'
-        }
-    }
-}
-
-
-
-
 
        stage('Docker Push') {
            steps {
