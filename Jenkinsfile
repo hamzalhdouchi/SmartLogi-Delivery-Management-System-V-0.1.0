@@ -149,8 +149,8 @@ stage('Docker Build') {
                                                      passwordVariable: 'DOCKER_PASS')]) {
                        bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
 
-                       bat "docker push smartlogi/smartlogi-app:${env.GIT_COMMIT_SHORT}"
-                       bat "docker push smartlogi/smartlogi-app:latest"
+                       bat "docker push hamzalh2/smartlogi-app:${env.GIT_COMMIT_SHORT}"
+                       bat "docker push hamzalh2/smartlogi-app:latest"
 
                        bat "docker logout"
                    }
