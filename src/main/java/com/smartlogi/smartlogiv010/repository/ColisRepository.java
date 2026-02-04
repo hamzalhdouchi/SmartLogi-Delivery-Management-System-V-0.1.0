@@ -9,6 +9,7 @@ import com.smartlogi.smartlogiv010.enums.Priorite;
 import com.smartlogi.smartlogiv010.enums.StatutColis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,6 +35,7 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
             "c.description LIKE %:keyword% OR " +
             "c.villeDestination LIKE %:keyword% OR " +
             "c.clientExpediteur.nom LIKE %:keyword% OR " +
+            "c.clientExpediteur.id LIKE %:keyword% OR " +
             "c.destinataire.nom LIKE %:keyword%")
     List<Colis> searchByKeyword(@Param("keyword") String keyword);
     @Query("SELECT COUNT(c) FROM Colis c WHERE c.statut = :statut")
@@ -68,4 +70,7 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
     List<Colis> findByDateCreationBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     Page<Colis> findAll(Pageable pageable);
     Page<Colis> findByZoneId(String zoneId, Pageable pageable);
+
+    List<Colis> findByDestinataire_id(String destinataireId);
 }
+
