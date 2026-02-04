@@ -42,6 +42,7 @@ public class JwtService {
         claims.put("roles", roles);
         claims.put("permissions", permissions);
 
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())
