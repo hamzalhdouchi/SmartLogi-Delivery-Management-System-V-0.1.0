@@ -9,6 +9,7 @@ import com.smartlogi.smartlogiv010.entity.User;
 import com.smartlogi.smartlogiv010.exception.ArgementNotFoundExption;
 import com.smartlogi.smartlogiv010.exception.ResourceNotFoundException;
 import com.smartlogi.smartlogiv010.mapper.SmartLogiMapper;
+import com.smartlogi.smartlogiv010.repository.DestinataireRepository;
 import com.smartlogi.smartlogiv010.repository.UserRepository;
 import com.smartlogi.smartlogiv010.service.interfaces.DestinataireService;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DestinataireServiceImpl implements DestinataireService {
 
-    private final UserRepository destinataireRepository;
+    private final DestinataireRepository destinataireRepository;
     private final SmartLogiMapper smartLogiMapper;
 
 
     @Override
     public UserResponse update(String id, DestinataireUpdateDto requestDto) {
-        User destinataire = destinataireRepository.findById(id)
+        Destinataire destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new ArgementNotFoundExption(id,"the destinataire id not found"));
         smartLogiMapper.updateEntityFromDto(requestDto, destinataire);
-        User updatedDestinataire = destinataireRepository.save(destinataire);
+        Destinataire updatedDestinataire = destinataireRepository.save(destinataire);
         return smartLogiMapper.toSimpleResponseDto(updatedDestinataire);
     }
 
@@ -59,7 +60,7 @@ public class DestinataireServiceImpl implements DestinataireService {
     }
     @Override
     public void delete(String id) {
-        User destinataire = destinataireRepository.findById(id)
+        Destinataire destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
         destinataireRepository.delete(destinataire);
     }
