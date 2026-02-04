@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Livreurs", description = "API pour la gestion complète des livreurs (création, affectation, statistiques)")
-@PreAuthorize("hasRole('ROLE_MANAGER')")
+//@PreAuthorize("hasRole('ROLE_MANAGER')")
 public class LivreurController {
 
     private final LivreurService livreurService;
@@ -36,7 +36,7 @@ public class LivreurController {
             description = "Mettre à jour les informations d'un livreur existant"
     )
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS') && hasRole('ROLE_LIVREUR')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS') && hasRole('ROLE_LIVREUR')")
     public ResponseEntity<ApiResponse<UserResponse>> update(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
@@ -59,7 +59,7 @@ public class LivreurController {
             description = "Récupérer les informations de base d'un livreur spécifique"
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_LIVREUR')")
+//    @PreAuthorize("hasRole('ROLE_LIVREUR')")
     public ResponseEntity<ApiResponse<UserResponse
             >> getById(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
@@ -82,7 +82,7 @@ public class LivreurController {
             summary = "Obtenir un livreur avec statistiques",
             description = "Récupérer les informations détaillées d'un livreur incluant ses statistiques de performance"
     )
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     @GetMapping("/{id}/advanced")
     public ResponseEntity<ApiResponse<UserResponse>> getByIdWithStats(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
@@ -103,7 +103,7 @@ public class LivreurController {
             description = "Récupérer les informations complètes d'un livreur incluant la liste de ses colis assignés"
     )
     @GetMapping("/{id}/detailed")
-    @PreAuthorize("hasRole('ROLE_LIVREUR')")
+//    @PreAuthorize("hasRole('ROLE_LIVREUR')")
     public ResponseEntity<ApiResponse<UserResponse>> getByIdWithColis(
             @Parameter(description = "ID du livreur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -123,7 +123,7 @@ public class LivreurController {
             description = "Récupérer les livreurs avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     public ResponseEntity<ApiResponse<Page<UserResponse
             >>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
@@ -147,7 +147,7 @@ public class LivreurController {
             description = "Récupérer tous les livreurs assignés à une zone spécifique"
     )
     @GetMapping("/zone/{zoneId}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     public ResponseEntity<ApiResponse<List<UserResponse
             >>> getByZone(
             @Parameter(description = "ID de la zone", required = true, example = "zone-001")
@@ -194,7 +194,7 @@ public class LivreurController {
             description = "Supprimer définitivement un livreur du système"
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du livreur à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
