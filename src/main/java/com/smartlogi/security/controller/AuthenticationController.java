@@ -1,5 +1,6 @@
 package com.smartlogi.security.controller;
 
+import com.smartlogi.security.dto.authDto.response.AuthResponse;
 import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.security.userMapper.UserMapper;
 import com.smartlogi.smartlogiv010.apiResponse.ApiResponse;
@@ -23,8 +24,9 @@ public class AuthenticationController {
     private final UserMapper userMapper;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(request);
+        return ResponseEntity.ok(authResponse);
     }
 
 
