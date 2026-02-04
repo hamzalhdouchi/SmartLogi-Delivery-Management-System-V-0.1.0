@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Gestion des Destinataires", description = "API pour la gestion des destinataires (création, modification, recherche)")
-@PreAuthorize("hasRole('ROLE_MANAGER')")
+//@PreAuthorize("hasRole('ROLE_MANAGER')")
 public class DestinataireController {
 
     private final DestinataireServiceImpl destinataireService;
