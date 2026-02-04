@@ -123,7 +123,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         log.warn("Requête HTTP mal formée: {}", ex.getMessage());
-
+        ex.printStackTrace();
         ErrorResponse errorResponse = new ErrorResponse(
                 status.value(),
                 "Malformed Request",
