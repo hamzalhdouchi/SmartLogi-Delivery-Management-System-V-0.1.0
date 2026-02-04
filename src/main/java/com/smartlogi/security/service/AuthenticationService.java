@@ -1,5 +1,7 @@
 package com.smartlogi.security.service;
 
+import com.smartlogi.security.dto.authDto.response.AuthResponse;
+import com.smartlogi.security.dto.authDto.response.UserResponse;
 import com.smartlogi.security.exception.DuplicateResourceException;
 import com.smartlogi.security.userMapper.UserMapper;
 import com.smartlogi.smartlogiv010.entity.*;
@@ -32,7 +34,7 @@ public class AuthenticationService {
 
 
 
-    public JwtAuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -44,7 +46,10 @@ public class AuthenticationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtService.generateToken(user);
-        return new JwtAuthResponse(token, "Bearer");
+
+        UserResponse userResponse =  userMapper.toResponse(user);
+
+        return AuthResponse.builder().userDetail(userResponse).token(token).build();
     }
 
 
