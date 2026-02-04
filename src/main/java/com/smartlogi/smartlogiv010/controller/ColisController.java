@@ -43,7 +43,7 @@ public class ColisController {
             description = "Créer un colis avec possibilité d'ajouter des produits existants ou de créer de nouveaux produits"
     )
     @PostMapping("/demande-livraison")
-    @PreAuthorize("hasAuthority('CAN_CREATE_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_CREATE_COLIS')")
     public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> create(
             @Parameter(description = "Données du colis à créer", required = true)
             @Valid @RequestBody ColisCreateRequestDto requestDto) {
@@ -210,7 +210,7 @@ public class ColisController {
             description = "Modifier les informations d'un colis existant"
     )
     @PutMapping("/{id}/update")
-    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_FULL')")
+//    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_FULL')")
     public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> update(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
@@ -227,32 +227,32 @@ public class ColisController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Obtenir un colis par ID",
-            description = "Récupérer les informations de base d'un colis spécifique"
-    )
-    @GetMapping("/{id}/getColis")
-    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
-    public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> getById(
-            @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-            @PathVariable String id) {
-        ColisSimpleResponseDto colis = colisService.getById(id);
-
-        ApiResponse<ColisSimpleResponseDto> response = ApiResponse.<ColisSimpleResponseDto>builder()
-                .success(true)
-                .message("Colis récupéré avec succès")
-                .data(colis)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
+        @Operation(
+                summary = "Obtenir un colis par ID",
+                description = "Récupérer les informations de base d'un colis spécifique"
+        )
+        @GetMapping("/{id}/getColis")
+        @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+        public ResponseEntity<ApiResponse<ColisSimpleResponseDto>> getById(
+                @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+                @PathVariable String id) {
+            ColisSimpleResponseDto colis = colisService.getById(id);
+    
+            ApiResponse<ColisSimpleResponseDto> response = ApiResponse.<ColisSimpleResponseDto>builder()
+                    .success(true)
+                    .message("Colis récupéré avec succès")
+                    .data(colis)
+                    .build();
+    
+            return ResponseEntity.ok(response);
+        }
 
     @Operation(
             summary = "Obtenir les détails complets d'un colis",
             description = "Récupérer toutes les informations détaillées d'un colis (historique, produits, etc.)"
     )
     @GetMapping("/{id}/detailed")
-    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<ColisAdvancedResponseDto>> getByIdWithDetails(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -272,7 +272,7 @@ public class ColisController {
             description = "Récupérer la liste complète de tous les colis"
     )
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getAll() {
         List<ColisSimpleResponseDto> colis = colisService.getAll(Pageable.unpaged()).getContent();
 
@@ -290,7 +290,7 @@ public class ColisController {
             description = "Récupérer les colis avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<Page<ColisSimpleResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
@@ -330,7 +330,7 @@ public class ColisController {
             description = "Récupérer tous les colis d'un client expéditeur spécifique"
     )
     @GetMapping("/client-expediteur/{clientId}")
-    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByClientExpediteur(
             @Parameter(description = "ID du client expéditeur", required = true, example = "client-123")
             @PathVariable String clientId) {
@@ -350,7 +350,7 @@ public class ColisController {
             description = "Récupérer tous les colis destinés à un destinataire spécifique"
     )
     @GetMapping("/destinataire/{destinataireId}")
-    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
     public ResponseEntity<ApiResponse<List<ColisSimpleResponseDto>>> getByDestinataire(
             @Parameter(description = "ID du destinataire", required = true, example = "dest-456")
             @PathVariable String destinataireId) {
@@ -370,7 +370,7 @@ public class ColisController {
             description = "Récupérer tous les colis assignés à un livreur spécifique"
     )
     @GetMapping("/livreur/{livreurId}")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+//    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<ColisAdvancedResponseDto>>> getByLivreur(
             @Parameter(description = "ID du livreur", required = true, example = "livreur-789")
             @PathVariable String livreurId) {
@@ -451,7 +451,7 @@ public class ColisController {
             description = "Modifier le statut d'un colis avec un commentaire optionnel"
     )
     @PutMapping("/{colisId}/changer-statut")
-    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_STATUS')")
+//    @PreAuthorize("hasAuthority('CAN_UPDATE_COLIS_STATUS')")
     public ResponseEntity<ApiResponse<Void>> changerStatut(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId,
