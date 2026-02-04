@@ -31,7 +31,7 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les détails d'un enregistrement spécifique de l'historique de livraison"
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS_HISTORIQUE')")
+//    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS_HISTORIQUE')")
     public ResponseEntity<ApiResponse<HistoriqueLivraisonResponseDto>> getById(
             @Parameter(description = "ID de l'historique de livraison", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -51,7 +51,7 @@ public class HistoriqueLivraisonController {
             description = "Récupérer la liste complète de tous les enregistrements d'historique de livraison"
     )
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_READ_COLIS_HISTORIQUE_FULL')")
+//    @PreAuthorize("hasAuthority('CAN_READ_COLIS_HISTORIQUE_FULL')")
     public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getAll() {
         List<HistoriqueLivraisonResponseDto> historiques = historiqueLivraisonService.getAll();
 
@@ -69,7 +69,7 @@ public class HistoriqueLivraisonController {
             description = "Récupérer les historiques de livraison avec pagination, tri et filtres"
     )
     @GetMapping("/paginated")
-    @PreAuthorize("hasAuthority('CAN_READ_COLIS_HISTORIQUE_FULL')")
+//    @PreAuthorize("hasAuthority('CAN_READ_COLIS_HISTORIQUE_FULL')")
     public ResponseEntity<ApiResponse<Page<HistoriqueLivraisonResponseDto>>> getAllPaginated(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
@@ -89,7 +89,7 @@ public class HistoriqueLivraisonController {
             description = "Récupérer tous les enregistrements d'historique pour un colis spécifique"
     )
     @GetMapping("/colis/{colisId}")
-    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS_HISTORIQUE')")
+//    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS_HISTORIQUE')")
     public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDto>>> getByColis(
             @Parameter(description = "ID du colis", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String colisId) {
