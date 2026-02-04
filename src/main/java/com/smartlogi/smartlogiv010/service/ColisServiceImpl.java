@@ -276,7 +276,7 @@ public class ColisServiceImpl implements ColisService {
 
     @Override
     public List<ColisSimpleResponseDto> getByDestinataire(String destinataireId) {
-        return colisRepository.searchByKeyword(destinataireId)
+        return colisRepository.findByDestinataire_id(destinataireId)
                 .stream()
                 .filter(colis -> colis.getDestinataire().getId().equals(destinataireId))
                 .map(smartLogiMapper::toSimpleResponseDto)
