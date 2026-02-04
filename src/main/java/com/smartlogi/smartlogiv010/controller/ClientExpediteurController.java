@@ -35,7 +35,6 @@ public class ClientExpediteurController {
             description = "Mettre à jour les informations d'un client expéditeur existant"
     )
     @PutMapping("/{id}/update")
-    @PreAuthorize("hasRole('ROLE_SENDER')")
     public ResponseEntity<ApiResponse<UserResponse>> update(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
@@ -57,7 +56,7 @@ public class ClientExpediteurController {
             description = "Récupérer les détails complets d'un client expéditeur spécifique"
     )
     @GetMapping("/{id}/getClient")
-    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
+//    @PreAuthorize("hasAuthority('CAN_READ_OWN_COLIS')")
     public ResponseEntity<ApiResponse<UserResponse>> getById(
             @Parameter(description = "ID du client expéditeur", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -77,7 +76,7 @@ public class ClientExpediteurController {
             description = "Obtenir la liste paginée de tous les clients expéditeurs avec possibilité de tri et de pagination"
     )
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(
             @Parameter(description = "Paramètres de pagination et de tri")
             Pageable pageable) {
@@ -97,7 +96,7 @@ public class ClientExpediteurController {
             description = "Rechercher un client expéditeur par mot-clé (nom, email, téléphone, etc.)"
     )
     @GetMapping("/search-keyword")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
     public ResponseEntity<ApiResponse<UserResponse>> findByKeyWord(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "dupont@gmail.com")
             @RequestParam String keyword) {
@@ -117,7 +116,7 @@ public class ClientExpediteurController {
             description = "Supprimer définitivement un client expéditeur du système"
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du client expéditeur à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
