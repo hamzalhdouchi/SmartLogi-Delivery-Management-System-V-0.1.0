@@ -1,0 +1,110 @@
+<div class="dashboard-container">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0">Mes Livraisons</h2>
+                <p class="text-muted mb-0">{{ filteredParcels.length }} colis assignés</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Filtrer par statut</label>
+                        <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+                            <option value="">Tous les statuts</option>
+                            <option *ngFor="let status of statusOptions" [value]="status">
+                                {{ getStatusLabel(status) }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Filtrer par priorité</label>
+                        <select class="form-select" [(ngModel)]="priorityFilter" (change)="applyFilters()">
+                            <option value="">Toutes les priorités</option>
+                            <option *ngFor="let priority of priorityOptions" [value]="priority">{{ priority }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary"
+                            (click)="statusFilter=''; priorityFilter=''; applyFilters()">
+                            <i class="fas fa-times me-1"></i>Réinitialiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parcels List -->
+        <div class="row">
+            <div class="col-lg-6 col-xl-4 mb-4" *ngFor="let parcel of filteredParcels">
+                <div class="card parcel-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="badge" [ngClass]="getStatusBadgeClass(parcel.status)">
+                            {{ getStatusLabel(parcel.status) }}
+                        </span>
+                        <span class="badge" [ngClass]="getPriorityBadgeClass(parcel.priority)">
+                            {{ parcel.priority }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-barcode me-2 text-muted"></i>
+                            {{ parcel.trackingNumber }}
+                        </h6>
+                        <p class="card-text mb-2">
+                            <i class="fas fa-user me-2 text-muted"></i>
+                            {{ parcel.recipientName }}
+                        </p>
+                        <p class="card-text mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                            {{ parcel.deliveryAddress }}
+                        </p>
+                        <p class="card-text mb-0">
+                            <i class="fas fa-weight me-2 text-muted"></i>
+                            {{ parcel.weight }} kg
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="btn-group w-100">
+                            <button class="btn btn-outline-info btn-sm" *ngIf="parcel.status === 'ASSIGNED'"
+                                (click)="quickStatusUpdate(parcel.id!, 'COLLECTED')">
+                                <i class="fas fa-box me-1"></i>Collecté
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" *ngIf="parcel.status === 'COLLECTED'"
+                                (click)="quickStatusUpdate(parcel.id!, 'IN_TRANSIT')">
+                                <i class="fas fa-truck me-1"></i>En transit
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" *ngIf="parcel.status === 'IN_TRANSIT'"
+                                (click)="quickStatusUpdate(parcel.id!, 'OUT_FOR_DELIVERY')">
+                                <i class="fas fa-shipping-fast me-1"></i>En livraison
+                            </button>
+                            <button class="btn btn-success btn-sm" *ngIf="parcel.status === 'OUT_FOR_DELIVERY'"
+                                (click)="quickStatusUpdate(parcel.id!, 'DELIVERED')">
+                                <i class="fas fa-check me-1"></i>Livré
+                            </button>
+                            <button class="btn btn-danger btn-sm" *ngIf="parcel.status === 'OUT_FOR_DELIVERY'"
+                                (click)="quickStatusUpdate(parcel.id!, 'FAILED')">
+                                <i class="fas fa-times me-1"></i>Échec
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="col-12" *ngIf="filteredParcels.length === 0">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5>Aucun colis trouvé</h5>
+                        <p class="text-muted">Modifiez vos filtres ou attendez de nouvelles assignations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
