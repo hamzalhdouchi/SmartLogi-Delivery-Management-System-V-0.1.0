@@ -2,10 +2,10 @@ package com.smartlogi.security.dto.authDto.response;
 
 
 import com.smartlogi.security.dto.roleDTO.response.RoleResponse;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class UserResponse {
     private String id;

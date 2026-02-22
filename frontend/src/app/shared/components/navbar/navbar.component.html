@@ -1,0 +1,102 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" routerLink="/dashboard">
+      <i class="fas fa-truck-fast me-2"></i>
+      <span class="fw-bold">SmartLogi</span>
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      (click)="toggleNavbar()"
+      aria-controls="navbarMain"
+      [attr.aria-expanded]="!isCollapsed"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse" [class.show]="!isCollapsed" id="navbarMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0" *ngIf="authService.isAuthenticated()">
+        <!-- Dashboard - All roles -->
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+            <i class="fas fa-tachometer-alt me-1"></i> Tableau de bord
+          </a>
+        </li>
+
+        <!-- Parcels - All roles -->
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/parcels" routerLinkActive="active">
+            <i class="fas fa-box me-1"></i> Colis
+          </a>
+        </li>
+
+        <!-- Manager Only Links -->
+        <ng-container *ngIf="isManager()">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/clients" routerLinkActive="active">
+              <i class="fas fa-users me-1"></i> Clients
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/drivers" routerLinkActive="active">
+              <i class="fas fa-user-tie me-1"></i> Livreurs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/zones" routerLinkActive="active">
+              <i class="fas fa-map-marked-alt me-1"></i> Zones
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+
+      <!-- Right Side Menu -->
+      <ul class="navbar-nav ms-auto" *ngIf="authService.isAuthenticated()">
+        <!-- User Dropdown -->
+        <li class="nav-item dropdown">
+          <a 
+            class="nav-link dropdown-toggle d-flex align-items-center" 
+            href="#" 
+            id="userDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            <i class="fas fa-user-circle me-2"></i>
+            <span>{{ userDisplayName }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item" routerLink="/profile">
+                <i class="fas fa-user me-2"></i> Mon Profil
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" (click)="logout()" style="cursor: pointer;">
+                <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- Login Link (when not authenticated) -->
+      <ul class="navbar-nav ms-auto" *ngIf="!authService.isAuthenticated()">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/login">
+            <i class="fas fa-sign-in-alt me-1"></i> Connexion
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/register">
+            <i class="fas fa-user-plus me-1"></i> Inscription
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

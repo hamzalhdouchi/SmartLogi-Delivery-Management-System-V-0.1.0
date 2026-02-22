@@ -23,8 +23,8 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
+//    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+//    private List<User> users = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

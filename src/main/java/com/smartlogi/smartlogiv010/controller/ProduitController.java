@@ -37,7 +37,7 @@ public class ProduitController {
             description = "Ajouter un nouveau produit dans le catalogue avec ses caractéristiques (nom, catégorie, poids, prix)"
     )
     @PostMapping
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> create(
             @Parameter(description = "Données du produit à créer", required = true)
             @Valid @RequestBody ProduitCreateRequestDto requestDto) {
@@ -57,7 +57,7 @@ public class ProduitController {
             description = "Mettre à jour les informations d'un produit existant"
     )
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> update(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") String id,
@@ -79,7 +79,7 @@ public class ProduitController {
             description = "Récupérer les informations de base d'un produit spécifique"
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<ProduitSimpleResponseDto>> getById(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -99,7 +99,7 @@ public class ProduitController {
             description = "Récupérer les informations détaillées d'un produit incluant ses statistiques d'utilisation"
     )
     @GetMapping("/{id}/advanced")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<ProduitAdvancedResponseDto>> getByIdWithStats(
             @Parameter(description = "ID du produit", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -139,7 +139,7 @@ public class ProduitController {
             description = "Récupérer la liste complète de tous les produits du catalogue"
     )
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getAll() {
         List<ProduitSimpleResponseDto> produits = produitService.getAll();
 
@@ -177,7 +177,7 @@ public class ProduitController {
             description = "Récupérer tous les produits d'une catégorie spécifique"
     )
     @GetMapping("/categorie/{categorie}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getByCategorie(
             @Parameter(description = "Catégorie des produits", required = true, example = "Électronique")
             @PathVariable String categorie) {
@@ -197,7 +197,7 @@ public class ProduitController {
             description = "Rechercher des produits par mot-clé (nom, catégorie, description, etc.)"
     )
     @GetMapping("/search/keyword")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> searchByKeyword(
             @Parameter(description = "Mot-clé de recherche", required = true, example = "samsung")
             @RequestParam String keyword) {
@@ -217,7 +217,7 @@ public class ProduitController {
             description = "Récupérer les produits dont le prix est compris dans une plage spécifique"
     )
     @GetMapping("/prix/range")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<ProduitSimpleResponseDto>>> getByPrixBetween(
             @Parameter(description = "Prix minimum", required = true, example = "100.00")
             @RequestParam BigDecimal prixMin,
@@ -239,7 +239,7 @@ public class ProduitController {
             description = "Récupérer la liste de toutes les catégories de produits disponibles"
     )
     @GetMapping("/categories")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<List<String>>> getAllCategories() {
         List<String> categories = produitService.getAllCategories();
 
@@ -257,7 +257,7 @@ public class ProduitController {
             description = "Supprimer définitivement un produit du catalogue"
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "ID du produit à supprimer", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {
@@ -276,7 +276,7 @@ public class ProduitController {
             description = "Vérifier si un produit existe dans le catalogue par son ID"
     )
     @GetMapping("/{id}/exists")
-    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_MANAGER')")
+//    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS') && hasRole('ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Boolean>> existsById(
             @Parameter(description = "ID du produit à vérifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable String id) {

@@ -15,6 +15,7 @@ import java.util.Set;
 )
 public interface RoleMapper {
 
+    @Mapping(target = "role.users",ignore = true)
     RoleResponse toResponse(Role role);
 
     List<RoleResponse> toResponseList(List<Role> roles);

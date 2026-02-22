@@ -1,0 +1,145 @@
+<div class="container-fluid py-4">
+    <!-- Loading -->
+    <div class="text-center py-5" *ngIf="isLoading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+    </div>
+
+    <div *ngIf="parcel && !isLoading">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a routerLink="/parcels" class="btn btn-link text-decoration-none ps-0">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+                <h2 class="mb-0">Colis {{ parcel.trackingNumber }}</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a [routerLink]="['/parcels', parcel.id, 'edit']" class="btn btn-outline-primary" *ngIf="isManager()">
+                    <i class="fas fa-edit me-2"></i>Modifier
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Main Info Card -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Détails du colis</h5>
+                        <span class="badge fs-6" [ngClass]="getStatusBadgeClass(parcel.status)">
+                            {{ getStatusLabel(parcel.status) }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-muted mb-2">Expéditeur</h6>
+                                <p class="mb-0 fw-bold">{{ parcel.senderName }}</p>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-muted mb-2">Destinataire</h6>
+                                <p class="mb-0 fw-bold">{{ parcel.recipientName }}</p>
+                            </div>
+                            <div class="col-md-12 mb-4">
+                                <h6 class="text-muted mb-2">Adresse de livraison</h6>
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                    {{ parcel.deliveryAddress }}
+                                </p>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Zone</h6>
+                                <p class="mb-0">{{ parcel.zoneName || 'Non assignée' }}</p>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Livreur</h6>
+                                <p class="mb-0">{{ parcel.driverName || 'Non assigné' }}</p>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Poids</h6>
+                                <p class="mb-0">{{ parcel.weight }} kg</p>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Priorité</h6>
+                                <span class="badge bg-primary">{{ parcel.priority }}</span>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Date de création</h6>
+                                <p class="mb-0">{{ parcel.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <h6 class="text-muted mb-2">Livraison estimée</h6>
+                                <p class="mb-0">{{ parcel.estimatedDeliveryDate | date:'dd/MM/yyyy' }}</p>
+                            </div>
+                            <div class="col-12" *ngIf="parcel.description">
+                                <h6 class="text-muted mb-2">Description</h6>
+                                <p class="mb-0">{{ parcel.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card" *ngIf="canUpdateStatus()">
+                    <div class="card-header">
+                        <h5 class="mb-0">Actions rapides</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-info" *ngIf="parcel.status === 'ASSIGNED'"
+                                (click)="updateStatus('COLLECTED')">
+                                <i class="fas fa-box me-2"></i>Marquer comme Collecté
+                            </button>
+                            <button class="btn btn-primary" *ngIf="parcel.status === 'COLLECTED'"
+                                (click)="updateStatus('IN_TRANSIT')">
+                                <i class="fas fa-truck me-2"></i>Marquer En Transit
+                            </button>
+                            <button class="btn btn-primary" *ngIf="parcel.status === 'IN_TRANSIT'"
+                                (click)="updateStatus('OUT_FOR_DELIVERY')">
+                                <i class="fas fa-shipping-fast me-2"></i>Marquer En Livraison
+                            </button>
+                            <button class="btn btn-success" *ngIf="parcel.status === 'OUT_FOR_DELIVERY'"
+                                (click)="updateStatus('DELIVERED')">
+                                <i class="fas fa-check me-2"></i>Marquer comme Livré
+                            </button>
+                            <button class="btn btn-danger" *ngIf="parcel.status === 'OUT_FOR_DELIVERY'"
+                                (click)="updateStatus('FAILED')">
+                                <i class="fas fa-times me-2"></i>Échec de livraison
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Historique</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <p class="mb-0 fw-bold">Créé</p>
+                                    <small class="text-muted">{{ parcel.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item" *ngIf="parcel.actualDeliveryDate">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <p class="mb-0 fw-bold">Livré</p>
+                                    <small class="text-muted">{{ parcel.actualDeliveryDate | date:'dd/MM/yyyy HH:mm'
+                                        }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
